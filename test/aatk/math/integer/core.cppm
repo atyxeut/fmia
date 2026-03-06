@@ -23,7 +23,9 @@ namespace test::aatk {
 
 using namespace ::aatk;
 
-namespace meta {
+} // namespace test::aatk
+
+namespace test::aatk::meta {
 
 using namespace ::aatk::meta;
 
@@ -76,9 +78,9 @@ consteval void does_make_larger_width_work() noexcept
   static_assert(std::same_as<make_larger_width_t<fixed_width_integer::i<256>>, fixed_width_integer::i<512>> == true);
 }
 
-} // namespace meta
+} // namespace test::aatk::meta
 
-namespace math {
+namespace test::aatk::math {
 
 export void int128_input_with_std_istream() noexcept
 {
@@ -100,6 +102,4 @@ export void int128_output_with_std_ostream_and_std_print() noexcept
   std::cout << '\n';
 }
 
-} // namespace math
-
-} // namespace test::aatk
+} // namespace test::aatk::math

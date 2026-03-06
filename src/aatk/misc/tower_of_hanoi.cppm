@@ -39,7 +39,9 @@ constexpr u32 peg_cnt = 3;
 constexpr auto peg_name_upper = "ABC";
 constexpr auto peg_name_lower = "abc";
 
-namespace get_move_cnt {
+} // namespace aatk::tower_of_hanoi
+
+namespace aatk::tower_of_hanoi::get_move_cnt {
 
 // initially all disks stack on one peg `from`, finally they all stack on one peg `to`
 export [[nodiscard]] constexpr move_cnt_type from_one_to_one_form(u32 disk_cnt) noexcept(noexcept((move_cnt_type(1) << disk_cnt) - 1))
@@ -150,9 +152,9 @@ export [[nodiscard]] constexpr move_cnt_type general_form(u32 disk_cnt, std::spa
   return std::min(general_form_one_step_strategy(disk_cnt, from_list, to_list), general_form_two_step_strategy(disk_cnt, from_list, to_list));
 }
 
-} // namespace get_move_cnt
+} // namespace aatk::tower_of_hanoi::get_move_cnt
 
-namespace print_moves {
+namespace aatk::tower_of_hanoi::print_moves {
 
 void move(u32 disk, u32 from, u32 to, bool upper_case = true)
 {
@@ -233,6 +235,4 @@ export void general_form(u32 disk_cnt, std::span<const u32> from_list, std::span
   }
 }
 
-} // namespace print_moves
-
-} // namespace aatk::tower_of_hanoi
+} // namespace aatk::tower_of_hanoi::print_moves

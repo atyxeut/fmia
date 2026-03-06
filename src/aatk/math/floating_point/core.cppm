@@ -30,10 +30,8 @@ using f80 = long double; // precision: 18 to 20 decimal places (probably, on MSV
 }
 // clang-format on
 
-export namespace aatk {
-
 // forward declaration
-namespace ieee754_float {
+export namespace aatk::ieee754_float {
 
 // IEEE 754 binary floating-point
 template <usize PrecisionBits>
@@ -45,9 +43,9 @@ template <usize PrecisionBits>
   requires (PrecisionBits >= 32 && is_power_of_2(PrecisionBits))
 class d;
 
-} // namespace ieee754_float
+} // namespace aatk::ieee754_float
 
-namespace meta {
+export namespace aatk::meta {
 
 template <typename>
 struct is_no_cv_custom_ieee754_binary_floating_point : std::false_type
@@ -87,9 +85,7 @@ using is_custom_ieee754_decimal_floating_point = is_no_cv_custom_ieee754_decimal
 template <typename T>
 constexpr bool is_custom_ieee754_decimal_floating_point_v = is_custom_ieee754_decimal_floating_point<T>::value;
 
-} // namespace meta
-
-} // namespace aatk
+} // namespace aatk::meta
 
 // clang-format off
 export {

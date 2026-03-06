@@ -75,19 +75,27 @@ using claim_cv = detail::claim_cv_selector<From, To>;
 export template <typename From, typename To>
 using claim_cv_t = claim_cv<From, To>::type;
 
-export template <typename T, typename U>
+} // namespace aatk::meta
+
+export namespace aatk::meta {
+
+template <typename T, typename U>
 struct not_same : std::negation<std::is_same<T, U>>
 {
 };
 
-export template <typename T, typename U>
+template <typename T, typename U>
 constexpr bool not_same_v = not_same<T, U>::value;
 
-export template <typename T, typename U>
+template <typename T, typename U>
 concept no_cvref_same_as = std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
 
-export template <typename T, typename U>
+template <typename T, typename U>
 concept no_cvref_not_same_as = !no_cvref_same_as<T, U>;
+
+} // namespace aatk::meta
+
+namespace aatk::meta {
 
 export template <std::size_t N>
 using index_constant = std::integral_constant<std::size_t, N>;
@@ -211,7 +219,11 @@ using is_no_duplication_integer_sequence = is_no_cv_no_duplication_integer_seque
 export template <typename T>
 constexpr bool is_no_duplication_integer_sequence_v = is_no_duplication_integer_sequence<T>::value;
 
-export template <typename T, typename... Us>
+} // namespace aatk::meta
+
+export namespace aatk::meta {
+
+template <typename T, typename... Us>
 struct is_any_of : std::disjunction<is_any_of<T, Us>...>
 {
 };
@@ -221,16 +233,16 @@ struct is_any_of<T, U> : std::bool_constant<std::same_as<T, U>>
 {
 };
 
-export template <typename T, typename... Us>
+template <typename T, typename... Us>
 constexpr bool is_any_of_v = is_any_of<T, Us...>::value;
 
-export template <typename T, typename... Us>
+template <typename T, typename... Us>
 using is_none_of = std::negation<is_any_of<T, Us...>>;
 
-export template <typename T, typename... Us>
+template <typename T, typename... Us>
 constexpr bool is_none_of_v = is_none_of<T, Us...>::value;
 
-export template <typename...>
+template <typename...>
 struct all_the_same : std::true_type
 {
 };
@@ -245,8 +257,12 @@ struct all_the_same<T, U> : std::bool_constant<std::same_as<T, U>>
 {
 };
 
-export template <typename... Ts>
+template <typename... Ts>
 constexpr bool all_the_same_v = all_the_same<Ts...>::value;
+
+} // namespace aatk::meta
+
+namespace aatk::meta {
 
 export template <typename... Ts>
 struct type_list

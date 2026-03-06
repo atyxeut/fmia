@@ -20,9 +20,6 @@ module;
 #include <__msvc_int128.hpp>
 #endif
 
-// included for libc++ `_LIBCPP_VERSION` macro
-#include <version>
-
 export module aatk.math.integer.core;
 
 import std;
@@ -47,9 +44,7 @@ using usize = std::size_t;
 }
 // clang-format on
 
-export namespace aatk {
-
-namespace meta {
+export namespace aatk::meta {
 
 template <typename T>
 struct is_no_cv_boolean : std::bool_constant<std::same_as<T, bool>>
@@ -77,7 +72,9 @@ concept nonbool_standard_integral = std::integral<T> && !boolean<T>;
 template <typename T>
 concept for_size_integral = std::same_as<T, u32> || std::same_as<T, usize>;
 
-} // namespace meta
+} // namespace aatk::meta
+
+export namespace aatk {
 
 template <meta::nonbool_standard_unsigned_integral T>
 [[nodiscard]] constexpr bool is_power_of_2(T x) noexcept
@@ -85,8 +82,10 @@ template <meta::nonbool_standard_unsigned_integral T>
   return x != 0 && (x & (x - 1)) == 0;
 }
 
+} // namespace aatk
+
 // forward declaration
-namespace fixed_width_integer {
+export namespace aatk::fixed_width_integer {
 
 template <usize WidthBits>
   requires (WidthBits >= 128 && is_power_of_2(WidthBits))
@@ -96,9 +95,9 @@ template <usize WidthBits>
   requires (WidthBits >= 128 && is_power_of_2(WidthBits))
 class u;
 
-} // namespace fixed_width_integer
+} // namespace aatk::fixed_width_integer
 
-namespace meta {
+export namespace aatk::meta {
 
 template <typename>
 struct is_no_cv_custom_fixed_width_signed_integral : std::false_type
@@ -138,9 +137,7 @@ using is_custom_fixed_width_unsigned_integral = is_no_cv_custom_fixed_width_unsi
 template <typename T>
 constexpr bool is_custom_fixed_width_unsigned_integral_v = is_custom_fixed_width_unsigned_integral<T>::value;
 
-} // namespace meta
-
-} // namespace aatk
+} // namespace aatk::meta
 
 // clang-format off
 export {

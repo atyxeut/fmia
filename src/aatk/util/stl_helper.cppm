@@ -45,7 +45,9 @@ struct array_impl<T, Dim, Dims...> : array_impl<typename array_impl<T, Dims...>:
 export template <typename T, std::size_t... Dims>
 using array = detail::array_impl<T, Dims...>::type;
 
-export namespace meta {
+} // namespace aatk
+
+export namespace aatk::meta {
 
 template <typename>
 struct is_no_cv_std_array : std::false_type
@@ -66,13 +68,15 @@ using is_std_array = is_no_cv_std_array<std::remove_cv_t<T>>;
 template <typename T>
 constexpr bool is_std_array_v = is_std_array<T>::value;
 
-} // namespace meta
+} // namespace aatk::meta
+
+export namespace aatk {
 
 // sets every element of a aatk::array to val
 // aatk::array<int, 3, 5, 2, 10> arr4d;
 // int val = -1;
 // aatk::fill_array(arr4d, val);
-export template <typename Elem, std::size_t Dim, typename T>
+template <typename Elem, std::size_t Dim, typename T>
 constexpr void fill_array(std::array<Elem, Dim>& arr, const T& val)
 {
   if constexpr (meta::is_no_cv_std_array_v<Elem>)
@@ -84,7 +88,7 @@ constexpr void fill_array(std::array<Elem, Dim>& arr, const T& val)
 
 // auto arr4d = aatk::make_array<int, 5, 8, 3, 2>(val);
 // combines `aatk::array<int, 5, 8, 3, 2> arr4d` and `aatk::fill_array(arr4d, val)`
-export template <typename Elem, std::size_t... Dims, typename T>
+template <typename Elem, std::size_t... Dims, typename T>
 [[nodiscard]] constexpr auto make_array(const T& val)
 {
   array<Elem, Dims...> arr;
@@ -92,7 +96,9 @@ export template <typename Elem, std::size_t... Dims, typename T>
   return arr;
 }
 
-namespace meta {
+} // namespace aatk
+
+namespace aatk::meta {
 
 // use std::allocator as a default allocator
 template <list_of_types CurAllocatorList, std::size_t DimCnt>
@@ -124,7 +130,9 @@ struct cur_dim_allocator<Elem, AllocatorList, memory::std_pmr_allocator_tag>
 template <typename Elem, typename AllocatorList>
 using cur_dim_allocator_t = cur_dim_allocator<Elem, AllocatorList>::type;
 
-} // namespace meta
+} // namespace aatk::meta
+
+namespace aatk {
 
 namespace detail {
 
@@ -198,7 +206,9 @@ export template <typename Elem, typename InnermostDimAllocator = memory::std_all
   return detail::make_vector_impl<Elem, meta::type_list<InnermostDimAllocator, Allocators...>>(first_dim_size, std::forward<Ts>(args)...);
 }
 
-export namespace meta {
+} // namespace aatk
+
+export namespace aatk::meta {
 
 template <typename T>
 struct is_no_cv_std_ratio : std::false_type
@@ -238,9 +248,11 @@ using is_std_duration = is_no_cv_std_duration<std::remove_cv_t<T>>;
 template <typename T>
 constexpr bool is_std_duration_v = is_std_duration<T>::value;
 
-} // namespace meta
+} // namespace aatk::meta
 
-export template <typename T1, typename T2, std::convertible_to<std::string> Delim>
+export namespace aatk {
+
+template <typename T1, typename T2, std::convertible_to<std::string> Delim>
 void print(std::ostream& ostr, const std::pair<T1, T2>& p, Delim&& delim, bool new_line = false)
 {
   ostr << p.first << std::forward<Delim>(delim) << p.second;
@@ -258,9 +270,9 @@ auto& operator <<(std::ostream& ostr, const std::pair<T1, T2>& p)
   return ostr;
 }
 
-namespace aatk {
+export namespace aatk {
 
-export template <typename... Ts, std::convertible_to<std::string> Delim>
+template <typename... Ts, std::convertible_to<std::string> Delim>
 void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim, bool new_line = false)
 {
   [&]<std::size_t... Is>(std::index_sequence<Is...>)
@@ -281,9 +293,7 @@ std::ostream& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
   return ostr;
 }
 
-namespace aatk {
-
-namespace meta {
+namespace aatk::meta {
 
 namespace detail {
 
@@ -307,7 +317,9 @@ using is_std_ostream_interactable = detail::is_std_ostream_interactable_impl<T>;
 export template <typename T>
 constexpr bool is_std_ostream_interactable_v = is_std_ostream_interactable<T>::value;
 
-} // namespace meta
+} // namespace aatk::meta
+
+namespace aatk {
 
 // for a range whose elements can be printed by std::ostream by default
 // e.g. std::vector<std::string>

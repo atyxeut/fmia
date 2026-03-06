@@ -23,7 +23,9 @@ namespace test::aatk {
 
 using namespace ::aatk;
 
-namespace meta {
+} // namespace test::aatk
+
+namespace test::aatk::meta {
 
 using namespace ::aatk::meta;
 
@@ -42,6 +44,4 @@ consteval void does_make_higher_precision_work()
   static_assert(std::same_as<make_higher_precision_t<ieee754_float::d<1024>>, ieee754_float::d<2048>> == true);
 }
 
-} // namespace meta
-
-} // namespace test::aatk
+} // namespace test::aatk::meta

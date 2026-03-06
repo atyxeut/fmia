@@ -20,34 +20,36 @@ import std;
 import aatk.data_structure.graph;
 import aatk.math.integer;
 
-namespace aatk::random {
+export namespace aatk::random {
 
-export inline const auto time_seed = std::chrono::steady_clock::now().time_since_epoch().count();
-export inline std::random_device seed_generator;
+inline const auto time_seed = std::chrono::steady_clock::now().time_since_epoch().count();
+inline std::random_device seed_generator;
 
-export inline std::mt19937 mt19937_engine(seed_generator());
-export inline std::mt19937_64 mt19937_64_engine(seed_generator());
+inline std::mt19937 mt19937_engine(seed_generator());
+inline std::mt19937_64 mt19937_64_engine(seed_generator());
 
-export template <std::integral T>
+template <std::integral T>
 [[nodiscard]] auto uniform_distribution(T l, T r)
 {
   return std::uniform_int_distribution<T>(l, r);
 }
 
-export template <std::floating_point T>
+template <std::floating_point T>
 [[nodiscard]] auto uniform_distribution(T l, T r)
 {
   return std::uniform_real_distribution<T>(l, r);
 }
 
-export template <typename T, typename Engine = std::mt19937>
+template <typename T, typename Engine = std::mt19937>
   requires std::is_arithmetic_v<T>
 [[nodiscard]] T rand(T l, T r, Engine& engine = mt19937_engine)
 {
   return uniform_distribution(l, r)(engine);
 }
 
-namespace generate {
+} // namespace aatk::random
+
+namespace aatk::random::generate {
 
 constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
@@ -128,6 +130,4 @@ export template <bool FlowerGraph = false, std::integral Vertex, std::integral W
   return data;
 }
 
-} // namespace generate
-
-} // namespace aatk::random
+} // namespace aatk::random::generate
