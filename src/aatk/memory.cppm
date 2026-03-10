@@ -15,7 +15,13 @@
 
 export module aatk.memory;
 
-export namespace aatk::memory {
+export namespace aatk {
+
+enum class resource_location
+{
+  stack, // i.e. inplace
+  heap
+};
 
 // represent std::allocator<T>
 struct std_allocator_tag
@@ -27,4 +33,4 @@ struct std_pmr_allocator_tag
 {
 };
 
-} // namespace aatk::memory
+} // namespace aatk

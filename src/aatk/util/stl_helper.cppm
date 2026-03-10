@@ -102,7 +102,7 @@ namespace aatk::meta {
 
 // use std::allocator as a default allocator
 template <list_of_types CurAllocatorList, std::size_t DimCnt>
-struct adjust_allocator_type_list : concat<CurAllocatorList, std::conditional_t<(length_v<CurAllocatorList>) < DimCnt, type_list<memory::std_allocator_tag>, empty_type_list>>
+struct adjust_allocator_type_list : concat<CurAllocatorList, std::conditional_t<(length_v<CurAllocatorList>) < DimCnt, type_list<std_allocator_tag>, empty_type_list>>
 {
 };
 
@@ -116,13 +116,13 @@ struct cur_dim_allocator
 };
 
 template <typename Elem, typename AllocatorList>
-struct cur_dim_allocator<Elem, AllocatorList, memory::std_allocator_tag>
+struct cur_dim_allocator<Elem, AllocatorList, std_allocator_tag>
 {
   using type = std::allocator<Elem>;
 };
 
 template <typename Elem, typename AllocatorList>
-struct cur_dim_allocator<Elem, AllocatorList, memory::std_pmr_allocator_tag>
+struct cur_dim_allocator<Elem, AllocatorList, std_pmr_allocator_tag>
 {
   using type = std::pmr::polymorphic_allocator<Elem>;
 };
@@ -164,7 +164,7 @@ public:
 //
 // aatk::vector<int, 4> vec4d;
 // same as: std::vector<std::vector<std::vector<std::vector<int>>>> vec4d;
-export template <typename T, std::size_t DimCnt = 1, typename InnermostDimAllocator = memory::std_allocator_tag, typename... Allocators>
+export template <typename T, std::size_t DimCnt = 1, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators>
   requires (sizeof...(Allocators) < DimCnt)
 using vector = detail::vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>::type;
 
@@ -199,7 +199,7 @@ template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
 //   std::ranges::for_each(vec, [&sum](int elem) { return sum += elem; });
 //   return sum;
 // }(aatk::make_vector<int>(10, -1)) << "\n";
-export template <typename Elem, typename InnermostDimAllocator = memory::std_allocator_tag, typename... Allocators, std::integral Dim, typename... Ts>
+export template <typename Elem, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators, std::integral Dim, typename... Ts>
   requires (sizeof(Dim) <= sizeof(std::size_t) && sizeof...(Ts) > 0 && sizeof...(Allocators) < sizeof...(Ts))
 [[nodiscard]] constexpr auto make_vector(Dim first_dim_size, Ts&&... args)
 {
