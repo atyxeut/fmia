@@ -3,6 +3,7 @@
 !.gitignore
 !COPYING
 !COPYING.LESSER
+!LICENSE
 !README.md
 
 !ruff.toml
