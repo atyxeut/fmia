@@ -3,4 +3,5 @@
 
 export module fmia.io;
 
+export import fmia.io.buffered_io;
 export import fmia.io.ranges_output;
