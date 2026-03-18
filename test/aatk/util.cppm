@@ -16,4 +16,4 @@
 export module test.aatk.util;
 
 export import test.aatk.util.misc;
-export import test.aatk.util.stl_helper;
+export import test.aatk.util.std_extension;

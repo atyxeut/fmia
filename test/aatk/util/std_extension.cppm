@@ -17,13 +17,13 @@ module;
 
 #include <cassert>
 
-export module test.aatk.util.stl_helper;
+export module test.aatk.util.std_extension;
 
 import std;
 
 import aatk.memory.core;
 import aatk.meta;
-import aatk.util.stl_helper;
+import aatk.util.std_extension;
 
 namespace test::aatk::util {
 

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module aatk.util.stl_helper;
+export module aatk.util.std_extension;
 
 import std;
 
