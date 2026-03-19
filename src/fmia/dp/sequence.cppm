@@ -1,7 +1,4 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-export module fmia.dp;
-
-export import fmia.dp.knapsack;
-export import fmia.dp.sequence;
+export module fmia.dp.sequence;
