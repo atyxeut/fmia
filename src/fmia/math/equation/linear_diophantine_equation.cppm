@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.math.equation;
+export module fmia.math.equation.linear_diophantine_equation;
 
-export import fmia.math.equation.linear_diophantine_equation;
+// information of equation a1x1 + a2x2 + a3x3 + ... + anxn = c
+
+namespace fmia {
+
+class linear_diophantine_equation
+{
+};
+
+} // namespace fmia
