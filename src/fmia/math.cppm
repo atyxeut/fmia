@@ -20,10 +20,4 @@ export import fmia.math.floating_point;
 export import fmia.math.fraction;
 export import fmia.math.geometry;
 export import fmia.math.integer;
-
-export namespace fmia::meta {
-
-template <typename T>
-concept arithmetic = integral<T> || floating_point<T>;
-
-} // namespace fmia::meta
+export import fmia.math.op;
