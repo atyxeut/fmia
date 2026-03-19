@@ -15,6 +15,7 @@
 
 export module fmia.math;
 
+export import fmia.math.complex_number;
 export import fmia.math.equation;
 export import fmia.math.floating_point;
 export import fmia.math.fraction;
