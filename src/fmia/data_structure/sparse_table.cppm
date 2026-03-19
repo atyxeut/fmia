@@ -13,16 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.data_structure;
+export module fmia.data_structure.sparse_table;
 
-export import fmia.data_structure.binary_search_tree;
-export import fmia.data_structure.graph;
-export import fmia.data_structure.heap;
-export import fmia.data_structure.linked_list;
-export import fmia.data_structure.queue;
-export import fmia.data_structure.segment_tree;
-export import fmia.data_structure.self_balancing_tree;
-export import fmia.data_structure.sparse_table;
-export import fmia.data_structure.stack;
-export import fmia.data_structure.string;
-export import fmia.data_structure.union_find;
+export import fmia.data_structure.sparse_table.ordinary;
