@@ -6,6 +6,7 @@ export module fmia;
 export import fmia.concurrency;
 export import fmia.data_structure;
 export import fmia.debug;
+export import fmia.dp;
 export import fmia.io;
 export import fmia.math;
 export import fmia.memory;
