@@ -13,14 +13,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-target("test-aatk")
+target("test-mzia")
   set_kind("object")
-  add_deps("aatk");
+  add_deps("mzia");
   add_files("**.cppm", { public = true })
 target_end()
 
 target("test-main")
   set_kind("binary")
-  add_deps("test-aatk")
+  add_deps("test-mzia")
   add_files("main.cpp")
 target_end()

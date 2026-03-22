@@ -13,20 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import std;
+export module test.mzia.util.std_extension.meta;
 
-import test.mzia;
+export import test.mzia.util.std_extension.meta.core;
+export import test.mzia.util.std_extension.meta.type_list;
 
-int main()
-{
-  // test::mzia::math::int128_input_with_std_istream();
-  test::mzia::math::int128_output_with_std_ostream_and_std_print();
-
-  test::mzia::util::does_make_vector_work();
-
-  test::mzia::util::std_pair_output_with_custom_print_and_std_ostream();
-  test::mzia::util::std_tuple_output_with_custom_print_and_std_ostream();
-
-  test::mzia::util::common_ranges_output_with_custom_print_and_std_ostream();
-  test::mzia::util::multidimensional_ranges_output_with_custom_print_and_std_ostream();
-}

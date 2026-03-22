@@ -14,7 +14,7 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set_xmakever("3.0.6")
-set_project("atyxeut-algorithm-toolkit")
+set_project("modern-fast-implementations-of-algorithms")
 set_languages("c++latest")
 
 add_rules("mode.debug", "mode.release")
