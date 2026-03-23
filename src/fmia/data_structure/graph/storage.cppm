@@ -93,18 +93,37 @@ concept graph = is_no_cv_graph_v<std::remove_cvref_t<T>>;
 
 } // namespace fmia::meta
 
-namespace fmia::graph {
+export namespace fmia::meta {
 
-namespace detail {
+template <typename T>
+struct is_no_cv_edge_list : std::false_type
+{
+};
+
+template <typename T>
+constexpr bool is_no_cv_edge_list_v = is_no_cv_edge_list<T>::value;
+
+template <typename T>
+concept edge_list = is_no_cv_edge_list_v<std::remove_cvref_t<T>>;
+
+} // namespace fmia::meta
+
+namespace fmia::graph::detail {
 
 template <typename Vertex, typename Weight>
-class edge_list_base
+class basic_edge_list_base
 {
+public:
+  using vertex_type = Vertex;
+  using weight_type = Weight;
+
 protected:
-  std::vector<edge<Vertex, Weight>> edges_;
+  std::vector<edge<vertex_type, weight_type>> edges_;
 
 public:
-  [[nodiscard]] constexpr auto size() const noexcept { return edges_.size(); }
+  [[nodiscard]] constexpr bool empty() const noexcept { return edges_.empty(); }
+
+  [[nodiscard]] constexpr auto edge_size() const noexcept { return edges_.size(); }
 
   [[nodiscard]] constexpr auto begin() noexcept { return edges_.begin(); }
   [[nodiscard]] constexpr auto begin() const noexcept { return edges_.begin(); }
@@ -112,25 +131,38 @@ public:
   [[nodiscard]] constexpr auto end() noexcept { return edges_.end(); }
   [[nodiscard]] constexpr auto end() const noexcept { return edges_.end(); }
 
-  [[nodiscard]] auto& operator [](usize idx) { return edges_[idx]; }
-  [[nodiscard]] constexpr const auto& operator [](usize idx) const { return edges_[idx]; }
+  [[nodiscard]] constexpr auto& operator [](usize idx) { return edges_[idx]; }
+  [[nodiscard]] constexpr auto& operator [](usize idx) const { return edges_[idx]; }
 
   constexpr void reserve(usize capacity) { edges_.reserve(capacity); }
 };
 
-} // namespace detail
-
-export template <std::integral Vertex>
-class unweighted_edge_list : public detail::edge_list_base<Vertex, void>
+template <typename Vertex, typename Weight>
+class edge_list_base : public basic_edge_list_base<Vertex, Weight>
 {
+private:
+  using base_ = basic_edge_list_base<Vertex, Weight>;
+
+protected:
+  std::unordered_map<typename base_::vertex_type_, bool> exist_;
+
 public:
+  [[nodiscard]] constexpr auto vertex_size() const noexcept { return static_cast<Vertex>(exist_.size()); }
+};
+
+} // namespace fmia::graph::detail
+
+export namespace fmia::graph {
+
+template <std::integral Vertex>
+struct basic_unweighted_edge_list : public detail::basic_edge_list_base<Vertex, void>
+{
   constexpr auto& add_edge(Vertex u, Vertex v) { return this->edges_.emplace_back(u, v); }
 };
 
-export template <std::integral Vertex, meta::arithmetic Weight>
-class weighted_edge_list : public detail::edge_list_base<Vertex, Weight>
+template <std::integral Vertex, meta::arithmetic Weight>
+struct basic_weighted_edge_list : public detail::basic_edge_list_base<Vertex, Weight>
 {
-public:
   constexpr auto& add_edge(Vertex u, Vertex v, const Weight& w) { return this->edges_.emplace_back(u, v, w); }
   constexpr auto& add_edge(Vertex u, Vertex v, Weight&& w) { return this->edges_.emplace_back(u, v, std::move(w)); }
 };
@@ -140,7 +172,63 @@ public:
 export namespace fmia::meta {
 
 template <typename Vertex>
+struct is_no_cv_edge_list<graph::basic_unweighted_edge_list<Vertex>> : std::true_type
+{
+};
+
+template <typename Vertex, typename Weight>
+struct is_no_cv_edge_list<graph::basic_weighted_edge_list<Vertex, Weight>> : std::true_type
+{
+};
+
+} // namespace fmia::meta
+
+export namespace fmia::graph {
+
+template <std::integral Vertex>
+class unweighted_edge_list : public detail::edge_list_base<Vertex, void>
+{
+public:
+  constexpr auto& add_edge(Vertex u, Vertex v)
+  {
+    this->exist_[u] = this->exist_[v] = true;
+    return this->edges_.emplace_back(u, v);
+  }
+};
+
+template <std::integral Vertex, meta::arithmetic Weight>
+class weighted_edge_list : public detail::edge_list_base<Vertex, Weight>
+{
+public:
+  constexpr auto& add_edge(Vertex u, Vertex v, const Weight& w)
+  {
+    this->exist_[u] = this->exist_[v] = true;
+    return this->edges_.emplace_back(u, v, w);
+  }
+
+  constexpr auto& add_edge(Vertex u, Vertex v, Weight&& w)
+  {
+    this->exist_[u] = this->exist_[v] = true;
+    return this->edges_.emplace_back(u, v, std::move(w));
+  }
+};
+
+} // namespace fmia::graph
+
+export namespace fmia::meta {
+
+template <typename Vertex>
+struct is_no_cv_edge_list<graph::unweighted_edge_list<Vertex>> : std::true_type
+{
+};
+
+template <typename Vertex>
 struct is_no_cv_unweighted_graph<graph::unweighted_edge_list<Vertex>> : std::true_type
+{
+};
+
+template <typename Vertex, typename Weight>
+struct is_no_cv_edge_list<graph::weighted_edge_list<Vertex, Weight>> : std::true_type
 {
 };
 
@@ -150,4 +238,3 @@ struct is_no_cv_weighted_graph<graph::weighted_edge_list<Vertex, Weight>> : std:
 };
 
 } // namespace fmia::meta
-

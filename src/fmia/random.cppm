@@ -49,11 +49,11 @@ template <typename T, typename Engine = std::mt19937>
 
 } // namespace fmia::random
 
-namespace fmia::random::generate {
+namespace fmia::random::generate::detail { constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}; } // namespace fmia::random::generate::detail
 
-constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+export namespace fmia::random::generate {
 
-export template <bool OnlyPositiveInteger = false>
+template <bool OnlyPositiveInteger = false>
 [[nodiscard]] auto integer(usize integer_length)
 {
   std::string data;
@@ -63,14 +63,14 @@ export template <bool OnlyPositiveInteger = false>
     data += '-';
 
   auto dist = uniform_distribution(0uz, 9uz);
-  data += decimal_digit_character[rand(1uz, 9uz)];
+  data += detail::decimal_digit_character[rand(1uz, 9uz)];
   while (integer_length-- > 1)
-    data += decimal_digit_character[dist(mt19937_engine)];
+    data += detail::decimal_digit_character[dist(mt19937_engine)];
 
   return data;
 }
 
-export template <std::integral T>
+template <std::integral T>
 [[nodiscard]] auto permutation(T begin, T end)
 {
   if (begin > end)
@@ -83,7 +83,7 @@ export template <std::integral T>
 }
 
 // get the edge list of a random unweighted tree
-export template <bool FlowerGraph = false, std::integral T>
+template <bool FlowerGraph = false, std::integral T>
 [[nodiscard]] auto unweighted_tree(T vertex_begin, T vertex_end)
 {
   if (vertex_begin > vertex_end)
@@ -92,7 +92,7 @@ export template <bool FlowerGraph = false, std::integral T>
   const auto p = permutation(vertex_begin, vertex_end);
 
   const auto edge_cnt = vertex_end - vertex_begin;
-  graph::unweighted_edge_list<T> data;
+  graph::basic_unweighted_edge_list<T> data;
   data.reserve(edge_cnt);
 
   for (auto v = 1uz; v <= edge_cnt; ++v) {
@@ -106,7 +106,7 @@ export template <bool FlowerGraph = false, std::integral T>
 }
 
 // get the edge list of a random weighted tree
-export template <bool FlowerGraph = false, std::integral Vertex, std::integral Weight>
+template <bool FlowerGraph = false, std::integral Vertex, std::integral Weight>
 [[nodiscard]] auto weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
 {
   if (vertex_begin > vertex_end)
@@ -118,7 +118,7 @@ export template <bool FlowerGraph = false, std::integral Vertex, std::integral W
   const auto p = permutation(vertex_begin, vertex_end);
 
   const auto edge_cnt = vertex_end - vertex_begin;
-  graph::weighted_edge_list<Vertex, Weight> data;
+  graph::basic_weighted_edge_list<Vertex, Weight> data;
   data.reserve(edge_cnt);
 
   auto w_dist = uniform_dist(weight_begin, weight_end);
@@ -133,4 +133,3 @@ export template <bool FlowerGraph = false, std::integral Vertex, std::integral W
 }
 
 } // namespace fmia::random::generate
-
