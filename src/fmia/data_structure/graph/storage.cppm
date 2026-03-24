@@ -32,14 +32,11 @@ struct weight<void>
 template <meta::arithmetic T>
 struct weight<T>
 {
+  static constexpr auto infinity = std::numeric_limits<T>::max();
+  static constexpr auto negative_infinity = std::numeric_limits<T>::min();
+
   T w;
 };
-
-template <meta::arithmetic T>
-constexpr auto default_weight_infinity = std::numeric_limits<T>::max();
-
-template <meta::arithmetic T>
-constexpr auto default_weight_negative_infinity = std::numeric_limits<T>::min();
 
 template <std::integral Vertex, typename Weight = void>
 struct edge_from : weight<Weight>

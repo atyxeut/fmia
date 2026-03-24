@@ -19,52 +19,52 @@ export import fmia.data_structure.graph.storage;
 
 import std;
 
-import fmia.math.integer.core;
+import fmia.math;
 
 namespace fmia::graph::shortest_path {
 
-export enum class error : u8 {
+export enum class error : std::uint8_t {
   empty_graph,
-  has_negative_cycle
+  negative_cycle
 };
 
 namespace detail {
 
 // brief explaination for correctness:
 // 1. the shortest path can have at most V - 1 edges
-// 2. distance[u] + w < distance[v] only happens if distance[u] was updated last round, so the rounds can be seen as steps on the shortest path
-//    for example, in the 1st round, only distance[s] can relax it's neighbors (move 1 step out),
-//    then in the 2nd round, choose to move 1 step to another vertex, then back (relax), cost 2 steps in total, or not do so (not relax)...
-//    we can walk through all V - 1 edges in V - 1 steps, so after V - 1 rounds, distance[i] for all vertices are found
+// 2. at the end of every round, if distance[i] is relaxed, then the length of the shortest path from s to i is
+//    guaranteed to be increased by at least 1 (as if update layer by layer)
+// as a result, V - 1 rounds are enough for every distance[i]
 //
 // time complexity: O(VE)
-template <typename EdgeList, typename Vertex, typename Weight>
-constexpr auto bellman_ford_naive_impl(const EdgeList& edges, Vertex source, Vertex vertex_count, const Weight& inf) -> std::expected<std::vector<Weight>, error>
+template <typename EdgeList, typename Vertex, typename Weight = EdgeList::weight_type>
+constexpr auto bellman_ford_impl(const EdgeList& edges, Vertex vertex_cnt, Vertex source) -> std::expected<std::vector<Weight>, error>
 {
   if (edges.empty())
     return std::unexpected(error::empty_graph);
 
-  std::vector<Weight> distance(vertex_count, inf);
+  std::vector<Weight> distance(vertex_cnt, Weight::infinity);
   distance[source] = 0;
 
-  bool relaxed;
+  bool relaxation_happened;
   do {
-    if (vertex_count-- == 0)
-      return std::unexpected(error::has_negative_cycle);
+    // works as a round counter
+    if (vertex_cnt-- == 0)
+      return std::unexpected(error::negative_cycle);
 
-    relaxed = false;
+    relaxation_happened = false;
     for (const auto& [u, v, w] : edges) {
-      // 1. avoid addition overflowl
-      // 2. prevent fake path from source
-      if (distance[u] == inf)
+      // 1. prevent fake paths from the source vertex
+      // 2. avoid addition overflow
+      if (distance[u] == Weight::infinity)
         continue;
 
-      if (auto new_distance = distance[u] + w; new_distance < distance[v]) {
+      if (const auto new_distance = distance[u] + w; new_distance < distance[v]) {
         distance[v] = new_distance;
-        relaxed = true;
+        relaxation_happened = true;
       }
     }
-  } while (relaxed);
+  } while (relaxation_happened);
 
   return distance;
 }
@@ -72,61 +72,65 @@ constexpr auto bellman_ford_naive_impl(const EdgeList& edges, Vertex source, Ver
 } // namespace detail
 
 export template <typename Vertex, typename Weight>
-[[nodiscard]] constexpr auto bellman_ford_naive(const basic_weighted_edge_list<Vertex, Weight>& edges, Vertex source, Vertex vertex_count, const Weight& inf = graph::default_weight_infinity<Weight>)
+[[nodiscard]] constexpr auto bellman_ford(const basic_weighted_edge_list<Vertex, Weight>& edges, Vertex vertex_cnt, Vertex source)
 {
-  return detail::bellman_ford_naive_impl(edges, source, vertex_count, inf);
+  return detail::bellman_ford_impl(edges, vertex_cnt, source);
 }
 
 export template <typename Vertex, typename Weight>
-[[nodiscard]] constexpr auto bellman_ford_naive(const weighted_edge_list<Vertex, Weight>& edges, Vertex source, const Weight& inf = graph::default_weight_infinity<Weight>)
+[[nodiscard]] constexpr auto bellman_ford(const weighted_edge_list<Vertex, Weight>& edges, Vertex source)
 {
-  return detail::bellman_ford_naive_impl(edges, source, edges.vertex_size(), inf);
+  return detail::bellman_ford_impl(edges, edges.vertex_size(), source);
 }
 
-// optimization: for every round, only check edges whose vertices were relaxed in the last round (does not affect the worst case asymptotic time complexity)
+// Moore's variation:
+// only check vertices that were relaxed in the last round (obviously correct)
 //
-// for correctness, any container can be used to mark the information,
-// however, FIFO containers (e.g. queue) are significantly better than FILO containers (e.g. stack),
-// because with an FIFO container, vertices that are closer to the source vertex are prioritized,
-// which is always better, as they are naturally more optimal than farther vertices
+// the choice of the container to hold the vertices can affect performance, some of them can even make the algorithm
+// worse than the vanilla version, for example, using a stack causes worst case exponential time complexity, this is
+// because that the process becomes depth first, i.e. if the optimal relaxation is performed first, then a suboptimal
+// relaxation is instead propagated first
 //
-// moreover, introducing an FILO container can cause even worse performance than the naive version,
-// because useless sub-optimal results can be repeatedly propagated very much
-export template <meta::graph T, std::same_as<typename T::vertex_type> Vertex, typename Weight = T::weight_type>
-[[nodiscard]] constexpr auto bellman_ford_queue_optimized(const T& g, Vertex source, const Weight& inf = graph::default_weight_infinity<Weight>) -> std::expected<std::vector<Weight>, error>
+// this implementation uses a queue to hold the vertices, guarantees not worse than the vanilla bellman-ford, and is
+// faster in average cases
+export template <meta::graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
+[[nodiscard]] constexpr auto bellman_ford_queue_optimized(const T& g, Vertex source) -> std::expected<std::vector<Weight>, error>
 {
   if (g.empty())
     return std::unexpected(error::empty_graph);
 
-  Vertex vertex_count = g.vertex_size();
+  const auto vertex_cnt = g.vertex_size();
 
-  std::vector<Weight> distance(vertex_count, inf);
+  std::vector<Weight> distance(vertex_cnt, Weight::infinity);
   distance[source] = 0;
 
+  // path_length[i] < 0: vertex i is in the queue
+  // path_length[i] >= 0: vertex i is not in the queue
+  // abs(path_length[i]): (edge size of the shortest path from the souce vertex to vertex i) + 1
+  auto path_length = std::vector<meta::make_signed_t<Vertex>>(vertex_cnt);
+  path_length[source] = -1;
+
   std::deque<Vertex> q {source};
-
-  // in_queue[i] < 0:  vertex i is in the queue
-  // in_queue[i] >= 0: vertex i is not in the queue
-  // abs(in_queue[i]): vertex i's enqueue count
-  std::vector<meta::make_signed_t<Vertex>> in_queue(vertex_count);
-  in_queue[source] = -1;
-
   while (!q.empty()) {
-    auto u = q.front();
+    const auto u = q.front();
     q.pop_front();
-    in_queue[u] = -in_queue[u];
+
+    // in case u has a self loop
+    const auto cur_length = path_length[u] = -path_length[u];
+
+    // in this pure queue optimized version, an enqueue_count array also works for detecting negative cycles, since
+    // it doesn't break the breadth first nature of the bellman-ford algorithm, however, the performance would be
+    // worse, because the algorithm may have to traverse the cycle multiple times to get enough information
+    if (static_cast<Vertex>(cur_length) > vertex_cnt)
+      return std::unexpected(error::negative_cycle);
 
     for (const auto& [v, w] : g[u].neighbors()) {
-      // distance[u] never equals to inf, since only relaxed vertices will be added to the queue
-      if (auto new_distance = distance[u] + w; new_distance < distance[v]) {
+      // distance[u] never equals to infinity, since only relaxed vertices are added to the queue
+      if (const auto new_distance = distance[u] + w; new_distance < distance[v]) {
         distance[v] = new_distance;
-        if (in_queue[v] < 0)
-          continue;
-        if (in_queue[v] >= vertex_count)
-          return std::unexpected(error::has_negative_cycle);
-        ++in_queue[v];
-        in_queue[v] = -in_queue[v];
-        q.emplace_back(v);
+        if (path_length[v] >= 0)
+          q.emplace_back(v);
+        path_length[v] = -cur_length - 1;
       }
     }
   }
