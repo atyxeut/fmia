@@ -35,7 +35,7 @@ namespace detail {
 // 2. distance[u] + w < distance[v] only happens if distance[u] was updated last round, so the rounds can be seen as steps on the shortest path
 //    for example, in the 1st round, only distance[s] can relax it's neighbors (move 1 step out),
 //    then in the 2nd round, choose to move 1 step to another vertex, then back (relax), cost 2 steps in total, or not do so (not relax)...
-//    we can walk through all V - 1 edges in V - 1 steps, so after V - 1 rounds, distance[i] for all vertexes are found
+//    we can walk through all V - 1 edges in V - 1 steps, so after V - 1 rounds, distance[i] for all vertices are found
 //
 // time complexity: O(VE)
 template <typename EdgeList, typename Vertex, typename Weight>
@@ -83,12 +83,12 @@ export template <typename Vertex, typename Weight>
   return detail::bellman_ford_naive_impl(edges, source, edges.vertex_size(), inf);
 }
 
-// optimization: for every round, only check edges whose vertexes was relaxed in the last round (does not affect the worst case asymptotic time complexity)
+// optimization: for every round, only check edges whose vertices were relaxed in the last round (does not affect the worst case asymptotic time complexity)
 //
 // for correctness, any container can be used to mark the information,
 // however, FIFO containers (e.g. queue) are significantly better than FILO containers (e.g. stack),
-// because with an FIFO container, vertexes that are closer to the source vertex are prioritized,
-// which is always better, as they are naturally more optimal than farther vertexes
+// because with an FIFO container, vertices that are closer to the source vertex are prioritized,
+// which is always better, as they are naturally more optimal than farther vertices
 //
 // moreover, introducing an FILO container can cause even worse performance than the naive version,
 // because useless sub-optimal results can be repeatedly propagated very much
@@ -117,7 +117,7 @@ export template <meta::graph T, std::same_as<typename T::vertex_type> Vertex, ty
     in_queue[u] = -in_queue[u];
 
     for (const auto& [v, w] : g[u].neighbors()) {
-      // distance[u] never equals to inf, since only relaxed vertexes will be added to the queue
+      // distance[u] never equals to inf, since only relaxed vertices will be added to the queue
       if (auto new_distance = distance[u] + w; new_distance < distance[v]) {
         distance[v] = new_distance;
         if (in_queue[v] < 0)
