@@ -25,6 +25,10 @@ namespace fmia::graph::shortest_path {
 
 export enum class error : std::uint8_t { empty_graph, negative_cycle };
 
+} // namespace fmia::graph::shortest_path
+
+namespace fmia::graph::shortest_path::single_source {
+
 namespace detail {
 
 // brief explaination for correctness:
@@ -145,4 +149,4 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
   return distance;
 }
 
-} // namespace fmia::graph::shortest_path
+} // namespace fmia::graph::shortest_path::single_source
