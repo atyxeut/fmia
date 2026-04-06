@@ -232,3 +232,9 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
 }
 
 } // namespace fmia::graph::shortest_path::single_source
+
+namespace fmia::graph::shortest_path::all_pairs {
+
+
+
+}
