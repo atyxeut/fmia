@@ -98,8 +98,8 @@ export template <typename Vertex, typename Weight>
 // because that the process becomes depth first, i.e. if the optimal relaxation is performed first, then a suboptimal
 // relaxation is instead propagated first
 //
-// this implementation uses a queue to hold the vertices, guarantees not worse than the vanilla bellman-ford, and is
-// faster in average cases
+// this implementation uses a queue to hold the vertices, guarantees to be not worse than the vanilla bellman-ford,
+// because a normal queue does not affect the original update order of the bellman-ford, and is faster in average cases
 export template <meta::graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
 [[nodiscard]] constexpr auto bellman_ford_queue_optimized(const T& g, Vertex source)
   -> std::expected<std::vector<Weight>, error>
@@ -123,9 +123,10 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
   {
     const auto u = q.front();
     q.pop_front();
+    path_length[u] = -path_length[u];
 
     // in case u has a self loop
-    const auto cur_length = path_length[u] = -path_length[u];
+    const auto cur_length = path_length[u];
 
     // in this pure queue optimized version, an enqueue_count array also works for detecting negative cycles, since
     // it doesn't break the breadth first nature of the bellman-ford algorithm, however, the performance would be
