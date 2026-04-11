@@ -195,3 +195,10 @@ export template <typename T>
 using make_higher_precision_t = make_higher_precision<T>::type;
 
 } // namespace fmia::meta
+
+export namespace fmia::meta {
+
+template <typename T>
+concept arithmetic = integral<T> || floating_point<T>;
+
+} // namespace fmia::meta
