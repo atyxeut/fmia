@@ -162,10 +162,8 @@ export template <
 std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
   std::size_t cur_dim = 0;
-  for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it)
-  {
+  for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it) {
     cur_dim = print(ostr, *it, std::forward<Delim>(delim), false);
-
     const auto dimension_delim = std::string(cur_dim, '\n');
     ostr << (std::ranges::next(it) == it_end ? std::string {} : dimension_delim);
   }
@@ -179,10 +177,8 @@ std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string
 export template <meta::multidimentional_cstyle_array T, std::convertible_to<std::string> Delim = std::string>
 void print(std::ostream& ostr, const T& arr, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
-  for (auto it = std::begin(arr), it_end = std::end(arr); it != it_end; ++it)
-  {
+  for (auto it = std::begin(arr), it_end = std::end(arr); it != it_end; ++it) {
     print(ostr, *it, std::forward<Delim>(delim), false);
-
     const auto dimension_delim = std::string(std::rank_v<std::remove_cvref_t<T>> - 1, '\n');
     ostr << (std::next(it) == it_end ? std::string {} : dimension_delim);
   }
@@ -338,18 +334,18 @@ template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
 [[nodiscard]] constexpr auto make_vector_impl(Dim first_dim_size, Ts&&... args)
 {
   using adjusted_allocator_type_list = meta::adjust_allocator_type_list_t<AllocatorList, sizeof...(Ts)>;
-  if constexpr (sizeof...(Ts) == 1)
-  {
+  if constexpr (sizeof...(Ts) == 1) {
     using cur_dim_allocator_type = meta::cur_dim_allocator_t<Elem, adjusted_allocator_type_list>;
+
     return vector<Elem, 1, cur_dim_allocator_type>(
       static_cast<std::size_t>(first_dim_size), static_cast<Elem>(args)...
     );
   }
-  else
-  {
+  else {
     using inner_allocator_type_list = meta::init_t<adjusted_allocator_type_list>;
     using inner_element_type = vector_impl<Elem, sizeof...(Ts) - 1, inner_allocator_type_list>::type;
     using cur_dim_allocator_type = meta::cur_dim_allocator_t<inner_element_type, adjusted_allocator_type_list>;
+
     return vector<inner_element_type, 1, cur_dim_allocator_type>(
       static_cast<std::size_t>(first_dim_size),
       make_vector_impl<Elem, inner_allocator_type_list>(std::forward<Ts>(args)...)

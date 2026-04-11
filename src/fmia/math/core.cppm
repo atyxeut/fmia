@@ -199,8 +199,7 @@ export auto& operator >>(std::istream& istr, i128& n)
 
 export auto& operator <<(std::ostream& ostr, u128 n)
 {
-  if (n == 0)
-  {
+  if (n == 0) {
     ostr << '0';
     return ostr;
   }
@@ -352,7 +351,6 @@ concept nonbool_integral = integral<T> && !boolean<T>;
 
 namespace fmia::meta::detail {
 
-
 template <typename T, usize TypeSize>
 struct make_higher_precision_selector_for_standard_integral_impl;
 
@@ -437,7 +435,7 @@ struct make_higher_precision_selector<T> : make_higher_precision_selector_for_in
 {
 };
 
-} // namespace fmia::meta
+} // namespace fmia::meta::detail
 
 // clang-format off
 
@@ -608,19 +606,19 @@ struct make_higher_precision_selector<T> : make_higher_precision_selector_for_fl
 {
 };
 
-} // namespace fmia::meta
+} // namespace fmia::meta::detail
 
 export namespace fmia::meta {
-  
+
 template <typename T>
 concept arithmetic = integral<T> || floating_point<T>;
-  
+
 // for a fixed-precision integer type: obtain i/u32 if its precision is smaller than 32 bits, otherwise obtain a
 // fixed-precision integer type that has double precision
 // for a big integer type: obtain itself
 // for a floating-point type: obtain a floating-point type that has double precision
 // for a big decimal type: obtain itself
-// 
+//
 // cv-qualifiers and signedness (only for integer types) are kept
 template <typename T>
 using make_higher_precision = detail::make_higher_precision_selector<T>;
@@ -628,16 +626,16 @@ using make_higher_precision = detail::make_higher_precision_selector<T>;
 template <typename T>
 using make_higher_precision_t = make_higher_precision<T>::type;
 
-}
+} // namespace fmia::meta
 
 namespace fmia::big_integer::naive {
-  
+
 }
 
 namespace fmia::big_integer::naive::delayed_carry {
-  
+
 }
 
 namespace fmia::big_integer::naive::immediate_carry {
-  
+
 }

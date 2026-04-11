@@ -201,8 +201,7 @@ export void from_different_to_one_form(u32 disk_cnt, std::span<const u32> from_l
     return;
 
   const u32 from = from_list[disk_cnt - 1];
-  if (from == to)
-  {
+  if (from == to) {
     from_different_to_one_form(disk_cnt - 1, from_list, to);
     return;
   }
@@ -219,8 +218,7 @@ export void from_one_to_different_form(u32 disk_cnt, u32 from, std::span<const u
     return;
 
   const u32 to = to_list[disk_cnt - 1];
-  if (from == to)
-  {
+  if (from == to) {
     from_one_to_different_form(disk_cnt - 1, from, to_list);
     return;
   }
@@ -237,8 +235,7 @@ export void general_form(u32 disk_cnt, std::span<const u32> from_list, std::span
     return;
 
   const u32 from = from_list[disk_cnt - 1], to = to_list[disk_cnt - 1];
-  if (from == to)
-  {
+  if (from == to) {
     general_form(disk_cnt - 1, from_list, to_list);
     return;
   }
@@ -246,14 +243,12 @@ export void general_form(u32 disk_cnt, std::span<const u32> from_list, std::span
   const u32 aux = peg_cnt - from - to;
   const auto one_step_strategy_cost = get_move_cnt::general_form_one_step_strategy(disk_cnt, from_list, to_list);
   const auto two_step_strategy_cost = get_move_cnt::general_form_two_step_strategy(disk_cnt, from_list, to_list);
-  if (one_step_strategy_cost <= two_step_strategy_cost)
-  {
+  if (one_step_strategy_cost <= two_step_strategy_cost) {
     from_different_to_one_form(disk_cnt - 1, from_list, aux);
     move(disk_cnt, from, to);
     from_one_to_different_form(disk_cnt - 1, aux, to_list);
   }
-  else
-  {
+  else {
     from_different_to_one_form(disk_cnt - 1, from_list, to);
     move(disk_cnt, from, aux);
     from_one_to_one_form(disk_cnt - 1, to, from);

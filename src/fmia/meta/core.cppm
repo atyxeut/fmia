@@ -156,8 +156,7 @@ struct is_no_cv_no_duplication_integer_sequence<std::integer_sequence<Int, Is...
   static constexpr bool value = [] consteval noexcept {
     std::array<std::size_t, sizeof...(Is)> I {Is...};
     std::ranges::sort(I);
-    for (auto i = 1uz; i < I.size(); ++i)
-    {
+    for (auto i = 1uz; i < I.size(); ++i) {
       if (I[i - 1] == I[i])
         return false;
     }

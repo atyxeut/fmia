@@ -65,8 +65,7 @@ export template <typename Fn, typename... Args>
 
     void end_timer() noexcept
     {
-      if (!is_timer_ended)
-      {
+      if (!is_timer_ended) {
         timer_end_ref = std::chrono::steady_clock::now();
         is_timer_ended = true;
       }
@@ -79,25 +78,20 @@ export template <typename Fn, typename... Args>
   time_point_type timer_begin;
   time_point_type timer_end;
 
-  try
-  {
+  try {
     timer_controller controller {timer_end};
     timer_begin = std::chrono::steady_clock::now();
-    if constexpr (std::is_void_v<result_type>)
-    {
+    if constexpr (std::is_void_v<result_type>) {
       std::invoke(std::forward<Fn>(func), std::forward<Args>(args)...);
       controller.end_timer();
       return timed_invocation_result<duration_type::rep, duration_type::period, void> {timer_end - timer_begin};
     }
-    else
-    {
+    else {
       auto result = std::invoke(std::forward<Fn>(func), std::forward<Args>(args)...);
       controller.end_timer();
       return timed_invocation_result {timer_end - timer_begin, std::move(result)};
     }
-  }
-  catch (...)
-  {
+  } catch (...) {
     std::println(std::cerr, "exception caught, execution time before exception is ");
     print_duration_as<double>(timer_end - timer_begin);
     std::println(std::cerr);
@@ -148,8 +142,7 @@ public:
         std::format("invalid index range, index starts at 1, and now there are {} laps", lap_count())
       );
 
-    for (; from_idx <= to_idx; ++from_idx)
-    {
+    for (; from_idx <= to_idx; ++from_idx) {
       std::println(std::cerr, "lap {}: ", from_idx);
       print_duration_as<double>(laps_[from_idx] - laps_[from_idx - 1]);
     }

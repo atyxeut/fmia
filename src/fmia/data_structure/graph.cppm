@@ -49,22 +49,18 @@ constexpr auto bellman_ford_impl(const EdgeList& edges, Vertex vertex_count, Ver
   distance[source] = 0;
 
   bool relaxation_happened;
-  do
-  {
+  do {
     // works as a round counter
     if (vertex_count-- == 0)
       return std::unexpected(error::negative_cycle);
 
     relaxation_happened = false;
-    for (const auto& [u, v, w] : edges)
-    {
+    for (const auto& [u, v, w] : edges) {
       // 1. prevent fake paths from the source vertex
       // 2. avoid addition overflow
       if (distance[u] == Weight::infinity)
         continue;
-
-      if (const auto new_distance = distance[u] + w; new_distance < distance[v])
-      {
+      if (const auto new_distance = distance[u] + w; new_distance < distance[v]) {
         distance[v] = new_distance;
         relaxation_happened = true;
       }
@@ -119,8 +115,7 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
   path_length[source] = -1;
 
   std::deque<Vertex> q {source};
-  while (!q.empty())
-  {
+  while (!q.empty()) {
     const auto u = q.front();
     q.pop_front();
     path_length[u] = -path_length[u];
@@ -128,11 +123,9 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
     // in case u has a self loop
     const auto cur_length = path_length[u];
 
-    for (const auto& [v, w] : g.neighbors(u))
-    {
+    for (const auto& [v, w] : g.neighbors(u)) {
       // distance[u] never equals to infinity, since only relaxed vertices are added to the queue
-      if (const auto new_distance = distance[u] + w; new_distance < distance[v])
-      {
+      if (const auto new_distance = distance[u] + w; new_distance < distance[v]) {
         distance[v] = new_distance;
 
         const bool v_in_queue = path_length[v] < 0;
@@ -187,10 +180,8 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
   sum_type sum = 0;
 
   std::deque<Vertex> q {source};
-  while (!q.empty())
-  {
-    for (const auto cnt = sum_type(q.size()); cnt * distance[q.front()] > sum;)
-    {
+  while (!q.empty()) {
+    for (const auto cnt = sum_type(q.size()); cnt * distance[q.front()] > sum;) {
       auto frt = q.front();
       q.pop_front();
       q.emplace_back(std::move(frt));
@@ -201,10 +192,8 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
     path_length[u] = -path_length[u];
     const auto cur_length = path_length[u];
 
-    for (const auto& [v, w] : g.neighbors(u))
-    {
-      if (const auto new_distance = distance[u] + w; new_distance < distance[v])
-      {
+    for (const auto& [v, w] : g.neighbors(u)) {
+      if (const auto new_distance = distance[u] + w; new_distance < distance[v]) {
         const bool v_in_queue = path_length[v] < 0;
         path_length[v] = cur_length + 1;
         if (static_cast<Vertex>(path_length[v]) > vertex_count)
@@ -217,8 +206,7 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
           sum += new_distance;
         distance[v] = new_distance;
 
-        if (!v_in_queue)
-        {
+        if (!v_in_queue) {
           if (q.empty() || distance[v] >= distance[q.front()])
             q.emplace_back(v);
           else
@@ -234,7 +222,5 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
 } // namespace fmia::graph::shortest_path::single_source
 
 namespace fmia::graph::shortest_path::all_pairs {
-
-
 
 }

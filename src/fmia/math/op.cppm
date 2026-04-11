@@ -65,21 +65,30 @@ struct is_enum_flag<operator_property> : std::true_type
   return static_cast<::fmia::operator_property>(std::to_underlying(a) & std::to_underlying(b));
 };
 
-constexpr auto& operator &=(::fmia::operator_property& a, ::fmia::operator_property b) noexcept { return a = a & b; };
+constexpr auto& operator &=(::fmia::operator_property& a, ::fmia::operator_property b) noexcept
+{
+  return a = a & b;
+};
 
 [[nodiscard]] constexpr auto operator ^(::fmia::operator_property a, ::fmia::operator_property b) noexcept
 {
   return static_cast<::fmia::operator_property>(std::to_underlying(a) ^ std::to_underlying(b));
 };
 
-constexpr auto& operator ^=(::fmia::operator_property& a, ::fmia::operator_property b) noexcept { return a = a ^ b; };
+constexpr auto& operator ^=(::fmia::operator_property& a, ::fmia::operator_property b) noexcept
+{
+  return a = a ^ b;
+};
 
 [[nodiscard]] constexpr auto operator |(::fmia::operator_property a, ::fmia::operator_property b) noexcept
 {
   return static_cast<::fmia::operator_property>(std::to_underlying(a) | std::to_underlying(b));
 };
 
-constexpr auto& operator |=(::fmia::operator_property& a, ::fmia::operator_property b) noexcept { return a = a | b; };
+constexpr auto& operator |=(::fmia::operator_property& a, ::fmia::operator_property b) noexcept
+{
+  return a = a | b;
+};
 
 export namespace fmia::meta {
 

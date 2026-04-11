@@ -43,12 +43,9 @@ public:
 
   constexpr trie_base(const trie_base& other)
   {
-    try
-    {
+    try {
       copy_tree_(other.root_, root_);
-    }
-    catch (...)
-    {
+    } catch (...) {
       destroy_tree_(root_);
       throw;
     }
@@ -65,8 +62,7 @@ public:
 
   constexpr trie_base& operator =(trie_base&& other) noexcept
   {
-    if (this != std::addressof(other))
-    {
+    if (this != std::addressof(other)) {
       destroy_tree_(root_);
       root_ = std::exchange(other.root_, nullptr);
     }
@@ -76,10 +72,8 @@ public:
 private:
   constexpr void copy_tree_(node_* from, node_*& to)
   {
-    if (!from)
-    {
-      if (to)
-      {
+    if (!from) {
+      if (to) {
         destroy_tree_(to);
         to = nullptr;
       }
@@ -109,8 +103,7 @@ private:
       return;
 
     std::vector<node_*> stack {root};
-    while (!stack.empty())
-    {
+    while (!stack.empty()) {
       auto cur = stack.back();
       stack.pop_back();
       cur->next.for_each_invoke([&stack](node_* ptr) {
@@ -142,8 +135,7 @@ public:
     // pending strong exception safety implementation
     ++root_->pass;
     auto cur = root_;
-    for (auto&& ch : str)
-    {
+    for (auto&& ch : str) {
       auto& next = cur->next[ch];
       if (!next)
         next = new node_;
@@ -163,8 +155,7 @@ private:
       return 0;
 
     auto cur = root_;
-    for (auto&& ch : str)
-    {
+    for (auto&& ch : str) {
       auto next = cur->next[ch];
       if (!next)
         return 0;
@@ -196,18 +187,15 @@ public:
     if (!root_ || count(str) == 0)
       return;
 
-    if (--root_->pass == 0)
-    {
+    if (--root_->pass == 0) {
       clear();
       return;
     }
 
     auto cur = root_;
-    for (auto&& ch : str)
-    {
+    for (auto&& ch : str) {
       auto& next = cur->next[ch];
-      if (--next->pass == 0)
-      {
+      if (--next->pass == 0) {
         destroy_tree_(next);
         next = nullptr;
         return;
@@ -243,8 +231,7 @@ struct trie_default_hash_map
     template <typename Fn>
     constexpr void for_each_invoke(Fn&& f) noexcept
     {
-      for (auto child : map_)
-      {
+      for (auto child : map_) {
         if (child)
           f(child);
       }
@@ -277,8 +264,7 @@ struct trie_normal_hash_map
     template <typename Fn>
     constexpr void for_each_invoke(Fn&& f) noexcept
     {
-      for (auto [_, child] : map_)
-      {
+      for (auto [_, child] : map_) {
         if (child)
           f(child);
       }
@@ -287,8 +273,7 @@ struct trie_normal_hash_map
     template <typename Fn>
     constexpr void for_each_invoke(Fn&& f, type& to) const
     {
-      for (auto [ch, child] : map_)
-      {
+      for (auto [ch, child] : map_) {
         if (child)
           f(child, to[ch]);
       }

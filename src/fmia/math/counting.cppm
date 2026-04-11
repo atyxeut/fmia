@@ -35,8 +35,7 @@ template <typename T>
   // the answer will easily exceed n, for example: for n = 2147483647, all answers for x in [0, 9] exceed 2147483647
   meta::make_larger_width_t<T> ans = 0;
 
-  for (T n_ = n, coeff = 1; n_ != 0; n_ /= 10, coeff *= 10)
-  {
+  for (T n_ = n, coeff = 1; n_ != 0; n_ /= 10, coeff *= 10) {
     // divide the number into 3 parts: high mid low, then count how many times does x occur at mid
     // coeff: 10^(weight of mid)
     const T high = n / (coeff * 10), mid = n_ % 10, low = n % coeff;
@@ -90,11 +89,11 @@ export template <meta::fixed_width_integral T>
   assert(n >= 0 && 0 <= x && x <= 9);
 
   T ans = 0;
-  while (n != 0)
-  {
+  while (n != 0) {
     ans += n % 10 == x;
     n /= 10;
   }
+
   return ans;
 }
 

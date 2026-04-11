@@ -1,5 +1,7 @@
 # clang-format style options: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
+# require clang-format 22
+
 # misc settings
 Language: Cpp
 Standard: Latest
@@ -18,7 +20,7 @@ BreakAdjacentStringLiterals: true
 SortUsingDeclarations: Never
 
 # penalty, higher penalty = less priority
-PenaltyExcessCharacter: 300
+PenaltyExcessCharacter: 50000
 PenaltyBreakAssignment: 50
 PenaltyBreakBeforeFirstCallParameter: 10
 PenaltyBreakBeforeMemberAccess: 5
@@ -90,7 +92,7 @@ IndentGotoLabels: false
 
 # function
 AlignAfterOpenBracket: BlockIndent
-AllowShortFunctionsOnASingleLine: All
+AllowShortFunctionsOnASingleLine: Inline
 BinPackArguments: true
 AllowAllArgumentsOnNextLine: true
 BinPackParameters: BinPack
@@ -139,9 +141,15 @@ AllowShortCompoundRequirementOnASingleLine: true
 RequiresClausePosition: OwnLine
 
 # parentheses / brace
+BreakBeforeCloseBracketBracedList: true
+BreakBeforeCloseBracketFunction: true
+BreakBeforeCloseBracketIf: true
+BreakBeforeCloseBracketLoop: true
+BreakBeforeCloseBracketSwitch: true
+
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterControlStatement: Always
+  AfterControlStatement: Never
   AfterExternBlock: false
   AfterFunction: true
   AfterClass: true
@@ -150,10 +158,11 @@ BraceWrapping:
   AfterEnum: false
   BeforeLambdaBody: false
   BeforeElse: true
-  BeforeCatch: true
+  BeforeCatch: false
   SplitEmptyFunction: false
   SplitEmptyRecord: true
   SplitEmptyNamespace: false
+
 Cpp11BracedListStyle: true
 BinPackLongBracedList: true
 SpaceBeforeCpp11BracedList: true
