@@ -16,3 +16,4 @@
 export module fmia.math.integer;
 
 export import fmia.math.integer.core;
+export import fmia.math.integer.counting;
