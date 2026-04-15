@@ -183,7 +183,7 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
   std::vector<meta::make_signed_t<Vertex>> path_length(vertex_count);
   path_length[source] = -1;
 
-  using sum_type = meta::make_larger_width_t<Weight>;
+  using sum_type = meta::make_higher_precision_t<Weight>;
   sum_type sum = 0;
 
   std::deque<Vertex> q {source};
