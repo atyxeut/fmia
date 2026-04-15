@@ -623,14 +623,176 @@ using make_higher_precision_t = make_higher_precision<T>::type;
 
 } // namespace fmia::meta
 
-namespace fmia::big_integer::naive {
+export namespace fmia::big_integer::naive {
 
+// support +, -, *, /, % operations using free functions for nonnegative operands
+
+struct sub_result
+{
+  int sgn;
+  std::vector<int> mag;
+};
+
+template <typename Remainder>
+struct div_result
+{
+  std::vector<int> q;
+  Remainder r;
+};
+
+void print(const std::vector<int>& num, bool new_line = false)
+{
+  for (auto i = num.size(); i > 0; --i)
+    std::cout << num[i - 1];
+  if (new_line)
+    std::cout << '\n';
 }
 
-namespace fmia::big_integer::naive::delayed_carry {
-
+void print(const sub_result& result, bool new_line = false)
+{
+  if (result.sgn < 0)
+    std::cout << '-';
+  print(result.mag, new_line);
 }
 
-namespace fmia::big_integer::naive::immediate_carry {
+[[nodiscard]] constexpr auto to_big_integer(std::string_view s)
+{
+  const auto n = s.size();
+  std::vector<int> ret(n);
 
+  for (auto i = 0uz; i < n; ++i)
+    ret[i] = s[n - i - 1] - '0';
+
+  return ret;
 }
+
+[[nodiscard]] constexpr bool is_zero(const std::vector<int>& num) noexcept
+{
+  return num.size() == 1 && num[0] == 0;
+}
+
+// a < b : -1, a = b: 0, a > b: 1
+[[nodiscard]] constexpr int compare(std::span<const int> a, std::span<const int> b) noexcept
+{
+  const auto la = a.size(), lb = b.size();
+
+  if (la == lb)
+    for (auto i = la; i > 0; --i)
+      if (a[i - 1] != b[i - 1])
+        return (a[i - 1] > b[i - 1]) - (a[i - 1] < b[i - 1]);
+
+  return (la > lb) - (la < lb);
+}
+
+constexpr void remove_lz(std::vector<int>& num) noexcept
+{
+  while (num.size() > 1 && num.back() == 0)
+    num.pop_back();
+}
+
+constexpr void carry(std::vector<int>& num) noexcept
+{
+  int c = 0, r;
+  for (auto& digit : num) {
+    digit += c;
+    r = digit % 10;
+    c = digit / 10 - (r < 0);
+    digit = r + 10 * (r < 0);
+  }
+}
+
+[[nodiscard]] constexpr auto add(const std::vector<int>& a, const std::vector<int>& b)
+{
+  std::vector<int> ans(std::max(a.size(), b.size()) + 1);
+
+  for (auto i = 0uz; i < a.size(); ++i)
+    ans[i] += a[i];
+  for (auto i = 0uz; i < b.size(); ++i)
+    ans[i] += b[i];
+
+  carry(ans);
+  remove_lz(ans);
+  return ans;
+}
+
+[[nodiscard]] constexpr auto sub(const std::vector<int>& a, const std::vector<int>& b) -> sub_result
+{
+  std::vector<int> ans(std::max(a.size(), b.size()));
+
+  const int sgn = compare(a, b);
+
+  for (auto i = 0uz; i < a.size(); ++i)
+    ans[i] += a[i] * sgn;
+  for (auto i = 0uz; i < b.size(); ++i)
+    ans[i] -= b[i] * sgn;
+
+  carry(ans);
+  remove_lz(ans);
+  return {sgn, ans};
+}
+
+[[nodiscard]] constexpr auto mul(const std::vector<int>& a, const std::vector<int>& b)
+{
+  if (is_zero(a) || is_zero(b))
+    return std::vector<int> {0};
+
+  // delayed carry is basically always safe here:
+  // ans[k] accumulates at most min(la, lb) additions, assume that every addition is ans[k] += 9 * 9, it still requires
+  // over 1e7 additions to overflow, in such cases, the inputs are far beyond the capability of this O(n^2) algorithm
+  std::vector<int> ans(a.size() + b.size());
+
+  for (auto i = 0uz; i < a.size(); ++i)
+    for (auto j = 0uz; j < b.size(); ++j)
+      ans[i + j] += a[i] * b[j];
+
+  carry(ans);
+  remove_lz(ans);
+  return ans;
+}
+
+// used when b is way smaller than a
+template <meta::fixed_precision_integral T>
+[[nodiscard]] constexpr auto div(const std::vector<int>& a, const T& b) -> div_result<T>
+{
+  assert(b != 0 && "divisor cannot be zero");
+
+  std::vector<int> q(a.size());
+  meta::make_higher_precision_t<T> r = 0;
+
+  for (auto i = q.size(); i > 0; --i) {
+    r = r * 10 + a[i - 1];
+    q[i - 1] = r / b;
+    r %= b;
+  }
+
+  remove_lz(q);
+  return {q, static_cast<T>(r)};
+}
+
+[[nodiscard]] constexpr auto div(const std::vector<int>& a, const std::vector<int>& b) -> div_result<std::vector<int>>
+{
+  assert(!is_zero(b) && "divisor cannot be zero");
+
+  if (compare(a, b) < 0)
+    return {{0}, a};
+
+  std::vector<int> q(a.size() - b.size() + 1), r(b.size() + 1);
+  std::copy(a.begin() + q.size(), a.end(), r.begin());
+
+  for (auto i = q.size(); i > 0; --i) {
+    std::move_backward(r.begin(), r.end() - 1, r.end());
+    r[0] = a[i - 1];
+    while (r.back() != 0 || compare(std::span(r.begin(), b.size()), b) >= 0) {
+      ++q[i - 1];
+      for (auto j = 0uz; j < b.size(); ++j)
+        r[j] -= b[j];
+      carry(r);
+    }
+  }
+
+  remove_lz(q);
+  remove_lz(r);
+  return {q, r};
+}
+
+} // namespace fmia::big_integer::naive
