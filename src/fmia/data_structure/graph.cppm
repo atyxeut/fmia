@@ -21,9 +21,9 @@ import std;
 
 import fmia.math;
 
-namespace fmia::graph::shortest_path {
+export namespace fmia::graph::shortest_path {
 
-export enum class error : std::uint8_t { empty_graph, negative_cycle };
+enum class error : u8 { empty_graph, negative_cycle };
 
 } // namespace fmia::graph::shortest_path
 
