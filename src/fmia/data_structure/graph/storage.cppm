@@ -19,6 +19,12 @@ import std;
 
 import fmia.math;
 
+export namespace fmia::graph {
+
+enum class graph_tag : u8 { undirected, directed };
+
+} // namespace fmia::graph
+
 namespace fmia::graph::detail {
 
 template <typename Vertex>
