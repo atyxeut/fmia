@@ -23,30 +23,13 @@ import fmia.math;
 
 namespace fmia::graph {
 
-export template <meta::graph T>
-[[nodiscard]] constexpr auto get_in_degree_info(const T& g)
-{
-  const auto n = g.vertex_size();
-  std::vector<typename T::degree_type> in_degree(n);
-  for (typename T::vertex_type u = 0; u < n; ++u)
-    for (const auto v : g.neighbors(u))
-      ++in_degree[v];
-
-  return in_degree;
-}
-
 namespace detail {
 
 enum class toposort_order : u8 { none, lexicographical };
 enum class toposort_error : u8 { has_cycle };
 
-template <typename T, typename Graph>
-concept degree_info_of = requires(T info, typename Graph::vertex_type u) {
-  { info[u] } -> std::same_as<typename Graph::degree_type&>;
-};
-
-template <toposort_order Order, typename Graph, typename Info, typename Fn>
-constexpr auto toposort_impl(const Graph& g, Info&& in_degree, Fn&& fn) -> std::expected<bool, toposort_error>
+template <toposort_order Order, typename Graph, typename Fn>
+constexpr auto toposort_impl(const Graph& g, Fn&& fn) -> std::expected<bool, toposort_error>
 {
   using vertex_type = Graph::vertex_type;
 
@@ -59,7 +42,7 @@ constexpr auto toposort_impl(const Graph& g, Info&& in_degree, Fn&& fn) -> std::
 
   queue_type q;
   for (vertex_type u = 0; u < n; ++u)
-    if (in_degree[u] == 0)
+    if (g.in_degree(u) == 0)
       q.push(u);
 
   bool unique_order = true;
@@ -80,7 +63,7 @@ constexpr auto toposort_impl(const Graph& g, Info&& in_degree, Fn&& fn) -> std::
     std::invoke(fn, u);
 
     for (const auto v : g.neighbors(u))
-      if (--in_degree[v] == 0)
+      if (--g.in_degree(v) == 0)
         q.push(v);
   }
 
@@ -95,25 +78,13 @@ constexpr auto toposort_impl(const Graph& g, Info&& in_degree, Fn&& fn) -> std::
 export template <meta::graph T, typename Fn>
 [[nodiscard]] constexpr auto toposort(const T& g, Fn&& fn)
 {
-  return detail::toposort_impl<detail::toposort_order::none>(g, get_in_degree_info(g), std::forward<Fn>(fn));
-}
-
-export template <meta::graph T, detail::degree_info_of<T> U, typename Fn>
-[[nodiscard]] constexpr auto toposort(const T& g, U in_degree, Fn&& fn)
-{
-  return detail::toposort_impl<detail::toposort_order::none>(g, std::move(in_degree), std::forward<Fn>(fn));
+  return detail::toposort_impl<detail::toposort_order::none>(g, std::forward<Fn>(fn));
 }
 
 export template <meta::graph T, typename Fn>
 [[nodiscard]] constexpr auto toposort_lexicographical_order(const T& g, Fn&& fn)
 {
-  return detail::toposort_impl<detail::toposort_order::lexicographical>(g, get_in_degree_info(g), std::forward<Fn>(fn));
-}
-
-export template <meta::graph T, detail::degree_info_of<T> U, typename Fn>
-[[nodiscard]] constexpr auto toposort_lexicographical_order(const T& g, U in_degree, Fn&& fn)
-{
-  return detail::toposort_impl<detail::toposort_order::lexicographical>(g, std::move(in_degree), std::forward<Fn>(fn));
+  return detail::toposort_impl<detail::toposort_order::lexicographical>(g, std::forward<Fn>(fn));
 }
 
 } // namespace fmia::graph
