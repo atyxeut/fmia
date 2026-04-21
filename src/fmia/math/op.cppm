@@ -15,6 +15,8 @@
 
 export module fmia.math.op;
 
+// operator utils
+
 import std;
 
 import fmia.math.core;
