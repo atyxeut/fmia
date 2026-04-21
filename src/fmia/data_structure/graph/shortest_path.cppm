@@ -110,7 +110,7 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
   // path_length[i] < 0: vertex i is in the queue
   // path_length[i] >= 0: vertex i is not in the queue
   // abs(path_length[i]): (edge size of the shortest path from the souce vertex to vertex i) + 1
-  std::vector<meta::make_signed_t<Vertex>> path_length(vertex_count);
+  std::vector<Vertex> path_length(vertex_count);
   path_length[source] = -1;
 
   std::deque<Vertex> q {source};
@@ -172,7 +172,7 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
   std::vector<Weight> distance(vertex_count, Weight::infinity);
   distance[source] = 0;
 
-  std::vector<meta::make_signed_t<Vertex>> path_length(vertex_count);
+  std::vector<Vertex> path_length(vertex_count);
   path_length[source] = -1;
 
   using sum_type = meta::make_higher_precision_t<Weight>;
