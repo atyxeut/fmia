@@ -16,11 +16,35 @@
 target("test-fmia")
   set_kind("object")
   add_deps("fmia");
-  add_files("**.cppm", { public = true })
+  add_files("fmia/**.cppm", { public = true })
 target_end()
 
-target("test-main")
+target("test-math-int128_input")
   set_kind("binary")
   add_deps("test-fmia")
-  add_files("main.cpp")
+  add_files("runner/math/int128_input.cpp")
+target_end()
+
+target("test-math-int128_output")
+  set_kind("binary")
+  add_deps("test-fmia")
+  add_files("runner/math/int128_output.cpp")
+target_end()
+
+target("test-util-make_vector")
+  set_kind("binary")
+  add_deps("test-fmia")
+  add_files("runner/util/make_vector.cpp")
+target_end()
+
+target("test-util-ranges_output")
+  set_kind("binary")
+  add_deps("test-fmia")
+  add_files("runner/util/ranges_output.cpp")
+target_end()
+
+target("test-util-std_tuple_output")
+  set_kind("binary")
+  add_deps("test-fmia")
+  add_files("runner/util/std_tuple_output.cpp")
 target_end()

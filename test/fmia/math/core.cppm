@@ -177,6 +177,7 @@ void int128_input_with_std_istream() noexcept
   u128 c, d;
 
   std::cin >> a >> b >> c >> d;
+  std::println("i128: {}\ni128: {}\nu128: {}\nu128: {}\n", a, b, c, d);
 }
 
 // implies test for std::format
@@ -186,9 +187,7 @@ void int128_output_with_std_ostream_and_std_print() noexcept
   u128 c = 30, d = 40;
 
   std::cout << a + b << ' ' << c + d << '\n';
-  std::println("{:05} {:05}", a + b, c + d);
-
-  std::cout << '\n';
+  std::println("{:05} {:05}\n", a + b, c + d);
 }
 
 } // namespace test::fmia::math

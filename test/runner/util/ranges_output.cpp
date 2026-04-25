@@ -13,21 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import std;
+import test.fmia.util;
 
-import test.fmia;
+using namespace test::fmia::util;
 
 int main()
 {
-  // test::fmia::math::int128_input_with_std_istream();
-  test::fmia::math::int128_output_with_std_ostream_and_std_print();
-
-  test::fmia::util::does_make_vector_work();
-
-  test::fmia::util::std_pair_output_with_custom_print_and_std_ostream();
-  test::fmia::util::std_tuple_output_with_custom_print_and_std_ostream();
-
-  test::fmia::util::cstyle_string_literal_output_no_ambiguous_overloads();
-  test::fmia::util::common_ranges_output_with_custom_print_and_std_ostream();
-  test::fmia::util::multidimensional_ranges_output_with_custom_print_and_std_ostream();
+  cstyle_string_literal_output_no_ambiguous_overloads();
+  common_ranges_output_with_custom_print_and_std_ostream();
+  multidimensional_ranges_output_with_custom_print_and_std_ostream();
 }

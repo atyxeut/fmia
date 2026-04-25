@@ -13,9 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.fmia;
+import test.fmia.math;
 
-export import test.fmia.data_structure;
-export import test.fmia.math;
-export import test.fmia.meta;
-export import test.fmia.util;
+using namespace test::fmia::math;
+
+int main()
+{
+  int128_output_with_std_ostream_and_std_print();
+}
