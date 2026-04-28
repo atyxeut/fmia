@@ -13,6 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.fmia.data_structure.trie;
+export module test.fmia.data_structure.string.trie;
 
-import fmia.data_structure.trie;
+import fmia.data_structure.string.trie;

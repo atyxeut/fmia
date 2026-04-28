@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.data_structure.trie.vanilla;
+export module fmia.data_structure.string.trie.vanilla;
 
 import std;
 
@@ -21,7 +21,7 @@ import fmia.math.core;
 import fmia.memory.core;
 import fmia.meta;
 
-namespace fmia {
+namespace fmia::detail {
 
 template <typename Char, typename HashMap, exception_safety E>
 class trie_base
@@ -275,7 +275,7 @@ struct trie_normal_hash_map
   };
 };
 
-} // namespace fmia
+} // namespace fmia::detail
 
 export namespace fmia {
 
@@ -283,13 +283,13 @@ template <
   typename Char, usize DistinctCharCount, std::regular_invocable<Char> Hash,
   exception_safety E = exception_safety::strong
 >
-using trie = trie_base<Char, trie_default_hash_map<Char, DistinctCharCount, Hash>, E>;
+using trie = detail::trie_base<Char, detail::trie_default_hash_map<Char, DistinctCharCount, Hash>, E>;
 
 using binary_trie = trie<int, 2, decltype([](int x) constexpr noexcept { return x; })>;
 using lower_char_trie = trie<char, 26, decltype([](char ch) constexpr noexcept { return ch - 'a'; })>;
 using upper_char_trie = trie<char, 26, decltype([](char ch) constexpr noexcept { return ch - 'A'; })>;
 
 template <typename Char, std::regular_invocable<Char> Hash, exception_safety E = exception_safety::strong>
-using hash_trie = trie_base<Char, trie_normal_hash_map<Char, Hash, std::unordered_map>, E>;
+using hash_trie = detail::trie_base<Char, detail::trie_normal_hash_map<Char, Hash, std::unordered_map>, E>;
 
-} // export namespace fmia
+} // namespace fmia
