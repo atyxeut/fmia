@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.debug.benchmark;
+export module fmia.debug.timer;
 
 import std;
 
-export namespace fmia::benchmark {
+export namespace fmia::debug {
 
 template <typename Rep, typename Period = std::milli, typename OtherRep, typename OtherPeriod>
 void print_duration_as(std::chrono::duration<OtherRep, OtherPeriod> duration, bool endline = true)
@@ -151,4 +151,4 @@ public:
   void print_laps() const { print_laps(1, lap_count()); }
 };
 
-} // namespace fmia::benchmark
+} // namespace fmia::debug

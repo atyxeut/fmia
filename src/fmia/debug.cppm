@@ -15,4 +15,4 @@
 
 export module fmia.debug;
 
-export import fmia.debug.benchmark;
+export import fmia.debug.timer;
