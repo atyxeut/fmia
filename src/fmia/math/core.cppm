@@ -354,6 +354,9 @@ concept integral = fixed_precision_integral<T> || arbitrary_precision_integral<T
 template <typename T>
 concept nonbool_integral = integral<T> && !boolean<T>;
 
+template <typename T>
+concept nothrow_integral = fixed_precision_integral<T>;
+
 } // namespace fmia::meta
 
 namespace fmia::meta {
@@ -557,6 +560,9 @@ concept arbitrary_precision_floating_point = is_big_decimal_v<T>;
 template <typename T>
 concept floating_point = fixed_precision_floating_point<T> || arbitrary_precision_floating_point<T>;
 
+template <typename T>
+concept nothrow_floating_point = fixed_precision_floating_point<T>;
+
 } // namespace fmia::meta
 
 namespace fmia::meta {
@@ -619,6 +625,9 @@ concept fixed_precision_arithmetic = fixed_precision_integral<T> || fixed_precis
 
 template <typename T>
 concept arbitratry_precision_arithmetic = is_big_integer_v<T> || is_big_decimal_v<T>;
+
+template <typename T>
+concept nothrow_arithmetic = nothrow_integral<T> || nothrow_floating_point<T>;
 
 // for a fixed-precision integer type: obtain i/u32 if its precision is smaller than 32 bits, otherwise obtain a
 // fixed-precision integer type that has double precision
