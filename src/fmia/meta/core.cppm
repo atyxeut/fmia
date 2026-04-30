@@ -65,8 +65,7 @@ export namespace fmia::meta {
 // O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive
 // recursive implementation
 template <std::integral T, T N>
-using make_reversed_integer_sequence =
-  make_reversed_integer_sequence_impl<std::make_integer_sequence<T, N>>::type;
+using make_reversed_integer_sequence = make_reversed_integer_sequence_impl<std::make_integer_sequence<T, N>>::type;
 
 template <std::size_t N>
 using make_reversed_index_sequence = make_reversed_integer_sequence<std::size_t, N>;

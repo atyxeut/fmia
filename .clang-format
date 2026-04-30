@@ -31,7 +31,7 @@ PenaltyBreakScopeResolution: 10000
 PenaltyBreakString: 500
 PenaltyBreakTemplateDeclaration: 3
 PenaltyIndentedWhitespace: 1
-PenaltyReturnTypeOnItsOwnLine: 1000
+PenaltyReturnTypeOnItsOwnLine: 50
 
 # comment
 AlignTrailingComments: Leave

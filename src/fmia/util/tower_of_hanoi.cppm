@@ -76,9 +76,8 @@ export namespace fmia::tower_of_hanoi::count_move {
 
 // initially all disks stack scatteredly, but finally they all stack on one peg `to`
 // from_list[i]: the (i + 1)-th disk's initial peg
-[[nodiscard]] constexpr move_cnt_type from_different_to_one_case(
-  peg_type disk_cnt, std::span<const peg_type> from_list, peg_type to
-) noexcept(nothrow_fn)
+[[nodiscard]] constexpr move_cnt_type
+from_different_to_one_case(peg_type disk_cnt, std::span<const peg_type> from_list, peg_type to) noexcept(nothrow_fn)
 {
   if (disk_cnt == 0)
     return 0;
@@ -97,9 +96,8 @@ export namespace fmia::tower_of_hanoi::count_move {
 
 // initially all disks stack on one peg `from`, but finally they stack scatteredly
 // to_list[i]: the (i + 1)-th disk's destination peg
-[[nodiscard]] constexpr move_cnt_type from_one_to_different_case(
-  peg_type disk_cnt, peg_type from, std::span<const peg_type> to_list
-) noexcept(nothrow_fn)
+[[nodiscard]] constexpr move_cnt_type
+from_one_to_different_case(peg_type disk_cnt, peg_type from, std::span<const peg_type> to_list) noexcept(nothrow_fn)
 {
   if (disk_cnt == 0)
     return 0;

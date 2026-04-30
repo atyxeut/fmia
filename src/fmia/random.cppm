@@ -124,9 +124,8 @@ template <bool FlowerGraph = false, std::integral Vertex>
 
 // get the edge list of a random weighted tree
 template <bool FlowerGraph = false, std::integral Vertex, std::integral Weight>
-[[nodiscard]] graph::basic_weighted_edge_list<Vertex, Weight> generate_weighted_tree(
-  Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end
-)
+[[nodiscard]] graph::basic_weighted_edge_list<Vertex, Weight>
+generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
 {
   if (vertex_begin > vertex_end)
     throw std::invalid_argument("invalid vertex index range");
