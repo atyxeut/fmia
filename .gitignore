@@ -22,3 +22,6 @@
 
 !benchmark
 !benchmark/**
+
+!doc
+!doc/**
