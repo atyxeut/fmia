@@ -237,7 +237,7 @@ enum class toposort_error : u8 { has_cycle };
 } // export namespace fmia::graph
 
 namespace fmia::graph {
-  
+
 enum class toposort_tag : u8 { none, lexicographical };
 
 template <toposort_tag Order, typename Graph, typename Fn>

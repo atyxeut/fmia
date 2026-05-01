@@ -478,7 +478,6 @@ concept nothrow_floating_point = fixed_precision_floating_point<T>;
 
 } // export namespace fmia::meta
 
-
 export namespace fmia::meta {
 
 template <typename T>
