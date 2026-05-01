@@ -723,7 +723,7 @@ struct sub_result
 };
 
 template <typename Remainder>
-struct div_result
+struct idiv_result
 {
   mag_type q;
   Remainder r;
@@ -841,9 +841,9 @@ constexpr void carry(mag_type& num) noexcept
 
 // used when b is way smaller than a
 template <meta::fixed_precision_integral T>
-[[nodiscard]] constexpr div_result<T> div(const mag_type& a, const T& b)
+[[nodiscard]] constexpr idiv_result<T> idiv(const mag_type& a, const T& b)
 {
-  assert(b != 0 && "divisor cannot be zero");
+  assert(b != 0);
 
   mag_type q(a.size());
   meta::make_higher_precision_t<T> r = 0;
@@ -858,9 +858,9 @@ template <meta::fixed_precision_integral T>
   return {std::move(q), static_cast<T>(r)};
 }
 
-[[nodiscard]] constexpr div_result<mag_type> div(const mag_type& a, const mag_type& b)
+[[nodiscard]] constexpr idiv_result<mag_type> idiv(const mag_type& a, const mag_type& b)
 {
-  assert(!is_zero(b) && "divisor cannot be zero");
+  assert(!is_zero(b));
 
   if (compare(a, b) < 0)
     return {{0}, a};
