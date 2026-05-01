@@ -262,6 +262,10 @@ struct basic_weighted_edge_list : public basic_edge_list_base<Vertex, weighted_e
   constexpr void add_edge(Vertex u, Vertex v, Weight&& w) { this->edges_.emplace_back(u, v, std::move(w)); }
 };
 
+} // export namespace fmia::graph
+
+export namespace fmia::meta {
+
 template <typename Vertex, typename Degree>
 struct is_no_cv_basic_edge_list<graph::basic_unweighted_edge_list<Vertex, Degree>> : std::true_type
 {
@@ -307,6 +311,10 @@ public:
     this->edges_.emplace_back(u, v, std::move(w));
   }
 };
+
+} // export namespace fmia::graph
+
+export namespace fmia::meta {
 
 template <typename Vertex>
 struct is_no_cv_edge_list<graph::unweighted_edge_list<Vertex>> : std::true_type
