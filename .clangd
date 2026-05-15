@@ -13,4 +13,5 @@ CompileFlags:
       -Wfloat-equal,
       -Wformat=2,
       -Wnrvo,
+      -Wno-bitwise-instead-of-logical,
     ]

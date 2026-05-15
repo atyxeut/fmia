@@ -13,7 +13,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.data_structure.string;
+export module fmia.data_structure.string.character.ascii;
 
-export import fmia.data_structure.string.character;
-export import fmia.data_structure.string.trie;
+export namespace fmia {
+
+[[nodiscard]] constexpr bool is_ascii_digit(char ch) noexcept
+{
+  return '0' <= ch & ch <= '9';
+}
+
+} // export namespace fmia

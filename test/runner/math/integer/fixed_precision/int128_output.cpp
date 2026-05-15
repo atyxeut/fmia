@@ -13,7 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.fmia.math.integer;
+import test.fmia.math.integer.fixed_precision;
 
-export import test.fmia.math.integer.arbitrary_precision;
-export import test.fmia.math.integer.fixed_precision;
+int main()
+{
+  int128_output_with_std_ostream_and_std_print();
+}

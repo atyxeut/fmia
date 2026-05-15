@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import test.fmia.math.integer;
+import test.fmia.math.integer.arbitrary_precision;
 
 int main()
 {
-  int128_output_with_std_ostream_and_std_print();
+  check_naive_div_correctness();
 }
