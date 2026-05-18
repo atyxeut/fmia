@@ -15,4 +15,5 @@
 
 export module fmia.data_structure.sparse_table;
 
+export import fmia.data_structure.sparse_table.multidimentional;
 export import fmia.data_structure.sparse_table.ordinary;
