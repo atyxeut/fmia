@@ -13,16 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia;
+export module fmia.system;
 
-export import fmia.concurrency;
-export import fmia.data_structure;
-export import fmia.debug;
-export import fmia.io;
-export import fmia.math;
-export import fmia.memory;
-export import fmia.meta;
-export import fmia.random;
-export import fmia.simd;
-export import fmia.system;
-export import fmia.util;
+export import fmia.system.posix;
+export import fmia.system.windows;

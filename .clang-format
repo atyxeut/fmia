@@ -41,7 +41,7 @@ SpacesInLineCommentPrefix:
   Maximum: -1
 
 #preprocesser / macro
-IndentPPDirectives: None
+IndentPPDirectives: BeforeHash
 AlignConsecutiveMacros:
   Enabled: false
   AcrossComments: false
