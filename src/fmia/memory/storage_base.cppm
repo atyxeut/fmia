@@ -33,32 +33,31 @@ template <meta::size_integral T>
 constexpr T dynamic_capacity = static_cast<T>(-1);
 
 template <typename Size, Size Capacity>
-class heap_capacity;
+struct heap_capacity;
 
 template <typename Size, Size Capacity>
   requires (Capacity > 0)
-class heap_capacity<Size, Capacity>
+struct heap_capacity<Size, Capacity>
 {
-protected:
-  static constexpr Size capacity_ = Capacity;
+  static constexpr Size capacity = Capacity;
 };
 
 template <typename Size, Size Capacity>
   requires (Capacity == dynamic_capacity<Size>)
-class heap_capacity<Size, Capacity>
+struct heap_capacity<Size, Capacity>
 {
-protected:
-  Size capacity_;
+  Size capacity = 0;
 
-protected:
   constexpr heap_capacity() noexcept = default;
-  constexpr heap_capacity(Size capacity) noexcept : capacity_ {capacity} {}
-  constexpr heap_capacity(heap_capacity&& other) noexcept : capacity_ {std::exchange(other.capacity_, 0)} {}
+  constexpr heap_capacity(Size cap) noexcept : capacity {cap} {}
+  constexpr heap_capacity(heap_capacity&& other) noexcept : capacity {std::exchange(other.capacity, 0)} {}
 
   constexpr auto& operator =(heap_capacity&& other) noexcept
   {
-    if (this != std::addressof(other))
-      capacity_ = std::exchange(other.capacity_, 0);
+    if (this == std::addressof(other))
+      return *this;
+
+    capacity = std::exchange(other.capacity, 0);
     return *this;
   }
 
@@ -67,185 +66,157 @@ protected:
 };
 
 template <typename T, typename Allocator, typename Size, Size Capacity, exception_safety ExceptionSafety>
-class heap_storage_base : public heap_capacity<Size, Capacity>
+class heap_storage_base
 {
-private:
-  using base_ = heap_capacity<Size, Capacity>;
-  using alt_ = std::allocator_traits<Allocator>;
-
 public:
-  using allocator_type = Allocator;
   using size_type = Size;
   using difference_type = std::make_signed_t<Size>;
+
+  using allocator_type = Allocator;
+  using allocator_traits = std::allocator_traits<allocator_type>;
+
   using value_type = T;
   using reference = value_type&;
   using const_reference = const value_type&;
-  using pointer = alt_::pointer;
-  using const_pointer = alt_::const_pointer;
-
-protected:
-  size_type size_;
-  pointer buffer_;
+  using pointer = allocator_traits::pointer;
+  using const_pointer = allocator_traits::const_pointer;
 
 private:
-  [[no_unique_address]] allocator_type allocator_;
+  static constexpr bool capacity_fixed_ = Capacity != dynamic_capacity<size_type>;
 
-  constexpr void deallocate_() noexcept
+  static constexpr bool allocator_fixed_ = allocator_traits::is_always_equal::value;
+  static constexpr bool allocator_pocma_ = allocator_traits::propagate_on_container_move_assignment::value;
+  static constexpr bool allocator_pocca_ = allocator_traits::propagate_on_container_copy_assignment::value;
+
+  struct buffer_type_ : heap_capacity<Size, Capacity>
   {
-    if (buffer_)
-      alt_::deallocate(allocator_, buffer_, this->capacity_);
-    buffer_ = nullptr;
-  }
+    using capacity_base = heap_capacity<Size, Capacity>;
 
-public:
-  [[nodiscard]] consteval bool has_dynamic_capacity() const noexcept { return Capacity == dynamic_capacity<size_type>; }
-  [[nodiscard]] constexpr size_type capacity() const noexcept { return this->capacity_; }
+    [[no_unique_address]] allocator_type allocator;
+    size_type size;
+    pointer data;
 
-  constexpr void clear() noexcept
-  {
-    while (size_ > 0) {
-      --size_;
-      alt_::destroy(allocator_, buffer_ + size_);
+    constexpr void clear() noexcept
+    {
+      if constexpr (std::is_trivially_destructible_v<value_type>)
+        size = 0;
+      else
+        while (size > 0)
+          allocator_traits::destroy(allocator, data + --size);
     }
-  }
+
+    constexpr void deallocate() noexcept
+    {
+      if (data) {
+        allocator_traits::deallocate(allocator, data, this->capacity);
+        data = nullptr;
+      }
+    }
+
+    constexpr explicit buffer_type_(size_type cap, const allocator_type& alloc, size_type s = 0)
+      : allocator(alloc), size {s}
+    {
+      if constexpr (capacity_fixed_)
+        data = allocator_traits::allocate(allocator, Capacity);
+      else
+        data = cap > 0 ? allocator_traits::allocate(allocator, this->capacity = cap) : nullptr;
+    }
+
+    constexpr buffer_type_(buffer_type_&& other) noexcept
+      : capacity_base(std::move(other)), allocator(std::move(other.allocator)), size {std::exchange(other.size, 0)},
+        data {std::exchange(other.data, nullptr)}
+    {}
+
+    constexpr buffer_type_& operator =(buffer_type_&& other) noexcept
+    {
+      if (this == std::addressof(other))
+        return *this;
+
+      clear();
+      deallocate();
+      capacity_base::operator =(std::move(other));
+      if constexpr (allocator_pocma_)
+        allocator = std::move(other.allocator);
+      size = std::exchange(other.size, 0);
+      data = std::exchange(other.data, nullptr);
+      return *this;
+    }
+
+    buffer_type_(const buffer_type_&) = delete;
+    buffer_type_& operator =(const buffer_type_&) = delete;
+
+    constexpr ~buffer_type_() noexcept
+    {
+      clear();
+      deallocate();
+    }
+  };
 
 protected:
-  constexpr heap_storage_base()
-    requires (!has_dynamic_capacity())
-    : size_ {}
-  {
-    buffer_ = alt_::allocate(allocator_, Capacity);
-  }
+  buffer_type_ buffer_;
 
-  constexpr explicit heap_storage_base(size_type capacity)
-    requires (has_dynamic_capacity())
-    : base_(capacity), size_ {}
-  {
-    buffer_ = capacity == 0 ? nullptr : alt_::allocate(allocator_, capacity);
-  }
+public:
+  [[nodiscard]] constexpr auto capacity() const noexcept { return buffer_.capacity; }
+  [[nodiscard]] constexpr auto size() const noexcept { return buffer_.size; }
+  [[nodiscard]] consteval auto max_size() const noexcept { return std::numeric_limits<difference_type>::max(); }
+  [[nodiscard]] constexpr auto get_allocator() const noexcept { return buffer_.allocator; }
+  [[nodiscard]] constexpr auto data() const noexcept { return buffer_.data; }
 
-  constexpr heap_storage_base(heap_storage_base&& other) noexcept
-    : base_(std::move(other)), size_ {std::exchange(other.size_, 0)}, buffer_ {std::exchange(other.buffer_, nullptr)},
-      allocator_ {std::move(other.allocator_)}
+  constexpr void clear() noexcept { buffer_.clear(); }
+
+protected:
+  constexpr explicit heap_storage_base(const allocator_type& alloc = allocator_type {})
+    requires (capacity_fixed_)
+    : buffer_(0, alloc)
   {}
 
-  constexpr auto& operator =(heap_storage_base&& other) noexcept(
-    alt_::is_always_equal::value || alt_::propagate_on_container_move_assignment::value
-  )
+  constexpr explicit heap_storage_base(size_type cap, const allocator_type& alloc = allocator_type {})
+    requires (!capacity_fixed_)
+    : buffer_(cap, alloc)
+  {}
+
+  constexpr heap_storage_base(heap_storage_base&& other) noexcept = default;
+
+  constexpr heap_storage_base& operator =(heap_storage_base&& other) noexcept(allocator_fixed_ || allocator_pocma_)
   {
     if (this == std::addressof(other))
       return *this;
 
-    constexpr bool equal_v = alt_::is_always_equal::value;
-    constexpr bool pocma_v = alt_::propagate_on_container_move_assignment::value;
-
-    if (equal_v || pocma_v || allocator_ == other.allocator_) {
-      clear();
-      deallocate_();
-      base_::operator =(std::move(other));
-      size_ = std::exchange(other.size_, 0);
-      buffer_ = std::exchange(other.buffer_, nullptr);
-      if constexpr (pocma_v)
-        allocator_ = std::move(other.allocator_);
+    if (allocator_fixed_ || allocator_pocma_ || buffer_.allocator == other.buffer_.allocator) {
+      buffer_ = std::move(other.buffer_);
       return *this;
     }
 
-    if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
-      if (buffer_ == nullptr || this->capacity_ < other.size_) {
-        const auto tmp_buffer = alt_::allocate(allocator_, other.size_);
-        clear();
-        deallocate_();
-        if constexpr (has_dynamic_capacity())
-          this->capacity_ = other.size_;
-        buffer_ = tmp_buffer;
-      } else {
-        clear();
-      }
-      size_ = other.size_;
-      while (other.size_ > 0) {
-        --other.size_;
-        alt_::construct(allocator_, buffer_ + other.size_, std::move(other.buffer_[other.size_]));
-        alt_::destroy(allocator_, other.buffer_ + other.size_);
-      }
-    } else if constexpr (ExceptionSafety == exception_safety::strong) {
-      if (other.size_ == 0) {
-        clear();
-        return *this;
-      }
-
-      const auto tmp_buffer = alt_::allocate(allocator_, other.size_);
-      size_type tmp_size = 0;
-      try {
-        for (; tmp_size < other.size_; ++tmp_size)
-          alt_::construct(allocator_, tmp_buffer + tmp_size, other.buffer_[tmp_size]);
-      } catch (...) {
-        while (tmp_size > 0) {
-          --tmp_size;
-          alt_::destroy(allocator_, tmp_buffer + tmp_size);
-        }
-        alt_::deallocate(allocator_, tmp_buffer, other.size_);
-        throw;
-      }
+    if (
+      (std::is_nothrow_move_constructible_v<value_type> || ExceptionSafety == exception_safety::basic)
+      && (data() && capacity() >= other.size())
+    ) {
       clear();
-      deallocate_();
-      if constexpr (has_dynamic_capacity())
-        this->capacity_ = other.size_;
-      size_ = other.size_;
-      buffer_ = tmp_buffer;
-    } else {
-      if (buffer_ == nullptr || this->capacity_ < other.size_) {
-        const auto tmp_buffer = alt_::allocate(allocator_, other.size_);
-        size_type tmp_size = 0;
-        try {
-          for (; tmp_size < other.size_; ++tmp_size)
-            alt_::construct(allocator_, tmp_buffer + tmp_size, std::move(other.buffer_[tmp_size]));
-          other.clear();
-        } catch (...) {
-          while (tmp_size > 0) {
-            --tmp_size;
-            alt_::destroy(allocator_, tmp_buffer + tmp_size);
-          }
-          alt_::deallocate(allocator_, tmp_buffer, other.size_);
-          throw;
-        }
-        clear();
-        deallocate_();
-        if constexpr (has_dynamic_capacity())
-          this->capacity_ = tmp_size;
-        size_ = tmp_size;
-        buffer_ = tmp_buffer;
-      } else {
-        clear();
-        try {
-          for (; size_ < other.size_; ++size_)
-            alt_::construct(allocator_, buffer_ + size_, std::move(other.buffer_[size_]));
-          other.clear();
-        } catch (...) {
-          clear();
-          throw;
-        }
-      }
+      for (; buffer_.size < other.size(); ++buffer_.size)
+        allocator_traits::construct(buffer_.allocator, data() + buffer_.size, std::move(other.data()[buffer_.size]));
+      return *this;
     }
+
+    auto tmpbuf = buffer_type_(other.size(), buffer_.allocator);
+    if constexpr (ExceptionSafety == exception_safety::strong && !std::is_nothrow_move_constructible_v<value_type>)
+      for (; tmpbuf.size < other.size(); ++tmpbuf.size)
+        allocator_traits::construct(buffer_.allocator, tmpbuf.data + tmpbuf.size, other.data()[tmpbuf.size]);
+    else
+      for (; tmpbuf.size < other.size(); ++tmpbuf.size)
+        allocator_traits::construct(buffer_.allocator, tmpbuf.data + tmpbuf.size, std::move(other.data()[tmpbuf.size]));
+
+    if constexpr (!capacity_fixed_)
+      std::swap(buffer_.capacity, tmpbuf.capacity);
+    std::swap(buffer_.size, tmpbuf.size);
+    std::swap(buffer_.data, tmpbuf.data);
     return *this;
   }
 
   constexpr heap_storage_base(const heap_storage_base& other)
-    : size_ {}, allocator_ {alt_::select_on_container_copy_construction(other.allocator_)}
+    : buffer_(other.size(), allocator_traits::select_on_container_copy_construction(other.buffer_.allocator))
   {
-    if constexpr (has_dynamic_capacity())
-      this->capacity_ = other.size_;
-    buffer_ = alt_::allocate(allocator_, this->capacity_);
-    try {
-      for (; size_ < other.size_; ++size_)
-        alt_::construct(allocator_, buffer_ + size_, other.buffer_[size_]);
-    } catch (...) {
-      while (size_ > 0) {
-        --size_;
-        alt_::destroy(allocator_, buffer_ + size_);
-      }
-      alt_::deallocate(allocator_, buffer_, this->capacity_);
-      throw;
-    }
+    for (; buffer_.size < other.size(); ++buffer_.size)
+      allocator_traits::construct(buffer_.allocator, data() + buffer_.size, other.data()[buffer_.size]);
   }
 
   constexpr auto& operator =(const heap_storage_base& other)
@@ -253,77 +224,27 @@ protected:
     if (this == std::addressof(other))
       return *this;
 
-    constexpr bool pocca_v = alt_::propagate_on_container_copy_assignment::value;
+    if (
+      ExceptionSafety == exception_safety::strong || (allocator_pocca_ && buffer_.allocator != other.buffer_.allocator)
+      || data() == nullptr || capacity() < other.size()
+    ) {
+      auto tmpbuf = buffer_type_(other.size(), allocator_pocca_ ? other.buffer_.allocator : buffer_.allocator);
+      for (; tmpbuf.size < other.size(); ++tmpbuf.size)
+        allocator_traits::construct(tmpbuf.allocator, tmpbuf.data + tmpbuf.size, other.data()[tmpbuf.size]);
 
-    if (other.size_ == 0) {
-      clear();
-      if constexpr (pocca_v) {
-        if (allocator_ != other.allocator_) {
-          deallocate_();
-          allocator_ = other.allocator_;
-          if constexpr (has_dynamic_capacity()) {
-            this->capacity_ = 0;
-            buffer_ = nullptr;
-          } else {
-            buffer_ = alt_::allocate(allocator_, Capacity);
-          }
-        }
-      }
+      if constexpr (!capacity_fixed_)
+        std::swap(buffer_.capacity, tmpbuf.capacity);
+      if constexpr (allocator_pocca_)
+        std::swap(buffer_.allocator, tmpbuf.allocator);
+      std::swap(buffer_.size, tmpbuf.size);
+      std::swap(buffer_.data, tmpbuf.data);
       return *this;
     }
 
-    if constexpr (ExceptionSafety == exception_safety::strong) {
-      const size_type tmp_capacity = has_dynamic_capacity() ? other.size_ : Capacity;
-      size_type tmp_size = 0;
-      const auto tmp_allocator = pocca_v ? other.allocator_ : allocator_;
-      const auto tmp_buffer = alt_::allocate(tmp_allocator, tmp_capacity);
-      try {
-        for (; tmp_size < other.size_; ++tmp_size)
-          alt_::construct(tmp_allocator, tmp_buffer + tmp_size, other.buffer_[tmp_size]);
-        clear();
-        deallocate_();
-        if constexpr (has_dynamic_capacity())
-          this->capacity_ = other.size_;
-        size_ = tmp_size;
-        buffer_ = tmp_buffer;
-        if constexpr (pocca_v)
-          allocator_ = other.allocator_;
-      } catch (...) {
-        while (tmp_size > 0) {
-          --tmp_size;
-          alt_::destroy(tmp_allocator, tmp_buffer + tmp_size);
-        }
-        alt_::deallocate(tmp_allocator, tmp_buffer, tmp_capacity);
-        throw;
-      }
-    } else {
-      clear();
-      if ((pocca_v && allocator_ != other.allocator_) || buffer_ == nullptr || this->capacity_ < other.size_) {
-        deallocate_();
-        if constexpr (has_dynamic_capacity())
-          this->capacity_ = other.size_;
-        if constexpr (pocca_v)
-          allocator_ = other.allocator_;
-        buffer_ = alt_::allocate(allocator_, this->capacity_);
-      }
-      try {
-        for (; size_ < other.size_; ++size_)
-          alt_::construct(allocator_, buffer_ + size_, other.buffer_[size_]);
-      } catch (...) {
-        while (size_ > 0) {
-          --size_;
-          alt_::destroy(allocator_, buffer_ + size_);
-        }
-        throw;
-      }
-    }
-    return *this;
-  }
-
-  constexpr ~heap_storage_base() noexcept
-  {
     clear();
-    deallocate_();
+    for (; buffer_.size < other.size(); ++buffer_.size)
+      allocator_traits::construct(buffer_.allocator, buffer_.data + buffer_.size, other.data()[buffer_.size]);
+    return *this;
   }
 };
 
@@ -331,18 +252,18 @@ protected:
 
 export namespace fmia {
 
-// normal heap memory, the size of the memory is determined at runtime
+// the size of the heap memory is determined at runtime
 template <typename T, meta::size_integral Size = usize, typename Allocator = std::allocator<T>>
 using heap_storage = heap_storage_base<T, Allocator, Size, dynamic_capacity<Size>, exception_safety::basic>;
 
 template <typename T, meta::size_integral Size = usize, typename Allocator = std::allocator<T>>
-using heap_storage_safer = heap_storage_base<T, Allocator, Size, dynamic_capacity<Size>, exception_safety::strong>;
+using safer_heap_storage = heap_storage_base<T, Allocator, Size, dynamic_capacity<Size>, exception_safety::strong>;
 
-// on-heap memory whose size is determined at compile-time
+// the size of the heap memory is determined at compile-time
 template <typename T, usize Capacity, typename Allocator = std::allocator<T>>
-using constant_heap_storage = heap_storage_base<T, Allocator, usize, Capacity, exception_safety::basic>;
+using fixed_heap_storage = heap_storage_base<T, Allocator, usize, Capacity, exception_safety::basic>;
 
 template <typename T, usize Capacity, typename Allocator = std::allocator<T>>
-using constant_heap_storage_safer = heap_storage_base<T, Allocator, usize, Capacity, exception_safety::strong>;
+using safer_fixed_heap_storage = heap_storage_base<T, Allocator, usize, Capacity, exception_safety::strong>;
 
 } // export namespace fmia
