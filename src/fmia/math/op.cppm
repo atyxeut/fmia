@@ -17,12 +17,12 @@ export module fmia.math.op;
 
 import std;
 
-import fmia.util.enum_flag;
 import fmia.meta;
+import fmia.util.enum_flag;
 
 export namespace fmia {
 
-enum class element_for_operator { add = 0, mul = 1 };
+enum class element_for_operator : enum_flag_underlying_type { add = 0, mul = 1 };
 
 template <element_for_operator Operator>
 struct neutral_element_tag
@@ -47,7 +47,7 @@ template <element_for_operator Operation, typename T>
 
 export namespace fmia {
 
-enum class operator_property { none = 0, associative = 1, commutative = 1 << 1 };
+enum class operator_property : enum_flag_underlying_type { none = 0, associative = 1, commutative = 1 << 1 };
 
 } // export namespace fmia
 

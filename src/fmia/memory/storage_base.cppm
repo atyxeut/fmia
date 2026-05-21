@@ -19,10 +19,11 @@ import std;
 
 import fmia.math.integer.fixed_precision;
 import fmia.memory.core;
+import fmia.util.enum_flag;
 
 export namespace fmia {
 
-enum class storage_location { heap, inplace };
+enum class storage_location : enum_underlying_type { heap, inplace };
 
 } // export namespace fmia
 

@@ -13,12 +13,23 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.memory.core;
+export module fmia.io.format_flag;
+
+import std;
 
 import fmia.util.enum_flag;
 
-export namespace fmia {
+export namespace fmia::io {
 
-enum class exception_safety : enum_underlying_type { basic, strong };
+enum class fmt : enum_flag_underlying_type { none, endl };
 
-} // export namespace fmia
+} // export namespace fmia::io
+
+export namespace fmia::meta {
+
+template <>
+struct is_enum_flag<io::fmt> : std::true_type
+{
+};
+
+} // export namespace fmia::meta

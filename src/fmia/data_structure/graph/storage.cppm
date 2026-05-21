@@ -17,12 +17,12 @@ export module fmia.data_structure.graph.storage;
 
 import std;
 
-import fmia.math;
 import fmia.meta.arithmetic;
+import fmia.util.enum_flag;
 
 export namespace fmia::graph {
 
-enum class graph_tag : u8 { undirected, directed };
+enum class category : enum_underlying_type { undirected, directed };
 
 } // export namespace fmia::graph
 

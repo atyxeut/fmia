@@ -18,30 +18,30 @@ export module fmia.data_structure.graph.traverse;
 import std;
 
 import fmia.data_structure.graph.storage;
-import fmia.math;
+import fmia.util.enum_flag;
 
 namespace fmia::graph {
 
-enum class trail_tag : u8 { none, circuit };
-enum class path_tag : u8 { none, cycle };
+enum class trail_tag : enum_underlying_type { none, circuit };
+enum class path_tag : enum_underlying_type { none, cycle };
 
 } // namespace fmia::graph
 
 export namespace fmia::graph {
 
-enum class eulerian_graph_error : u8 { no_eulerian_trail, no_eulerian_circuit };
+enum class eulerian_graph_error : enum_underlying_type { no_eulerian_trail, no_eulerian_circuit };
 
 } // export namespace fmia::graph
 
 namespace fmia::graph {
 
-template <graph_tag GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
+template <category GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
 constexpr std::pair<Vertex, bool> get_eulerian_trail_start_vertex(const Graph& g) noexcept
 {
   const auto n = g.vertex_size();
   Vertex start = -1, end = -1;
 
-  if constexpr (GraphTag == graph_tag::undirected) {
+  if constexpr (GraphTag == category::undirected) {
     for (Vertex u = 0; u < n; ++u) {
       if (g.degree(u) & 1) {
         if (start == -1)
@@ -54,7 +54,7 @@ constexpr std::pair<Vertex, bool> get_eulerian_trail_start_vertex(const Graph& g
     }
   }
 
-  if constexpr (GraphTag == graph_tag::directed) {
+  if constexpr (GraphTag == category::directed) {
     for (Vertex u = 0; u < n; ++u) {
       const auto diff = g.in_degree(u) - g.out_degree(u);
       if (diff < -1 | diff > 1 | (diff == -1 & start != -1) | (diff == 1 & end != -1))
@@ -160,21 +160,21 @@ constexpr void get_an_eulerian_trail_impl_for_directed_iterative(const G& g, T s
   }
 }
 
-template <graph_tag GraphTag, typename T, typename G, typename U>
+template <category GraphTag, typename T, typename G, typename U>
 constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start)
 {
   auto cur_edge_it = init_current_edge_iterators(g);
 
-  if constexpr (GraphTag == graph_tag::undirected) {
+  if constexpr (GraphTag == category::undirected) {
     std::vector<bool> vis(g.edge_size() >> 1);
     get_an_eulerian_trail_impl_for_undirected_iterative(g, start, cur_edge_it, vis, path);
   }
 
-  if constexpr (GraphTag == graph_tag::directed)
+  if constexpr (GraphTag == category::directed)
     get_an_eulerian_trail_impl_for_directed_iterative(g, start, cur_edge_it, path);
 }
 
-template <trail_tag TrailTag, graph_tag GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
+template <trail_tag TrailTag, category GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
 constexpr std::expected<std::vector<Vertex>, eulerian_graph_error> get_an_eulerian_trail(const Graph& g)
 {
   std::vector<Vertex> path;
@@ -207,38 +207,38 @@ export namespace fmia::graph {
 template <meta::graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_trail_for_undirected(const T& g)
 {
-  return get_an_eulerian_trail<trail_tag::none, graph_tag::undirected>(g);
+  return get_an_eulerian_trail<trail_tag::none, category::undirected>(g);
 }
 
 template <meta::graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_circuit_for_undirected(const T& g)
 {
-  return get_an_eulerian_trail<trail_tag::circuit, graph_tag::undirected>(g);
+  return get_an_eulerian_trail<trail_tag::circuit, category::undirected>(g);
 }
 
 template <meta::graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_trail_for_directed(const T& g)
 {
-  return get_an_eulerian_trail<trail_tag::none, graph_tag::directed>(g);
+  return get_an_eulerian_trail<trail_tag::none, category::directed>(g);
 }
 
 template <meta::graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_circuit_for_directed(const T& g)
 {
-  return get_an_eulerian_trail<trail_tag::circuit, graph_tag::directed>(g);
+  return get_an_eulerian_trail<trail_tag::circuit, category::directed>(g);
 }
 
 } // export namespace fmia::graph
 
 export namespace fmia::graph {
 
-enum class toposort_error : u8 { has_cycle };
+enum class toposort_error : enum_underlying_type { has_cycle };
 
 } // export namespace fmia::graph
 
 namespace fmia::graph {
 
-enum class toposort_tag : u8 { none, lexicographical };
+enum class toposort_tag : enum_underlying_type { none, lexicographical };
 
 template <toposort_tag Order, typename Graph, typename Fn>
 constexpr std::expected<bool, toposort_error> toposort_impl(const Graph& g, Fn&& fn)

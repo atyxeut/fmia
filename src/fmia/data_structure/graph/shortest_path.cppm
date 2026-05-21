@@ -18,12 +18,12 @@ export module fmia.data_structure.graph.shortest_path;
 import std;
 
 import fmia.data_structure.graph.storage;
-import fmia.math;
 import fmia.meta.arithmetic;
+import fmia.util.enum_flag;
 
 export namespace fmia::graph::shortest_path {
 
-enum class error : u8 { empty_graph, negative_cycle };
+enum class error : enum_underlying_type { empty_graph, negative_cycle };
 
 } // export namespace fmia::graph::shortest_path
 
