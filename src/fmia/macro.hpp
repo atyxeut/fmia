@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-// NOLINTBEGIN
+// IWYU pragma: begin_keep
 
 #include "macro/is_in_debug_mode.hpp"
 #include "macro/wconversion_switch.hpp"
 
-// NOLINTEND
+// IWYU pragma: end_keep
