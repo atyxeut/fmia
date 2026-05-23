@@ -19,13 +19,13 @@ import std;
 
 import fmia.math.integer.fixed_precision;
 
-export {
+export namespace fmia {
 
 using f32 = float;       // precision: 6 to 9 decimal places
 using f64 = double;      // precision: 15 to 17 decimal places
 using f80 = long double; // precision: 18 to 20 decimal places (note that on MSVC long double is double)
 
-} // export
+} // export namespace fmia
 
 // forward declarations
 export namespace fmia::ieee754 {
@@ -44,7 +44,7 @@ class d;
 
 // clang-format off
 
-export {
+export namespace fmia {
 
 // f128 precision: 33 to 35 decimal places
 #ifdef __SIZEOF_FLOAT128__
@@ -54,7 +54,7 @@ export {
   using f128 = ::fmia::ieee754::f<128>;
 #endif
 
-} // export
+} // export namespace fmia
 
 // clang-format on
 

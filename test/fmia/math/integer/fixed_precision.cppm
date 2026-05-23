@@ -21,6 +21,7 @@ import fmia.math.integer.fixed_precision;
 
 using namespace fmia;
 using namespace fmia::meta;
+using namespace fmia::operator_overload::io_operator;
 
 consteval void does_is_boolean_work() noexcept
 {

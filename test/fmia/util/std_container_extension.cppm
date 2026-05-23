@@ -25,6 +25,7 @@ import fmia.memory.allocator;
 import fmia.util.std_container_extension;
 
 using namespace fmia;
+using namespace fmia::operator_overload::io_operator;
 
 export {
 

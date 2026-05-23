@@ -231,7 +231,7 @@ void print(std::ostream& ostr, const std::pair<T1, T2>& p, Delim&& delim = std::
 
 } // export namespace fmia
 
-export {
+export namespace fmia::inline operator_overload::inline io_operator {
 
 template <typename T1, typename T2>
 auto& operator <<(std::ostream& ostr, const std::pair<T1, T2>& p)
@@ -240,7 +240,7 @@ auto& operator <<(std::ostream& ostr, const std::pair<T1, T2>& p)
   return ostr;
 }
 
-} // export
+} // export namespace fmia::inline operator_overload::inline io_operator
 
 export namespace fmia {
 
@@ -257,7 +257,7 @@ void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim = std::
 
 } // export namespace fmia
 
-export {
+export namespace fmia::inline operator_overload::inline io_operator {
 
 template <typename... Ts>
 auto& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
@@ -266,7 +266,7 @@ auto& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
   return ostr;
 }
 
-} // export
+} // export namespace fmia::inline operator_overload::inline io_operator
 
 namespace fmia::meta::cpp17 {
 
@@ -370,7 +370,7 @@ void print(std::ostream& ostr, const T& arr, Delim&& delim = std::string(1, ' ')
 
 } // export namespace fmia
 
-export {
+export namespace fmia::inline operator_overload::inline io_operator {
 
 // clang-format off
 
@@ -396,4 +396,4 @@ auto& operator <<(std::ostream& ostr, const T (&arr)[N])
   return ostr;
 }
 
-} // export
+} // export namespace fmia::inline operator_overload::inline io_operator

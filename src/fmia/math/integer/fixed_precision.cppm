@@ -31,7 +31,7 @@ import fmia.meta.type_list;
 
 // clang-format off
 
-export {
+export namespace fmia {
 
 using i8  = std::int8_t;
 using u8  = std::uint8_t;
@@ -48,7 +48,7 @@ using idx64 = i64;
 using isize = std::ptrdiff_t;
 using usize = std::size_t;
 
-} // export
+} // export namespace fmia
 
 // clang-format on
 
@@ -183,9 +183,9 @@ class u;
 
 // clang-format off
 
-export {
- 
 #if defined(__SIZEOF_INT128__) || _MSC_VER >= 1934
+  export namespace fmia {
+
   #ifdef __SIZEOF_INT128__
     // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html
     __extension__ using i128 = __int128;
@@ -195,42 +195,46 @@ export {
     using u128 = std::_Unsigned128;
   #endif
 
+  } // export namespace fmia
+
+  export namespace fmia::inline operator_overload::inline io_operator {
+
   auto& operator >>(std::istream& istr, u128& n)
   {
     std::string buffer;
     istr >> buffer;
-  
+
     n = 0;
     for (char ch : buffer)
       n = n * 10 + static_cast<u128>(ch - '0');
-  
+
     return istr;
   }
-  
+
   auto& operator >>(std::istream& istr, i128& n)
   {
     std::string buffer;
     istr >> buffer;
-  
+
     const int sgn = buffer[0] == '-' ? -1 : 1;
-  
+
     u128 mag = 0;
     for (usize i = sgn < 0; i < buffer.size(); ++i)
       mag = mag * 10 + static_cast<u128>(buffer[i] - '0');
-  
+
     if (mag > std::numeric_limits<i128>::max() || sgn > 0)
       n = static_cast<i128>(mag);
     else
       n = -static_cast<i128>(mag);
-  
+
     return istr;
   }
-  
+
   auto& operator <<(std::ostream& ostr, u128 n)
   {
     if (n == 0)
       return ostr << '0';
-  
+
     std::string buffer;
     for (; n; n /= 10)
       buffer += static_cast<char>(n % 10 + '0');
@@ -248,12 +252,16 @@ export {
       ostr << static_cast<u128>(n);
     return ostr;
   }
+
+  } // export namespace fmia::inline operator_overload::inline io_operator
 #else
+  export namespace fmia {
+
   using i128 = ::fmia::integer::i<128>;
   using u128 = ::fmia::integer::u<128>;
-#endif
 
-} // export
+  } // export namespace fmia
+#endif
 
 // clang-format on
 

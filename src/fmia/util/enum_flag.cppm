@@ -39,7 +39,7 @@ concept enum_flag = is_enum_flag_v<T>;
 
 } // export namespace fmia::meta
 
-export {
+export namespace fmia::inline operator_overload::inline enum_flag_operator {
 
 template <::fmia::meta::enum_flag T>
 [[nodiscard]] constexpr auto operator &(T a, T b) noexcept
@@ -77,4 +77,4 @@ constexpr auto& operator |=(T& a, T b) noexcept
   return a = a | b;
 };
 
-} // export
+} // export namespace fmia::inline operator_overload::inline enum_flag_operator
