@@ -42,12 +42,48 @@ using u32 = std::uint32_t;
 using i64 = std::int64_t;
 using u64 = std::uint64_t;
 
+using idx32 = i32;
+using idx64 = i64;
+
 using isize = std::ptrdiff_t;
 using usize = std::size_t;
 
 } // export
 
 // clang-format on
+
+export namespace fmia::meta {
+
+template <typename T>
+struct is_no_cv_boolean : std::bool_constant<std::same_as<T, bool>>
+{
+};
+
+template <typename T>
+constexpr bool is_no_cv_boolean_v = is_no_cv_boolean<T>::value;
+
+template <typename T>
+using is_boolean = is_no_cv_boolean<std::remove_cv_t<T>>;
+
+template <typename T>
+constexpr bool is_boolean_v = is_boolean<T>::value;
+
+template <typename T>
+concept boolean = is_boolean_v<std::remove_cv_t<T>>;
+
+template <typename T>
+concept nonbool_standard_unsigned_integral = std::unsigned_integral<T> && !boolean<T>;
+
+template <typename T>
+concept nonbool_standard_integral = std::integral<T> && !boolean<T>;
+
+template <typename T>
+concept index_integral = std::same_as<T, idx32> || std::same_as<T, idx64> || std::same_as<T, isize>;
+
+template <typename T>
+concept standard_size_integral = std::same_as<T, usize>;
+
+} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -132,40 +168,6 @@ template <meta::state_integral T>
 
 } // export namespace fmia
 
-export namespace fmia::meta {
-
-template <typename T>
-concept size_integral = std::same_as<T, u32> || std::same_as<T, usize>;
-
-} // export namespace fmia::meta
-
-export namespace fmia::meta {
-
-template <typename T>
-struct is_no_cv_boolean : std::bool_constant<std::same_as<T, bool>>
-{
-};
-
-template <typename T>
-constexpr bool is_no_cv_boolean_v = is_no_cv_boolean<T>::value;
-
-template <typename T>
-using is_boolean = is_no_cv_boolean<std::remove_cv_t<T>>;
-
-template <typename T>
-constexpr bool is_boolean_v = is_boolean<T>::value;
-
-template <typename T>
-concept boolean = is_boolean_v<std::remove_cv_t<T>>;
-
-template <typename T>
-concept nonbool_standard_unsigned_integral = std::unsigned_integral<T> && !boolean<T>;
-
-template <typename T>
-concept nonbool_standard_integral = std::integral<T> && !boolean<T>;
-
-} // export namespace fmia::meta
-
 // forward declarations
 export namespace fmia::integer {
 
@@ -182,7 +184,7 @@ class u;
 // clang-format off
 
 export {
-
+ 
 #if defined(__SIZEOF_INT128__) || _MSC_VER >= 1934
   #ifdef __SIZEOF_INT128__
     // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html

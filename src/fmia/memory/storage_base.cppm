@@ -29,8 +29,8 @@ enum class storage_location : enum_underlying_type { heap, inplace };
 
 namespace fmia {
 
-template <meta::size_integral T>
-constexpr T dynamic_capacity = static_cast<T>(-1);
+template <meta::index_integral T>
+constexpr T dynamic_capacity = -1;
 
 template <typename Size, Size Capacity>
 struct heap_capacity;
@@ -253,10 +253,10 @@ protected:
 export namespace fmia {
 
 // the size of the heap memory is determined at runtime
-template <typename T, meta::size_integral Size = usize, typename Allocator = std::allocator<T>>
+template <typename T, meta::index_integral Size = usize, typename Allocator = std::allocator<T>>
 using heap_storage = heap_storage_base<T, Allocator, Size, dynamic_capacity<Size>, exception_safety::basic>;
 
-template <typename T, meta::size_integral Size = usize, typename Allocator = std::allocator<T>>
+template <typename T, meta::index_integral Size = usize, typename Allocator = std::allocator<T>>
 using safer_heap_storage = heap_storage_base<T, Allocator, Size, dynamic_capacity<Size>, exception_safety::strong>;
 
 // the size of the heap memory is determined at compile-time
