@@ -13,6 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.data_structure.binary_search_tree;
-
-export import fmia.data_structure.binary_search_tree.naive;
+export module fmia.data_structure.binary_tree.binary_search_tree;

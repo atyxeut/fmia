@@ -14,5 +14,3 @@
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
 export module fmia.data_structure.stack;
-
-export import fmia.data_structure.stack.vanilla;

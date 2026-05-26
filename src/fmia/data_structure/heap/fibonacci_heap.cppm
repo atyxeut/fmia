@@ -13,4 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.data_structure.segment_tree.multidimentional;
+export module fmia.data_structure.heap.fibonacci_heap;
