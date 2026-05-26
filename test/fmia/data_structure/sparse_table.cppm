@@ -13,7 +13,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.fmia.data_structure;
+export module test.fmia.data_structure.sparse_table;
 
-export import test.fmia.data_structure.sparse_table;
-export import test.fmia.data_structure.string;
+import std;
+
+import fmia.data_structure.sparse_table;
+
+using namespace fmia;
+
+export {
+
+void max_query_sparse_table() {
+  
+}
+  
+} // export
