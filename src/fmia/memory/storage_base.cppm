@@ -103,8 +103,8 @@ private:
       }
     }
 
-    constexpr explicit buffer_type_(size_type cap, const allocator_type& alloc, size_type size = 0)
-      : capacity_base(cap), allocator(alloc), size {size},
+    constexpr explicit buffer_type_(size_type cap, const allocator_type& alloc)
+      : capacity_base(cap), allocator(alloc), size {},
         data {this->capacity > 0 ? allocator_traits::allocate(allocator, this->capacity) : nullptr}
     {}
 
