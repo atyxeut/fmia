@@ -22,7 +22,6 @@ export module fmia.data_structure.sparse_table;
 import std;
 
 import fmia.math.integer.fixed_precision;
-import fmia.memory.core;
 import fmia.memory.storage_base;
 
 namespace fmia {

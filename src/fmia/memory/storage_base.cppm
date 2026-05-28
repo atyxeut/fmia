@@ -18,13 +18,88 @@ export module fmia.memory.storage_base;
 import std;
 
 import fmia.math.integer.fixed_precision;
-import fmia.memory.allocator;
-import fmia.memory.core;
 import fmia.util.enum_flag;
 
 export namespace fmia {
 
 enum class storage_location : enum_underlying_type { heap, inplace };
+enum class exception_safety : enum_underlying_type { basic, strong };
+
+} // export namespace fmia
+
+namespace fmia {
+
+enum class uninitialized_construction_category : enum_underlying_type { move, copy };
+
+template <typename Allocator, typename InputIt, typename ForwardIt>
+concept uninitialized_construct_function_invocable =
+  std::same_as<
+    typename std::allocator_traits<Allocator>::value_type, typename std::iterator_traits<ForwardIt>::value_type
+  >
+  && std::constructible_from<typename std::allocator_traits<Allocator>::value_type, std::iter_reference_t<InputIt>>;
+
+template <uninitialized_construction_category Category, typename Allocator, typename InputIt, typename ForwardIt>
+constexpr auto uninitialized_construct_n(Allocator& alloc, InputIt first, std::ptrdiff_t count, ForwardIt dest)
+{
+  if (count <= 0) {
+    if constexpr (Category == uninitialized_construction_category::move)
+      return std::pair {first, dest};
+    else
+      return dest;
+  }
+
+  using allocator_traits = std::allocator_traits<Allocator>;
+  using value_type = allocator_traits::value_type;
+
+  if !consteval {
+    if constexpr (
+      std::same_as<Allocator, std::allocator<value_type>> && std::is_trivially_copyable_v<value_type>
+      && std::contiguous_iterator<InputIt> && std::contiguous_iterator<ForwardIt>
+    ) {
+      std::memcpy(std::to_address(dest), std::to_address(first), count * sizeof(value_type));
+      if constexpr (Category == uninitialized_construction_category::move)
+        return std::pair {first + count, dest + count};
+      else
+        return dest + count;
+    }
+  }
+
+  auto cur = dest;
+  try {
+    for (; count-- > 0; ++first, (void)++cur) {
+      if constexpr (Category == uninitialized_construction_category::move)
+        allocator_traits::construct(alloc, std::addressof(*cur), std::move(*first));
+      else
+        allocator_traits::construct(alloc, std::addressof(*cur), *first);
+    }
+  } catch (...) {
+    for (; dest != cur; ++dest)
+      allocator_traits::destroy(alloc, std::addressof(*dest));
+    throw;
+  }
+  if constexpr (Category == uninitialized_construction_category::move)
+    return std::pair {first, cur};
+  else
+    return cur;
+}
+
+} // namespace fmia
+
+export namespace fmia {
+
+template <typename Allocator, std::input_iterator InputIt, std::forward_iterator ForwardIt>
+  requires uninitialized_construct_function_invocable<Allocator, InputIt, ForwardIt>
+constexpr auto uninitialized_move_n(Allocator& alloc, InputIt first, std::ptrdiff_t count, ForwardIt dest)
+{
+  return uninitialized_construct_n<uninitialized_construction_category::move>(alloc, first, count, dest);
+}
+
+template <typename Allocator, std::input_iterator InputIt, std::forward_iterator ForwardIt>
+  requires uninitialized_construct_function_invocable<Allocator, InputIt, ForwardIt>
+constexpr auto uninitialized_copy_n(Allocator& alloc, InputIt first, std::ptrdiff_t count, ForwardIt dest)
+{
+  return uninitialized_construct_n<uninitialized_construction_category::copy>(alloc, first, count, dest);
+}
 
 } // export namespace fmia
 

@@ -17,7 +17,7 @@ export module fmia.data_structure.string.trie;
 
 import std;
 
-import fmia.memory.core;
+import fmia.memory.storage_base;
 import fmia.meta;
 
 namespace fmia::detail {
