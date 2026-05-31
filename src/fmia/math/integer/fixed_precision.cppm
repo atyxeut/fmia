@@ -83,6 +83,9 @@ concept index_integral = std::same_as<T, idx32> || std::same_as<T, idx64> || std
 template <typename T>
 concept standard_size_integral = std::same_as<T, usize>;
 
+template <typename T>
+concept size_integral = standard_size_integral<T> || std::same_as<T, u32>;
+
 } // export namespace fmia::meta
 
 export namespace fmia::meta {

@@ -39,7 +39,7 @@ concept uninitialized_construct_function_invocable =
   && std::constructible_from<typename std::allocator_traits<Allocator>::value_type, std::iter_reference_t<InputIt>>;
 
 template <uninitialized_construction_category Category, typename Allocator, typename InputIt, typename ForwardIt>
-constexpr auto uninitialized_construct_n(Allocator& alloc, InputIt first, std::ptrdiff_t count, ForwardIt dest)
+constexpr auto uninitialized_construct_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest)
 {
   if (count <= 0) {
     if constexpr (Category == uninitialized_construction_category::move)
@@ -89,14 +89,14 @@ export namespace fmia {
 
 template <typename Allocator, std::input_iterator InputIt, std::forward_iterator ForwardIt>
   requires uninitialized_construct_function_invocable<Allocator, InputIt, ForwardIt>
-constexpr auto uninitialized_move_n(Allocator& alloc, InputIt first, std::ptrdiff_t count, ForwardIt dest)
+constexpr auto uninitialized_move_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest)
 {
   return uninitialized_construct_n<uninitialized_construction_category::move>(alloc, first, count, dest);
 }
 
 template <typename Allocator, std::input_iterator InputIt, std::forward_iterator ForwardIt>
   requires uninitialized_construct_function_invocable<Allocator, InputIt, ForwardIt>
-constexpr auto uninitialized_copy_n(Allocator& alloc, InputIt first, std::ptrdiff_t count, ForwardIt dest)
+constexpr auto uninitialized_copy_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest)
 {
   return uninitialized_construct_n<uninitialized_construction_category::copy>(alloc, first, count, dest);
 }
@@ -105,15 +105,11 @@ constexpr auto uninitialized_copy_n(Allocator& alloc, InputIt first, std::ptrdif
 
 namespace fmia {
 
-template <meta::index_integral T>
-constexpr T dynamic_storage_capacity = -1;
+template <meta::size_integral T>
+constexpr T dynamic_storage_capacity = static_cast<T>(-1);
 
 template <typename Size, Size Capacity>
-struct heap_capacity;
-
-template <typename Size, Size Capacity>
-  requires (Capacity >= 0)
-struct heap_capacity<Size, Capacity>
+struct heap_capacity
 {
   static constexpr Size capacity = Capacity;
   constexpr heap_capacity(Size) noexcept {};
@@ -127,12 +123,12 @@ struct heap_capacity<Size, Capacity>
   constexpr heap_capacity(Size cap) noexcept : capacity {cap} {}
 };
 
-template <typename T, typename Allocator, typename Size, Size Capacity, exception_safety ExceptionSafety>
+template <typename T, typename Size, Size Capacity, typename Allocator, exception_safety ExceptionSafety>
 class heap_buffer_base
 {
 public:
   using size_type = Size;
-  using difference_type = size_type;
+  using difference_type = std::make_signed_t<size_type>;
 
   using allocator_type = Allocator;
   using allocator_traits = std::allocator_traits<allocator_type>;
@@ -312,18 +308,18 @@ protected:
 export namespace fmia {
 
 // contiguous heap memory whose size is determined at runtime
-template <typename T, meta::index_integral Size, typename Allocator>
-using heap_buffer = heap_buffer_base<T, Allocator, Size, dynamic_storage_capacity<Size>, exception_safety::basic>;
+template <typename T, meta::size_integral Size, typename Allocator>
+using heap_buffer = heap_buffer_base<T, Size, dynamic_storage_capacity<Size>, Allocator, exception_safety::basic>;
 
-template <typename T, meta::index_integral Size, typename Allocator>
+template <typename T, meta::size_integral Size, typename Allocator>
 using safer_heap_buffer =
-  heap_buffer_base<T, Allocator, Size, dynamic_storage_capacity<Size>, exception_safety::strong>;
+  heap_buffer_base<T, Size, dynamic_storage_capacity<Size>, Allocator, exception_safety::strong>;
 
 // contiguous heap memory whose size is determined at compile-time
-template <typename T, idx64 Capacity, typename Allocator>
-using fixed_heap_buffer = heap_buffer_base<T, Allocator, idx64, Capacity, exception_safety::basic>;
+template <typename T, std::size_t Capacity, typename Allocator>
+using fixed_heap_buffer = heap_buffer_base<T, std::size_t, Capacity, Allocator, exception_safety::basic>;
 
-template <typename T, idx64 Capacity, typename Allocator>
-using safer_fixed_heap_buffer = heap_buffer_base<T, Allocator, idx64, Capacity, exception_safety::strong>;
+template <typename T, std::size_t Capacity, typename Allocator>
+using safer_fixed_heap_buffer = heap_buffer_base<T, std::size_t, Capacity, Allocator, exception_safety::strong>;
 
 } // export namespace fmia
