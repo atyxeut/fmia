@@ -18,30 +18,27 @@ export module fmia.memory.storage_base;
 import std;
 
 import fmia.math.integer.fixed_precision;
-import fmia.util.enum_flag;
 
 export namespace fmia {
 
-enum class storage_location : enum_underlying_type { heap, inplace };
-enum class exception_safety : enum_underlying_type { basic, strong };
+enum class storage_location { heap, inplace };
+enum class exception_safety { basic, strong };
 
 } // export namespace fmia
 
 namespace fmia {
 
-enum class uninitialized_construction_category : enum_underlying_type { move, copy };
+enum class uninitialized_construction_category { move, copy };
 
 template <typename Allocator, typename InputIt, typename ForwardIt>
 concept uninitialized_construct_function_invocable =
-  std::same_as<
-    typename std::allocator_traits<Allocator>::value_type, typename std::iterator_traits<ForwardIt>::value_type
-  >
+  std::same_as<typename std::allocator_traits<Allocator>::value_type, std::iter_value_t<ForwardIt>>
   && std::constructible_from<typename std::allocator_traits<Allocator>::value_type, std::iter_reference_t<InputIt>>;
 
 template <uninitialized_construction_category Category, typename Allocator, typename InputIt, typename ForwardIt>
 constexpr auto uninitialized_construct_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest)
 {
-  if (count <= 0) {
+  if (count == 0) {
     if constexpr (Category == uninitialized_construction_category::move)
       return std::pair {first, dest};
     else
@@ -58,17 +55,18 @@ constexpr auto uninitialized_construct_n(Allocator& alloc, InputIt first, std::s
     ) {
       std::memcpy(std::to_address(dest), std::to_address(first), count * sizeof(value_type));
       if constexpr (Category == uninitialized_construction_category::move)
-        return std::pair {first + count, dest + count};
+        return std::pair {first + static_cast<std::ptrdiff_t>(count), dest + static_cast<std::ptrdiff_t>(count)};
       else
-        return dest + count;
+        return dest + static_cast<std::ptrdiff_t>(count);
     }
   }
 
   auto cur = dest;
   try {
-    for (; count-- > 0; ++first, (void)++cur) {
+    for (; count > 0; ++first, (void)++cur) {
+      --count;
       if constexpr (Category == uninitialized_construction_category::move)
-        allocator_traits::construct(alloc, std::addressof(*cur), std::move(*first));
+        allocator_traits::construct(alloc, std::addressof(*cur), std::ranges::iter_move(first));
       else
         allocator_traits::construct(alloc, std::addressof(*cur), *first);
     }
@@ -140,16 +138,19 @@ public:
   using const_pointer = allocator_traits::const_pointer;
 
 private:
+  static constexpr bool move_nothrow_ = std::is_nothrow_move_constructible_v<value_type>;
+
+  static constexpr bool exception_safety_strong_ = ExceptionSafety == exception_safety::strong;
+
+  using capacity_base_ = heap_capacity<size_type, Capacity>;
   static constexpr bool capacity_fixed_ = Capacity != dynamic_storage_capacity<size_type>;
 
   static constexpr bool allocator_fixed_ = allocator_traits::is_always_equal::value;
   static constexpr bool allocator_pocma_ = allocator_traits::propagate_on_container_move_assignment::value;
   static constexpr bool allocator_pocca_ = allocator_traits::propagate_on_container_copy_assignment::value;
 
-  struct buffer_type_ : heap_capacity<Size, Capacity>
+  struct buffer_type_ : capacity_base_
   {
-    using capacity_base = heap_capacity<Size, Capacity>;
-
     [[no_unique_address]] allocator_type allocator;
     size_type size;
     pointer data;
@@ -157,13 +158,17 @@ private:
     [[nodiscard]] constexpr reference operator [](size_type i) noexcept { return data[i]; }
     [[nodiscard]] constexpr const_reference operator [](size_type i) const noexcept { return data[i]; }
 
-    constexpr void clear() noexcept
+    constexpr void destroy(size_type count) noexcept
+      pre(count <= size)
     {
-      if constexpr (std::is_trivially_destructible_v<value_type>)
-        size = 0;
-      else
-        while (size > 0)
-          allocator_traits::destroy(allocator, data + --size);
+      if constexpr (std::is_trivially_destructible_v<value_type>) {
+        size -= count;
+      } else {
+        while (count > 0) {
+          --count;
+          allocator_traits::destroy(allocator, data + static_cast<difference_type>(--size));
+        }
+      }
     }
 
     constexpr void deallocate() noexcept
@@ -175,12 +180,12 @@ private:
     }
 
     constexpr explicit buffer_type_(size_type cap, const allocator_type& alloc)
-      : capacity_base(cap), allocator(alloc), size {},
+      : capacity_base_(cap), allocator(alloc), size {},
         data {this->capacity > 0 ? allocator_traits::allocate(allocator, this->capacity) : nullptr}
     {}
 
     constexpr buffer_type_(buffer_type_&& other) noexcept
-      : capacity_base(std::move(other)), allocator(std::move(other.allocator)), size {std::exchange(other.size, 0)},
+      : capacity_base_(std::move(other)), allocator(std::move(other.allocator)), size {std::exchange(other.size, 0)},
         data {std::exchange(other.data, nullptr)}
     {}
 
@@ -189,9 +194,9 @@ private:
       if (this == std::addressof(other))
         return *this;
 
-      clear();
+      destroy(size);
       deallocate();
-      capacity_base::operator =(std::move(other));
+      capacity_base_::operator =(std::move(other));
       if constexpr (allocator_pocma_)
         allocator = std::move(other.allocator);
       size = std::exchange(other.size, 0);
@@ -204,7 +209,7 @@ private:
 
     constexpr ~buffer_type_() noexcept
     {
-      clear();
+      destroy(size);
       deallocate();
     }
   };
@@ -215,18 +220,39 @@ protected:
 public:
   [[nodiscard]] constexpr size_type max_size() const noexcept { return allocator_traits::max_size(buffer_.allocator); }
   [[nodiscard]] constexpr size_type capacity() const noexcept { return buffer_.capacity; }
-  [[nodiscard]] constexpr size_type size() const noexcept { return buffer_.size; }
 
   [[nodiscard]] constexpr allocator_type get_allocator() const noexcept { return buffer_.allocator; }
 
   [[nodiscard]] constexpr const_pointer data() const noexcept { return buffer_.data; }
 
-  constexpr void clear() noexcept { buffer_.clear(); }
+  constexpr void clear() noexcept { buffer_.destroy(buffer_.size); }
+
+  constexpr void recapacity(size_type count)
+    requires (!capacity_fixed_)
+    pre(count > this->capacity)
+  {
+    const pointer ndata = allocator_traits::allocate(buffer_.allocator, count);
+    try {
+      if constexpr (exception_safety_strong_ && !move_nothrow_)
+        uninitialized_copy_n(buffer_.allocator, buffer_.data, buffer_.size, ndata);
+      else
+        uninitialized_move_n(buffer_.allocator, buffer_.data; buffer_.size, ndata);
+    } catch (...) {
+      allocator_traits::deallocate(buffer_.allocator, ndata, count);
+      throw;
+    }
+    const size_type nsize = buffer_.size;
+    clear();
+    buffer_.deallocate();
+    buffer_.capacity = count;
+    buffer_.size = nsize;
+    buffer_.data = ndata;
+  }
 
 protected:
-  constexpr explicit heap_buffer_base(const allocator_type& alloc = allocator_type {}) : buffer_(0, alloc) {}
+  constexpr explicit heap_buffer_base(const allocator_type& alloc) : buffer_(0, alloc) {}
 
-  constexpr explicit heap_buffer_base(size_type cap, const allocator_type& alloc = allocator_type {})
+  constexpr explicit heap_buffer_base(size_type cap, const allocator_type& alloc)
     requires (!capacity_fixed_)
     : buffer_(cap, alloc)
   {}
@@ -243,10 +269,7 @@ protected:
       return *this;
     }
 
-    if (
-      (std::is_nothrow_move_constructible_v<value_type> || ExceptionSafety == exception_safety::basic)
-      && (buffer_.data && buffer_.capacity >= other.buffer_.size)
-    ) {
+    if ((move_nothrow_ || !exception_safety_strong_) && (buffer_.data && buffer_.capacity >= other.buffer_.size)) {
       buffer_.clear();
       uninitialized_move_n(buffer_.allocator, other.buffer_.data, other.buffer_.size, buffer_.data);
       buffer_.size = other.buffer_.size;
@@ -254,7 +277,7 @@ protected:
     }
 
     auto tmpbuf = buffer_type_(other.buffer_.size, buffer_.allocator);
-    if constexpr (ExceptionSafety == exception_safety::strong && !std::is_nothrow_move_constructible_v<value_type>)
+    if constexpr (exception_safety_strong_ && !move_nothrow_)
       uninitialized_copy_n(buffer_.allocator, other.buffer_.data, other.buffer_.size, tmpbuf.data);
     else
       uninitialized_move_n(buffer_.allocator, other.buffer_.data, other.buffer_.size, tmpbuf.data);
@@ -280,7 +303,7 @@ protected:
       return *this;
 
     if (
-      ExceptionSafety == exception_safety::strong || (allocator_pocca_ && buffer_.allocator != other.buffer_.allocator)
+      exception_safety_strong_ || (allocator_pocca_ && buffer_.allocator != other.buffer_.allocator)
       || buffer_.data == nullptr || buffer_.capacity < other.buffer_.size
     ) {
       auto tmpbuf = buffer_type_(other.buffer_.size, allocator_pocca_ ? other.buffer_.allocator : buffer_.allocator);
