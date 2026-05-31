@@ -309,17 +309,17 @@ export namespace fmia {
 
 // contiguous heap memory whose size is determined at runtime
 template <typename T, meta::size_integral Size, typename Allocator>
-using heap_buffer = heap_buffer_base<T, Size, dynamic_storage_capacity<Size>, Allocator, exception_safety::basic>;
+using relaxed_heap_buffer =
+  heap_buffer_base<T, Size, dynamic_storage_capacity<Size>, Allocator, exception_safety::basic>;
 
 template <typename T, meta::size_integral Size, typename Allocator>
-using safer_heap_buffer =
-  heap_buffer_base<T, Size, dynamic_storage_capacity<Size>, Allocator, exception_safety::strong>;
+using heap_buffer = heap_buffer_base<T, Size, dynamic_storage_capacity<Size>, Allocator, exception_safety::strong>;
 
 // contiguous heap memory whose size is determined at compile-time
 template <typename T, std::size_t Capacity, typename Allocator>
-using fixed_heap_buffer = heap_buffer_base<T, std::size_t, Capacity, Allocator, exception_safety::basic>;
+using relaxed_fixed_heap_buffer = heap_buffer_base<T, std::size_t, Capacity, Allocator, exception_safety::basic>;
 
 template <typename T, std::size_t Capacity, typename Allocator>
-using safer_fixed_heap_buffer = heap_buffer_base<T, std::size_t, Capacity, Allocator, exception_safety::strong>;
+using fixed_heap_buffer = heap_buffer_base<T, std::size_t, Capacity, Allocator, exception_safety::strong>;
 
 } // export namespace fmia
