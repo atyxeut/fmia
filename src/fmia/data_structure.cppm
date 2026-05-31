@@ -4,6 +4,7 @@
 export module fmia.data_structure;
 
 export import fmia.data_structure.binary_tree;
+export import fmia.data_structure.binary_lifting_table;
 export import fmia.data_structure.fenwick_tree;
 export import fmia.data_structure.graph;
 export import fmia.data_structure.hash_table;
