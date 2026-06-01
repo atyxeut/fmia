@@ -15,9 +15,10 @@
 
 set_xmakever("3.0.9")
 set_project("fast-modern-implementations-of-algorithms")
-set_languages("c++latest")
+set_languages("cxx26")
 
 add_rules("mode.debug", "mode.release")
+set_policy("check.auto_ignore_flags", false)
 
 if is_mode("release") then
   add_defines("NDEBUG")
@@ -33,6 +34,7 @@ if is_host("windows") then
   if get_config("toolchain") == "gcc" then
     -- gcc 16 still requires this on Windows
     add_syslinks("stdc++exp")
+    add_cxxflags("-fcontracts", "-freflection")
   end
 elseif is_host("macosx") then
   if get_config("toolchain") == "gcc" then

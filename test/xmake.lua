@@ -19,6 +19,12 @@ target("test-fmia")
   add_files("fmia/**.cppm", { public = true })
 target_end()
 
+target("test-any")
+  set_kind("binary")
+  add_deps("test-fmia")
+  add_files("runner/any.cpp")
+target_end()
+
 target("test-math-int128_output")
   set_kind("binary")
   add_deps("test-fmia")
