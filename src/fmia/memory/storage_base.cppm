@@ -229,14 +229,20 @@ public:
 
   constexpr void recapacity(size_type count)
     requires (!capacity_fixed_)
-    pre(count > this->capacity)
+    pre(count > buffer_.capacity)
   {
+    if (buffer_.capacity == 0) {
+      buffer_.data = allocator_traits::allocate(buffer_.allocator, count);
+      buffer_.capacity = count;
+      return;
+    }
+
     const pointer ndata = allocator_traits::allocate(buffer_.allocator, count);
     try {
       if constexpr (exception_safety_strong_ && !move_nothrow_)
         uninitialized_copy_n(buffer_.allocator, buffer_.data, buffer_.size, ndata);
       else
-        uninitialized_move_n(buffer_.allocator, buffer_.data; buffer_.size, ndata);
+        uninitialized_move_n(buffer_.allocator, buffer_.data, buffer_.size, ndata);
     } catch (...) {
       allocator_traits::deallocate(buffer_.allocator, ndata, count);
       throw;
