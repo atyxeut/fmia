@@ -25,6 +25,12 @@ target("test-any")
   add_files("runner/any.cpp")
 target_end()
 
+target("test-data_structure-sparse_table-math_correctness")
+  set_kind("binary")
+  add_deps("test-fmia")
+  add_files("runner/data_structure/sparse_table/math_correctness.cpp")
+target_end()
+
 target("test-math-int128_output")
   set_kind("binary")
   add_deps("test-fmia")

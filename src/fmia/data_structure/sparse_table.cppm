@@ -86,7 +86,7 @@ public:
   template <std::ranges::forward_range R, typename F = MergeFn>
   constexpr explicit sparse_table(R&& r, F&& fn = MergeFn {}, const allocator_type& alloc = allocator_type {}) //
     pre(std::ranges::size(r) > 0)
-    : Buffer(alloc), fn_(std::forward<F>(fn)), size_ {std::ranges::size(r)}, max_exp_p1_ {ilog2(size_) + 1}
+    : Buffer(alloc), fn_(std::forward<F>(fn)), size_ {std::ranges::size(r)}, max_exp_p1_ {static_cast<size_type>(ilog2(size_) + 1)}
   {
     // sum_(j = 0)^(J) (n - 2^j + 1) = (n + 1)(j + 1) - (2^(j + 1) - 1)
     this->recapacity((size_ + 1) * max_exp_p1_ - (static_cast<size_type>(1) << max_exp_p1_) + 1);

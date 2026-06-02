@@ -53,12 +53,12 @@ using type_list_2 = type_list<std::string, unsigned, const volatile bool, bool>;
 using type_list_3 = type_list<int, char, const int, volatile char>;
 using type_list_4 = type_list<int, int, int, int, int, int, int>;
 using type_list_5 = type_list<
-  const float, float, double, int, const double, char, std::byte, volatile unsigned long long, volatile void, char,
-  unsigned char, signed char, short, void, const void
+  const float, float, double, int, const double, char, std::byte, volatile unsigned long long, volatile void, char, unsigned char,
+  signed char, short, void, const void
 >;
 using type_list_6 = type_list<
-  const float, float, double, int, const double, std::byte, volatile unsigned long long, volatile void, unsigned char,
-  signed char, short, void, const void
+  const float, float, double, int, const double, std::byte, volatile unsigned long long, volatile void, unsigned char, signed char, short,
+  void, const void
 >;
 
 using indexed_type_list_1 = indexed_type_list<std::make_index_sequence<length_v<type_list_1>>, type_list_1>;
@@ -89,9 +89,7 @@ consteval void does_cons_work() noexcept
 {
   // cons for meta::type_list
   static_assert(std::same_as<cons_t<int, type_list_1>, type_list<int, double, float, std::vector<int>, long long>>);
-  static_assert(
-    std::same_as<cons_t<void, type_list_2>, type_list<void, std::string, unsigned, const volatile bool, bool>>
-  );
+  static_assert(std::same_as<cons_t<void, type_list_2>, type_list<void, std::string, unsigned, const volatile bool, bool>>);
   static_assert(std::same_as<cons_t<double, type_list_3>, type_list<double, int, char, const int, volatile char>>);
 
   // cons for meta::indexed_type_list
@@ -99,9 +97,8 @@ consteval void does_cons_work() noexcept
     indexed_type_list<std::index_sequence<4, 0, 1, 2, 3>, type_list<int, double, float, std::vector<int>, long long>>;
   static_assert(std::same_as<cons_t<indexed_type<4, int>, indexed_type_list_1>, indexed_type_list_1_after_cons>);
 
-  using indexed_type_list_2_after_cons = indexed_type_list<
-    std::index_sequence<4, 0, 1, 2, 3>, type_list<double, std::string, unsigned, const volatile bool, bool>
-  >;
+  using indexed_type_list_2_after_cons =
+    indexed_type_list<std::index_sequence<4, 0, 1, 2, 3>, type_list<double, std::string, unsigned, const volatile bool, bool>>;
   static_assert(std::same_as<cons_t<indexed_type<4, double>, indexed_type_list_2>, indexed_type_list_2_after_cons>);
 
   using indexed_type_list_3_after_cons =
@@ -113,9 +110,7 @@ consteval void does_snoc_work() noexcept
 {
   // snoc for meta::type_list
   static_assert(std::same_as<snoc_t<int, type_list_1>, type_list<double, float, std::vector<int>, long long, int>>);
-  static_assert(
-    std::same_as<snoc_t<void, type_list_2>, type_list<std::string, unsigned, const volatile bool, bool, void>>
-  );
+  static_assert(std::same_as<snoc_t<void, type_list_2>, type_list<std::string, unsigned, const volatile bool, bool, void>>);
   static_assert(std::same_as<snoc_t<double, type_list_3>, type_list<int, char, const int, volatile char, double>>);
 
   // snoc for meta::indexed_type_list
@@ -123,9 +118,8 @@ consteval void does_snoc_work() noexcept
     indexed_type_list<std::index_sequence<0, 1, 2, 3, 4>, type_list<double, float, std::vector<int>, long long, int>>;
   static_assert(std::same_as<snoc_t<indexed_type<4, int>, indexed_type_list_1>, indexed_type_list_1_after_snoc>);
 
-  using indexed_type_list_2_after_snoc = indexed_type_list<
-    std::index_sequence<0, 1, 2, 3, 4>, type_list<std::string, unsigned, const volatile bool, bool, double>
-  >;
+  using indexed_type_list_2_after_snoc =
+    indexed_type_list<std::index_sequence<0, 1, 2, 3, 4>, type_list<std::string, unsigned, const volatile bool, bool, double>>;
   static_assert(std::same_as<snoc_t<indexed_type<4, double>, indexed_type_list_2>, indexed_type_list_2_after_snoc>);
 
   using indexed_type_list_3_after_snoc =
@@ -161,19 +155,17 @@ consteval void does_concat_work() noexcept
   static_assert(std::same_as<concat_t<empty_indexed_type_list>, empty_indexed_type_list>);
   static_assert(std::same_as<concat_t<indexed_type_list_2>, indexed_type_list_2>);
 
-  using concatenation_of_1_2 =
-    type_list<double, float, std::vector<int>, long long, std::string, unsigned, const volatile bool, bool>;
+  using concatenation_of_1_2 = type_list<double, float, std::vector<int>, long long, std::string, unsigned, const volatile bool, bool>;
   static_assert(std::same_as<concat_t<type_list_1, type_list_2>, concatenation_of_1_2>);
 
   using concatenation_of_1_2_3 = type_list<
-    double, float, std::vector<int>, long long, std::string, unsigned, const volatile bool, bool, int, char, const int,
-    volatile char
+    double, float, std::vector<int>, long long, std::string, unsigned, const volatile bool, bool, int, char, const int, volatile char
   >;
   static_assert(std::same_as<concat_t<type_list_1, type_list_2, type_list_3>, concatenation_of_1_2_3>);
 
   using concatenation_of_1_2_3_4 = type_list<
-    double, float, std::vector<int>, long long, std::string, unsigned, const volatile bool, bool, int, char, const int,
-    volatile char, int, int, int, int, int, int, int
+    double, float, std::vector<int>, long long, std::string, unsigned, const volatile bool, bool, int, char, const int, volatile char, int,
+    int, int, int, int, int, int
   >;
   static_assert(std::same_as<concat_t<type_list_1, type_list_2, type_list_3, type_list_4>, concatenation_of_1_2_3_4>);
 
@@ -186,9 +178,7 @@ consteval void does_concat_work() noexcept
   // by default
   static_assert(std::same_as<huge_concat_test_helper_t<huge_concatenation_before>, huge_concatenation_after>);
 
-  using list_1 = indexed_type_list<
-    std::index_sequence<0, 1, 2, 3, 4>, type_list<double, float, std::vector<int>, long long, std::string>
-  >;
+  using list_1 = indexed_type_list<std::index_sequence<0, 1, 2, 3, 4>, type_list<double, float, std::vector<int>, long long, std::string>>;
   using list_2 = indexed_type_list<std::index_sequence<5, 8, 9>, type_list<unsigned, const volatile bool, bool>>;
   using list_3 = indexed_type_list<std::index_sequence<0, 1, 2>, type_list<int, bool, void>>;
 
@@ -238,8 +228,7 @@ consteval void does_init_work() noexcept
   using init_type_list_of_2 = type_list<std::string, unsigned, const volatile bool>;
   static_assert(std::same_as<init_t<type_list_2>, init_type_list_of_2> == true);
 
-  using init_indexed_type_list_of_1 =
-    indexed_type_list<std::index_sequence<0, 1, 2>, type_list<double, float, std::vector<int>>>;
+  using init_indexed_type_list_of_1 = indexed_type_list<std::index_sequence<0, 1, 2>, type_list<double, float, std::vector<int>>>;
   static_assert(std::same_as<init_t<indexed_type_list_1>, init_indexed_type_list_of_1> == true);
 
   using init_indexed_type_list_of_2 =
@@ -349,9 +338,7 @@ consteval void does_take_while_work() noexcept
 consteval void does_take_while_end_work() noexcept
 {
   using take_while_type_list_of_empty_list_from_end = empty_type_list;
-  static_assert(
-    std::same_as<take_while_end_t<std::is_integral, empty_type_list>, take_while_type_list_of_empty_list_from_end>
-  );
+  static_assert(std::same_as<take_while_end_t<std::is_integral, empty_type_list>, take_while_type_list_of_empty_list_from_end>);
 
   using take_while_type_list_of_1_from_end = type_list<long long>;
   static_assert(std::same_as<take_while_end_t<std::is_integral, type_list_1>, take_while_type_list_of_1_from_end>);
@@ -363,17 +350,13 @@ consteval void does_take_while_end_work() noexcept
   static_assert(std::same_as<take_while_end_t<std::is_integral, type_list_3>, take_while_type_list_of_3_from_end>);
 
   using take_while_type_list_of_4_from_end = empty_type_list;
-  static_assert(
-    std::same_as<take_while_end_t<std::is_floating_point, type_list_4>, take_while_type_list_of_4_from_end>
-  );
+  static_assert(std::same_as<take_while_end_t<std::is_floating_point, type_list_4>, take_while_type_list_of_4_from_end>);
 
   using take_while_type_list_of_5_1_from_end = type_list<void, const void>;
   static_assert(std::same_as<take_while_end_t<std::is_void, type_list_5>, take_while_type_list_of_5_1_from_end>);
 
   using take_while_type_list_of_5_2_from_end = empty_type_list;
-  static_assert(
-    std::same_as<take_while_end_t<std::is_floating_point, type_list_5>, take_while_type_list_of_5_2_from_end>
-  );
+  static_assert(std::same_as<take_while_end_t<std::is_floating_point, type_list_5>, take_while_type_list_of_5_2_from_end>);
 }
 
 consteval void does_drop_while_work() noexcept
@@ -391,8 +374,8 @@ consteval void does_drop_while_work() noexcept
   static_assert(std::same_as<drop_while_t<std::is_void, type_list_4>, drop_while_type_list_of_4>);
 
   using drop_while_type_list_of_5 = type_list<
-    int, const double, char, std::byte, volatile unsigned long long, volatile void, char, unsigned char, signed char,
-    short, void, const void
+    int, const double, char, std::byte, volatile unsigned long long, volatile void, char, unsigned char, signed char, short, void,
+    const void
   >;
   static_assert(std::same_as<drop_while_t<std::is_floating_point, type_list_5>, drop_while_type_list_of_5>);
 }
@@ -412,18 +395,15 @@ consteval void does_drop_while_end_work() noexcept
   static_assert(std::same_as<drop_while_end_t<std::is_void, type_list_4>, drop_while_type_list_of_4_from_end>);
 
   using drop_while_type_list_of_5_from_end = type_list<
-    const float, float, double, int, const double, char, std::byte, volatile unsigned long long, volatile void, char,
-    unsigned char, signed char, short, void, const void
+    const float, float, double, int, const double, char, std::byte, volatile unsigned long long, volatile void, char, unsigned char,
+    signed char, short, void, const void
   >;
-  static_assert(
-    std::same_as<drop_while_end_t<std::is_floating_point, type_list_5>, drop_while_type_list_of_5_from_end>
-  );
+  static_assert(std::same_as<drop_while_end_t<std::is_floating_point, type_list_5>, drop_while_type_list_of_5_from_end>);
 }
 
 consteval void does_filter_work() noexcept
 {
-  using filtered_type_list_of_5_1 =
-    type_list<int, char, volatile unsigned long long, char, unsigned char, signed char, short>;
+  using filtered_type_list_of_5_1 = type_list<int, char, volatile unsigned long long, char, unsigned char, signed char, short>;
   static_assert(std::same_as<filter_t<std::is_integral, type_list_5>, filtered_type_list_of_5_1>);
 
   using filtered_type_list_of_5_2 = type_list<const float, float, double, const double>;
@@ -472,8 +452,8 @@ consteval void does_remove_work() noexcept
   static_assert(std::same_as<remove_t<int, type_list_4>, remove_all_int_type_list_of_4>);
 
   using remove_all_char_type_list_of_5 = type_list<
-    const float, float, double, int, const double, std::byte, volatile unsigned long long, volatile void, unsigned char,
-    signed char, short, void, const void
+    const float, float, double, int, const double, std::byte, volatile unsigned long long, volatile void, unsigned char, signed char, short,
+    void, const void
   >;
   static_assert(std::same_as<remove_t<char, type_list_5>, remove_all_char_type_list_of_5>);
 }
