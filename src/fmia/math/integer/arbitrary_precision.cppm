@@ -214,7 +214,7 @@ FMIA_WCONVERSION_PUSH()
 
 // used when b is way smaller than a
 [[nodiscard]] constexpr auto floor_div(const std::vector<int>& a, int b) -> floor_div_result<int>
-//  pre(b != 0)
+// pre(b != 0) unknown linking error
 {
   std::vector<int> q(a.size());
   long long r = 0;
@@ -230,8 +230,8 @@ FMIA_WCONVERSION_PUSH()
   return {std::move(q), static_cast<int>(r)};
 }
 
-[[nodiscard]] constexpr auto floor_div(const std::vector<int>& a, const std::vector<int>& b)
-  -> floor_div_result<std::vector<int>> pre(!is_zero(b))
+[[nodiscard]] constexpr auto floor_div(const std::vector<int>& a, const std::vector<int>& b) -> floor_div_result<std::vector<int>> //
+  pre(!is_zero(b))
 {
   const int cmp_result = compare<int>(a, b);
   if (cmp_result < 0)
@@ -315,7 +315,8 @@ FMIA_WCONVERSION_PUSH()
 
 FMIA_WCONVERSION_POP()
 
-[[nodiscard]] constexpr auto pow(std::vector<int> a, int n) -> std::vector<int> pre(n >= 0)
+[[nodiscard]] constexpr auto pow(std::vector<int> a, int n) -> std::vector<int> //
+  pre(n >= 0)
 {
   if (n == 0)
     return {1};
@@ -334,7 +335,8 @@ FMIA_WCONVERSION_POP()
 
 FMIA_WCONVERSION_PUSH()
 
-[[nodiscard]] constexpr auto floor_root(const std::vector<int>& a, int n) -> std::vector<int> pre(n > 0)
+[[nodiscard]] constexpr auto floor_root(const std::vector<int>& a, int n) -> std::vector<int> //
+  pre(n > 0)
 {
   if (n == 1 || is_zero(a))
     return a;

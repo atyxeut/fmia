@@ -160,7 +160,8 @@ private:
     [[nodiscard]] constexpr reference operator [](size_type i) noexcept { return data[i]; }
     [[nodiscard]] constexpr const_reference operator [](size_type i) const noexcept { return data[i]; }
 
-    constexpr void destroy(size_type count) noexcept pre(count <= size)
+    constexpr void destroy(size_type count) noexcept //
+      pre(count <= size)
     {
       if constexpr (std::is_trivially_destructible_v<value_type>) {
         size -= count;
@@ -228,9 +229,11 @@ public:
 
   constexpr void clear() noexcept { buffer_.destroy(buffer_.size); }
 
+  // clang-format off
+  
   constexpr void recapacity(size_type count)
     requires (!capacity_fixed_)
-  pre(count > buffer_.capacity)
+    pre(count > buffer_.capacity)
   {
     if (buffer_.capacity == 0) {
       buffer_.data = allocator_traits::allocate(buffer_.allocator, count);
@@ -255,6 +258,8 @@ public:
     buffer_.size = nsize;
     buffer_.data = ndata;
   }
+
+  // clang-format on
 
 protected:
   constexpr explicit heap_buffer_base(const allocator_type& alloc) : buffer_(0, alloc) {}

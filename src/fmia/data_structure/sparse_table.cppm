@@ -41,12 +41,14 @@ private:
   const size_type max_exp_p1_;
 
 public:
-  [[nodiscard]] constexpr auto&& operator [](this auto&& self, size_type i, size_type j) noexcept pre(j* self.size_ + i < self.buffer_.size)
+  [[nodiscard]] constexpr auto&& operator [](this auto&& self, size_type i, size_type j) noexcept //
+    pre(j* self.size_ + i < self.buffer_.size)
   {
     return std::forward<decltype(self)>(self).buffer_[j * self.size_ + i];
   }
 
-  [[nodiscard]] constexpr T query(size_type l, size_type r) const noexcept(std::is_nothrow_invocable_v<const MergeFn&, T, T>) pre(l <= r)
+  [[nodiscard]] constexpr T query(size_type l, size_type r) const noexcept(std::is_nothrow_invocable_v<const MergeFn&, T, T>) //
+    pre(l <= r)
   {
     if constexpr (meta::idempotent_operator<MergeFn, T>) {
       const size_type j = ilog2(r - l + 1);
