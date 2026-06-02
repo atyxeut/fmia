@@ -25,7 +25,7 @@ struct has_cv : std::bool_constant<std::is_const_v<T> || std::is_volatile_v<T>>
 };
 
 template <typename T>
-constexpr bool has_cv_v = has_cv<T>::value;
+inline constexpr bool has_cv_v = has_cv<T>::value;
 
 template <typename T>
 struct is_cv : std::bool_constant<std::is_const_v<T> && std::is_volatile_v<T>>
@@ -33,7 +33,7 @@ struct is_cv : std::bool_constant<std::is_const_v<T> && std::is_volatile_v<T>>
 };
 
 template <typename T>
-constexpr bool is_cv_v = is_cv<T>::value;
+inline constexpr bool is_cv_v = is_cv<T>::value;
 
 } // export namespace fmia::meta
 

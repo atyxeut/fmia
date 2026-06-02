@@ -32,7 +32,7 @@ struct is_enum_flag : std::false_type
 };
 
 template <typename T>
-constexpr bool is_enum_flag_v = is_enum_flag<T>::value;
+inline constexpr bool is_enum_flag_v = is_enum_flag<T>::value;
 
 template <typename T>
 concept enum_flag = is_enum_flag_v<T>;

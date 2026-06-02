@@ -34,13 +34,13 @@ struct is_no_cv_arbitrary_precision_integral : std::false_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_arbitrary_precision_integral_v = is_no_cv_arbitrary_precision_integral<T>::value;
+inline constexpr bool is_no_cv_arbitrary_precision_integral_v = is_no_cv_arbitrary_precision_integral<T>::value;
 
 template <typename T>
 using is_arbitrary_precision_integral = is_no_cv_arbitrary_precision_integral<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_arbitrary_precision_integral_v = is_arbitrary_precision_integral<T>::value;
+inline constexpr bool is_arbitrary_precision_integral_v = is_arbitrary_precision_integral<T>::value;
 
 template <typename T>
 concept arbitrary_precision_integral = is_arbitrary_precision_integral_v<T>;

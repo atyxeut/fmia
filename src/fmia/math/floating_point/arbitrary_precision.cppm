@@ -27,13 +27,13 @@ struct is_no_cv_arbitrary_precision_floating_point : std::false_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_arbitrary_precision_floating_point_v = is_no_cv_arbitrary_precision_floating_point<T>::value;
+inline constexpr bool is_no_cv_arbitrary_precision_floating_point_v = is_no_cv_arbitrary_precision_floating_point<T>::value;
 
 template <typename T>
 using is_arbitrary_precision_floating_point = is_no_cv_arbitrary_precision_floating_point<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_arbitrary_precision_floating_point_v = is_arbitrary_precision_floating_point<T>::value;
+inline constexpr bool is_arbitrary_precision_floating_point_v = is_arbitrary_precision_floating_point<T>::value;
 
 template <typename T>
 concept arbitrary_precision_floating_point = is_arbitrary_precision_floating_point_v<T>;

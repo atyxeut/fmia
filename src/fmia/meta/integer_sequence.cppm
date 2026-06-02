@@ -155,12 +155,12 @@ struct is_no_cv_no_duplication_integer_sequence<std::integer_sequence<Int, Is...
 };
 
 template <typename T>
-constexpr bool is_no_cv_no_duplication_integer_sequence_v = is_no_cv_no_duplication_integer_sequence<T>::value;
+inline constexpr bool is_no_cv_no_duplication_integer_sequence_v = is_no_cv_no_duplication_integer_sequence<T>::value;
 
 template <typename T>
 using is_no_duplication_integer_sequence = is_no_cv_no_duplication_integer_sequence<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_no_duplication_integer_sequence_v = is_no_duplication_integer_sequence<T>::value;
+inline constexpr bool is_no_duplication_integer_sequence_v = is_no_duplication_integer_sequence<T>::value;
 
 } // export namespace fmia::meta

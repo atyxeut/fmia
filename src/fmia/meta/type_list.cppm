@@ -33,13 +33,13 @@ struct is_any_of<T, U> : std::bool_constant<std::same_as<T, U>>
 };
 
 template <typename T, typename... Us>
-constexpr bool is_any_of_v = is_any_of<T, Us...>::value;
+inline constexpr bool is_any_of_v = is_any_of<T, Us...>::value;
 
 template <typename T, typename... Us>
 using is_none_of = std::negation<is_any_of<T, Us...>>;
 
 template <typename T, typename... Us>
-constexpr bool is_none_of_v = is_none_of<T, Us...>::value;
+inline constexpr bool is_none_of_v = is_none_of<T, Us...>::value;
 
 template <typename...>
 struct all_the_same : std::true_type
@@ -57,7 +57,7 @@ struct all_the_same<T, U> : std::bool_constant<std::same_as<T, U>>
 };
 
 template <typename... Ts>
-constexpr bool all_the_same_v = all_the_same<Ts...>::value;
+inline constexpr bool all_the_same_v = all_the_same<Ts...>::value;
 
 } // export namespace fmia::meta
 
@@ -79,13 +79,13 @@ struct is_no_cv_type_list<type_list<Ts...>> : std::true_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_type_list_v = is_no_cv_type_list<T>::value;
+inline constexpr bool is_no_cv_type_list_v = is_no_cv_type_list<T>::value;
 
 template <typename T>
 using is_type_list = is_no_cv_type_list<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_type_list_v = is_type_list<T>::value;
+inline constexpr bool is_type_list_v = is_type_list<T>::value;
 
 using empty_type_list = type_list<>;
 
@@ -100,13 +100,13 @@ struct is_no_cv_empty_type_list<empty_type_list> : std::true_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_empty_type_list_v = is_no_cv_empty_type_list<T>::value;
+inline constexpr bool is_no_cv_empty_type_list_v = is_no_cv_empty_type_list<T>::value;
 
 template <typename T>
 using is_empty_type_list = is_no_cv_empty_type_list<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_empty_type_list_v = is_empty_type_list<T>::value;
+inline constexpr bool is_empty_type_list_v = is_empty_type_list<T>::value;
 
 template <std::size_t I, typename T>
 struct indexed_type
@@ -132,13 +132,13 @@ struct is_no_cv_indexed_type<indexed_type<I, T>> : std::true_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_indexed_type_v = is_no_cv_indexed_type<T>::value;
+inline constexpr bool is_no_cv_indexed_type_v = is_no_cv_indexed_type<T>::value;
 
 template <typename T>
 using is_indexed_type = is_no_cv_indexed_type<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_indexed_type_v = is_indexed_type<T>::value;
+inline constexpr bool is_indexed_type_v = is_indexed_type<T>::value;
 
 template <typename, typename>
 struct indexed_type_list;
@@ -161,13 +161,13 @@ struct is_no_cv_indexed_type_list<indexed_type_list<std::index_sequence<Is...>, 
 };
 
 template <typename T>
-constexpr bool is_no_cv_indexed_type_list_v = is_no_cv_indexed_type_list<T>::value;
+inline constexpr bool is_no_cv_indexed_type_list_v = is_no_cv_indexed_type_list<T>::value;
 
 template <typename T>
 using is_indexed_type_list = is_no_cv_indexed_type_list<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_indexed_type_list_v = is_indexed_type_list<T>::value;
+inline constexpr bool is_indexed_type_list_v = is_indexed_type_list<T>::value;
 
 using empty_indexed_type_list = indexed_type_list<std::index_sequence<>, type_list<>>;
 
@@ -182,13 +182,13 @@ struct is_no_cv_empty_indexed_type_list<empty_indexed_type_list> : std::true_typ
 };
 
 template <typename T>
-constexpr bool is_no_cv_empty_indexed_type_list_v = is_no_cv_empty_indexed_type_list<T>::value;
+inline constexpr bool is_no_cv_empty_indexed_type_list_v = is_no_cv_empty_indexed_type_list<T>::value;
 
 template <typename T>
 using is_empty_indexed_type_list = is_no_cv_empty_indexed_type_list<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_empty_indexed_type_list_v = is_empty_indexed_type_list<T>::value;
+inline constexpr bool is_empty_indexed_type_list_v = is_empty_indexed_type_list<T>::value;
 
 template <typename T>
 concept list_of_types = is_type_list_v<T> || is_indexed_type_list_v<T>;
@@ -409,13 +409,13 @@ struct is_no_cv_template_wrapper<bind_back<T, BoundArgs...>> : std::true_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_template_wrapper_v = is_no_cv_template_wrapper<T>::value;
+inline constexpr bool is_no_cv_template_wrapper_v = is_no_cv_template_wrapper<T>::value;
 
 template <typename T>
 using is_template_wrapper = is_no_cv_template_wrapper<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_template_wrapper_v = is_template_wrapper<T>::value;
+inline constexpr bool is_template_wrapper_v = is_template_wrapper<T>::value;
 
 template <typename T>
 concept wrapped_template = is_template_wrapper_v<T>;
@@ -466,7 +466,7 @@ struct is_predicate : is_predicate_impl<T, std::make_index_sequence<ArityLimit>>
 };
 
 template <template <typename...> typename T, std::size_t ArityLimit = 5>
-constexpr bool is_predicate_v = is_predicate<T, ArityLimit>::value;
+inline constexpr bool is_predicate_v = is_predicate<T, ArityLimit>::value;
 
 template <template <typename...> typename T>
 concept predicate = is_predicate_v<T>;
@@ -891,14 +891,14 @@ struct any<T, type_list<Us...>> : std::disjunction<T<Us>...>
 };
 
 template <template <typename> typename T, typename TypeList>
-constexpr bool any_v = any<T, TypeList>::value;
+inline constexpr bool any_v = any<T, TypeList>::value;
 
 // test if none of the types of the given type list satisfy the given predicate
 template <template <typename> typename T, list_of_types U>
 using none = std::negation<any<T, U>>;
 
 template <template <typename> typename T, typename TypeList>
-constexpr bool none_v = none<T, TypeList>::value;
+inline constexpr bool none_v = none<T, TypeList>::value;
 
 // test if all of the types of the given type list satisfy the given predicate
 //
@@ -920,7 +920,7 @@ struct all<T, type_list<Us...>> : std::conjunction<T<Us>...>
 };
 
 template <template <typename> typename T, typename TypeList>
-constexpr bool all_v = all<T, TypeList>::value;
+inline constexpr bool all_v = all<T, TypeList>::value;
 
 template <typename, typename>
 struct has_any;
@@ -946,12 +946,12 @@ struct has_any<T, indexed_type_list<std::index_sequence<Is...>, type_list<Us...>
 };
 
 template <typename T, typename AnyTypeList>
-constexpr bool has_any_v = has_any<T, AnyTypeList>::value;
+inline constexpr bool has_any_v = has_any<T, AnyTypeList>::value;
 
 template <typename T, list_of_types U>
 using has_none = std::negation<has_any<T, U>>;
 
 template <typename T, typename U>
-constexpr bool has_none_v = has_none<T, U>::value;
+inline constexpr bool has_none_v = has_none<T, U>::value;
 
 } // export namespace fmia::meta

@@ -60,13 +60,13 @@ struct is_no_cv_boolean : std::bool_constant<std::same_as<T, bool>>
 };
 
 template <typename T>
-constexpr bool is_no_cv_boolean_v = is_no_cv_boolean<T>::value;
+inline constexpr bool is_no_cv_boolean_v = is_no_cv_boolean<T>::value;
 
 template <typename T>
 using is_boolean = is_no_cv_boolean<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_boolean_v = is_boolean<T>::value;
+inline constexpr bool is_boolean_v = is_boolean<T>::value;
 
 template <typename T>
 concept boolean = is_boolean_v<std::remove_cv_t<T>>;
@@ -289,14 +289,14 @@ struct is_no_cv_custom_twos_complement_signed_integral<integer::i<Bits>> : std::
 };
 
 template <typename T>
-constexpr bool is_no_cv_custom_twos_complement_signed_integral_v =
+inline constexpr bool is_no_cv_custom_twos_complement_signed_integral_v =
   is_no_cv_custom_twos_complement_signed_integral<T>::value;
 
 template <typename T>
 using is_custom_twos_complement_signed_integral = is_no_cv_custom_twos_complement_signed_integral<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_custom_twos_complement_signed_integral_v = is_custom_twos_complement_signed_integral<T>::value;
+inline constexpr bool is_custom_twos_complement_signed_integral_v = is_custom_twos_complement_signed_integral<T>::value;
 
 template <typename T>
 concept twos_complement_signed_integral =
@@ -313,13 +313,13 @@ struct is_no_cv_custom_unsigned_integral<integer::u<Bits>> : std::true_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_custom_unsigned_integral_v = is_no_cv_custom_unsigned_integral<T>::value;
+inline constexpr bool is_no_cv_custom_unsigned_integral_v = is_no_cv_custom_unsigned_integral<T>::value;
 
 template <typename T>
 using is_custom_unsigned_integral = is_no_cv_custom_unsigned_integral<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_custom_unsigned_integral_v = is_custom_unsigned_integral<T>::value;
+inline constexpr bool is_custom_unsigned_integral_v = is_custom_unsigned_integral<T>::value;
 
 template <typename T>
 concept custom_twos_complement_signed_integral = is_custom_twos_complement_signed_integral_v<T>;
@@ -483,13 +483,13 @@ struct is_no_cv_modular_integral : std::bool_constant<std::same_as<T, std::remov
 };
 
 template <typename T>
-constexpr bool is_no_cv_modular_integral_v = is_no_cv_modular_integral<T>::value;
+inline constexpr bool is_no_cv_modular_integral_v = is_no_cv_modular_integral<T>::value;
 
 template <typename T>
 using is_modular_integral = is_no_cv_modular_integral<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_modular_integral_v = is_modular_integral<T>::value;
+inline constexpr bool is_modular_integral_v = is_modular_integral<T>::value;
 
 template <typename T>
 concept modular_integral = is_modular_integral_v<T>;

@@ -67,13 +67,13 @@ struct is_no_cv_std_array<std::array<T, N>> : std::true_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_std_array_v = is_no_cv_std_array<T>::value;
+inline constexpr bool is_no_cv_std_array_v = is_no_cv_std_array<T>::value;
 
 template <typename T>
 using is_std_array = is_no_cv_std_array<std::remove_cv_t<T>>;
 
 template <typename T>
-constexpr bool is_std_array_v = is_std_array<T>::value;
+inline constexpr bool is_std_array_v = is_std_array<T>::value;
 
 } // export namespace fmia::meta
 
@@ -333,7 +333,7 @@ template <typename T>
 using is_std_ostream_interactable = is_std_ostream_interactable_impl<T>;
 
 template <typename T>
-constexpr bool is_std_ostream_interactable_v = is_std_ostream_interactable<T>::value;
+inline constexpr bool is_std_ostream_interactable_v = is_std_ostream_interactable<T>::value;
 
 } // export namespace fmia::meta::cpp17
 

@@ -121,7 +121,7 @@ struct is_no_cv_unweighted_graph : std::false_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_unweighted_graph_v = is_no_cv_unweighted_graph<T>::value;
+inline constexpr bool is_no_cv_unweighted_graph_v = is_no_cv_unweighted_graph<T>::value;
 
 template <typename T>
 concept unweighted_graph = is_no_cv_unweighted_graph_v<std::remove_cvref_t<T>>;
@@ -132,7 +132,7 @@ struct is_no_cv_weighted_graph : std::false_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_weighted_graph_v = is_no_cv_weighted_graph<T>::value;
+inline constexpr bool is_no_cv_weighted_graph_v = is_no_cv_weighted_graph<T>::value;
 
 template <typename T>
 concept weighted_graph = is_no_cv_weighted_graph_v<std::remove_cvref_t<T>>;
@@ -146,7 +146,7 @@ struct is_no_cv_basic_unweighted_graph : std::false_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_basic_unweighted_graph_v =
+inline constexpr bool is_no_cv_basic_unweighted_graph_v =
   is_no_cv_basic_unweighted_graph<T>::value || is_no_cv_unweighted_graph_v<T>;
 
 template <typename T>
@@ -158,7 +158,7 @@ struct is_no_cv_basic_weighted_graph : std::false_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_basic_weighted_graph_v =
+inline constexpr bool is_no_cv_basic_weighted_graph_v =
   is_no_cv_basic_weighted_graph<T>::value || is_no_cv_weighted_graph_v<T>;
 
 template <typename T>
@@ -177,7 +177,7 @@ struct is_no_cv_edge_list : std::false_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_edge_list_v = is_no_cv_edge_list<T>::value;
+inline constexpr bool is_no_cv_edge_list_v = is_no_cv_edge_list<T>::value;
 
 template <typename T>
 concept edge_list = is_no_cv_edge_list_v<std::remove_cvref_t<T>>;
@@ -188,7 +188,7 @@ struct is_no_cv_basic_edge_list : std::false_type
 };
 
 template <typename T>
-constexpr bool is_no_cv_basic_edge_list_v = is_no_cv_basic_edge_list<T>::value || is_no_cv_edge_list_v<T>;
+inline constexpr bool is_no_cv_basic_edge_list_v = is_no_cv_basic_edge_list<T>::value || is_no_cv_edge_list_v<T>;
 
 template <typename T>
 concept basic_edge_list = is_no_cv_basic_edge_list_v<std::remove_cvref_t<T>>;

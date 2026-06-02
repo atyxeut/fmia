@@ -25,7 +25,7 @@ struct not_same : std::negation<std::is_same<T, U>>
 };
 
 template <typename T, typename U>
-constexpr bool not_same_v = not_same<T, U>::value;
+inline constexpr bool not_same_v = not_same<T, U>::value;
 
 template <typename T, typename U>
 concept not_same_as = !std::same_as<T, U>;
