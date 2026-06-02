@@ -426,7 +426,7 @@ export namespace fmia {
 // no compilation error: unsigned int _ = abs(1u);
 // no overflow: unsigned int _ = abs(-2147483647 - 1);
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr meta::make_unsigned_t<T> abs(T x) noexcept
+[[nodiscard]] constexpr auto abs(T x) noexcept
 {
   // for negative x, ~x + 1 is |x| if the bit representation is 2's complement
   return x >= 0 ? static_cast<meta::make_unsigned_t<T>>(x) : ~static_cast<meta::make_unsigned_t<T>>(x) + 1;

@@ -36,7 +36,7 @@ enum class eulerian_graph_error : enum_underlying_type { no_eulerian_trail, no_e
 namespace fmia::graph {
 
 template <category GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
-constexpr std::pair<Vertex, bool> get_eulerian_trail_start_vertex(const Graph& g) noexcept
+[[nodiscard]] constexpr auto get_eulerian_trail_start_vertex(const Graph& g) noexcept -> std::pair<Vertex, bool>
 {
   const auto n = g.vertex_size();
   Vertex start = -1, end = -1;
@@ -89,7 +89,7 @@ constexpr std::pair<Vertex, bool> get_eulerian_trail_start_vertex(const Graph& g
 }
 
 template <typename Graph, typename Vertex = Graph::vertex_type, typename Iterator = Graph::neighbor_iterator>
-constexpr std::vector<Iterator> init_current_edge_iterators(const Graph& g)
+[[nodiscard]] constexpr auto init_current_edge_iterators(const Graph& g) -> std::vector<Iterator>
 {
   const auto n = g.vertex_size();
 
@@ -175,7 +175,7 @@ constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start)
 }
 
 template <trail_tag TrailTag, category GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
-constexpr std::expected<std::vector<Vertex>, eulerian_graph_error> get_an_eulerian_trail(const Graph& g)
+[[nodiscard]] constexpr auto get_an_eulerian_trail(const Graph& g) -> std::expected<std::vector<Vertex>, eulerian_graph_error>
 {
   std::vector<Vertex> path;
 
@@ -240,7 +240,7 @@ namespace fmia::graph {
 enum class toposort_tag : enum_underlying_type { none, lexicographical };
 
 template <toposort_tag Order, typename Graph, typename Fn>
-constexpr std::expected<bool, toposort_error> toposort_impl(const Graph& g, Fn&& fn)
+[[nodiscard]] constexpr auto toposort_impl(const Graph& g, Fn&& fn) -> std::expected<bool, toposort_error>
 {
   using vertex_type = Graph::vertex_type;
 

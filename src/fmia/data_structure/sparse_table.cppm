@@ -46,7 +46,7 @@ public:
     return std::forward<decltype(self)>(self).buffer_[j * self.size_ + i];
   }
 
-  [[nodiscard]] constexpr auto query(size_type l, size_type r) const noexcept(std::is_nothrow_invocable_v<const MergeFn&, T, T>) pre(l <= r)
+  [[nodiscard]] constexpr T query(size_type l, size_type r) const noexcept(std::is_nothrow_invocable_v<const MergeFn&, T, T>) pre(l <= r)
   {
     if constexpr (meta::idempotent_operator<MergeFn, T>) {
       const size_type j = ilog2(r - l + 1);
@@ -55,7 +55,7 @@ public:
       const size_type d = r - l + 1;
       size_type j = ilog2(d);
 
-      auto res = (*this)[l, j];
+      T res = (*this)[l, j];
       l += static_cast<size_type>(1) << j;
       while (l <= r) {
         --j;

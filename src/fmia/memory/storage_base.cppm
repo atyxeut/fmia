@@ -110,6 +110,7 @@ template <typename Size, Size Capacity>
 struct heap_capacity
 {
   static constexpr Size capacity = Capacity;
+
   constexpr heap_capacity(Size) noexcept {};
 };
 
@@ -118,6 +119,7 @@ template <typename Size, Size Capacity>
 struct heap_capacity<Size, Capacity>
 {
   Size capacity;
+
   constexpr heap_capacity(Size cap) noexcept : capacity {cap} {}
 };
 
@@ -302,7 +304,7 @@ protected:
     buffer_.size = other.buffer_.size;
   }
 
-  constexpr auto& operator =(const heap_buffer_base& other)
+  constexpr heap_buffer_base& operator =(const heap_buffer_base& other)
   {
     if (this == std::addressof(other))
       return *this;

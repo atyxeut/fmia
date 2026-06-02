@@ -145,7 +145,7 @@ private:
   enum class count_type_ { full_string, prefix };
 
   template <count_type_ CountType, typename T>
-  constexpr std::size_t count_impl_(T&& str) const noexcept
+  constexpr auto count_impl_(T&& str) const noexcept -> std::size_t
   {
     if (!root_)
       return 0;
@@ -166,13 +166,13 @@ private:
 
 public:
   template <meta::input_range_of<Char> T>
-  constexpr std::size_t count(T&& str) const noexcept
+  constexpr auto count(T&& str) const noexcept
   {
     return count_impl_<count_type_::full_string>(std::forward<T>(str));
   }
 
   template <meta::input_range_of<Char> T>
-  constexpr std::size_t count_has_prefix(T&& str) const noexcept
+  constexpr auto count_has_prefix(T&& str) const noexcept
   {
     return count_impl_<count_type_::prefix>(std::forward<T>(str));
   }

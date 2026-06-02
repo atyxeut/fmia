@@ -53,7 +53,7 @@ namespace fmia::random {
 constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
 template <bool AllowNegative>
-[[nodiscard]] std::string generate_integer_impl(std::size_t length)
+[[nodiscard]] auto generate_integer_impl(std::size_t length) -> std::string
 {
   if (length == 0)
     throw std::invalid_argument("length must be positive");
@@ -87,7 +87,7 @@ export namespace fmia::random {
 }
 
 template <std::integral T>
-[[nodiscard]] std::vector<T> generate_permutation(T begin, T end)
+[[nodiscard]] auto generate_permutation(T begin, T end) -> std::vector<T>
 {
   if (begin > end)
     throw std::invalid_argument("invalid integer range");
@@ -100,7 +100,7 @@ template <std::integral T>
 
 // get the edge list of a random unweighted tree
 template <bool GenerateStar = false, std::integral Vertex>
-[[nodiscard]] graph::basic_unweighted_edge_list<Vertex> generate_unweighted_tree(Vertex vertex_begin, Vertex vertex_end)
+[[nodiscard]] auto generate_unweighted_tree(Vertex vertex_begin, Vertex vertex_end) -> graph::basic_unweighted_edge_list<Vertex>
 {
   if (vertex_begin > vertex_end)
     throw std::invalid_argument("invalid vertex index range");
@@ -123,8 +123,8 @@ template <bool GenerateStar = false, std::integral Vertex>
 
 // get the edge list of a random weighted tree
 template <bool GenerateStar = false, std::integral Vertex, std::integral Weight>
-[[nodiscard]] graph::basic_weighted_edge_list<Vertex, Weight>
-generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
+[[nodiscard]] auto generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
+  -> graph::basic_weighted_edge_list<Vertex, Weight>
 {
   if (vertex_begin > vertex_end)
     throw std::invalid_argument("invalid vertex index range");
