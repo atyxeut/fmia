@@ -72,6 +72,7 @@ consteval void does_compare_precision_for_integral_work() noexcept
   static_assert(compare_precision_v<i128, i128> == 0);
   static_assert(!precision_comparable<i128, u128>);
 
+#if !(defined(__SIZEOF_INT128__) || _MSC_VER >= 1934)
   static_assert(compare_precision_v<i128, integer::i<128>> == 0);
   static_assert(compare_precision_v<integer::u<128>, u128> == 0);
 
@@ -85,6 +86,7 @@ consteval void does_compare_precision_for_integral_work() noexcept
 
   static_assert(!precision_comparable<integer::i<128>, integer::u<128>>);
   static_assert(!precision_comparable<integer::u<128>, integer::i<128>>);
+#endif
 }
 
 consteval void does_compare_precision_for_floating_point_work() noexcept
@@ -96,17 +98,17 @@ consteval void does_compare_precision_for_floating_point_work() noexcept
   static_assert(compare_precision_v<double, f128> == -1);
   static_assert(compare_precision_v<f128, f128> == 0);
 
+#ifndef __SIZEOF_FLOAT128__
   static_assert(compare_precision_v<double, ieee754::f<128>> == -1);
-
   static_assert(compare_precision_v<ieee754::f<128>, ieee754::f<128>> == 0);
   static_assert(compare_precision_v<ieee754::f<128>, ieee754::f<256>> == -1);
   static_assert(compare_precision_v<ieee754::f<256>, ieee754::f<128>> == 1);
+  static_assert(!precision_comparable<ieee754::f<128>, ieee754::d<128>>);
+  static_assert(!precision_comparable<ieee754::f<128>, ieee754::d<256>>);
+#endif
 
   static_assert(compare_precision_v<ieee754::d<128>, ieee754::d<128>> == 0);
   static_assert(compare_precision_v<ieee754::d<128>, ieee754::d<256>> == -1);
   static_assert(compare_precision_v<ieee754::d<256>, ieee754::d<128>> == 1);
-
-  static_assert(!precision_comparable<ieee754::f<128>, ieee754::d<128>>);
-  static_assert(!precision_comparable<ieee754::f<128>, ieee754::d<256>>);
   static_assert(!precision_comparable<ieee754::d<128>, ieee754::f<256>>);
 }

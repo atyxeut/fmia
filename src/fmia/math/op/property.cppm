@@ -51,7 +51,11 @@ public:
 template <typename Operator>
 idempotent_operator_wrapper(Operator&& f) -> idempotent_operator_wrapper<std::remove_cvref_t<Operator>>;
 
+} // export namespace fmia
+
+export namespace fmia::meta {
+
 template <typename Operator>
 inline constexpr bool enable_idempotent_operator<idempotent_operator_wrapper<Operator>> = true;
 
-} // export namespace fmia
+} // export namespace fmia::meta

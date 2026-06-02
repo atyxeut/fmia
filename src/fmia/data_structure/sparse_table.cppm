@@ -50,7 +50,7 @@ public:
   [[nodiscard]] constexpr auto query(size_type l, size_type r) const noexcept(std::is_nothrow_invocable_v<const MergeFn&, T, T>)
     pre(l <= r)
   {
-    if constexpr (meta::idempotent_operator<MergeFn>) {
+    if constexpr (meta::idempotent_operator<MergeFn, T>) {
       const size_type j = ilog2(r - l + 1);
       return std::invoke(fn_, (*this)[l, j], (*this)[r + 1 - (static_cast<size_type>(1) << j), j]);
     } else {
