@@ -5,7 +5,7 @@
 # misc settings
 Language: Cpp
 Standard: Latest
-ColumnLimit: 120
+ColumnLimit: 140
 IndentWidth: 2
 ContinuationIndentWidth: 2
 UseTab: Never

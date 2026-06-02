@@ -201,8 +201,7 @@ constexpr std::expected<std::vector<Vertex>, eulerian_graph_error> get_an_euleri
 
 export namespace fmia::graph {
 
-// leave isolated vertices, the rest of the graph must be (strongly) connected, otherwise the the following functions
-// have undefined behavior
+// leave isolated vertices, the rest of the graph must be (strongly) connected, otherwise the following functions have undefined behavior
 
 template <meta::graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_trail_for_undirected(const T& g)
@@ -246,8 +245,8 @@ constexpr std::expected<bool, toposort_error> toposort_impl(const Graph& g, Fn&&
   using vertex_type = Graph::vertex_type;
 
   using queue_type = std::conditional_t<
-    Order == toposort_tag::lexicographical,
-    std::priority_queue<vertex_type, std::vector<vertex_type>, std::greater<vertex_type>>, std::queue<vertex_type>
+    Order == toposort_tag::lexicographical, std::priority_queue<vertex_type, std::vector<vertex_type>, std::greater<vertex_type>>,
+    std::queue<vertex_type>
   >;
 
   vertex_type n = g.vertex_size();

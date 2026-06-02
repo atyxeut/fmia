@@ -80,8 +80,7 @@ private:
     to = new node_;
     to->pass = from->pass;
     to->end = from->end;
-    from->next
-      .for_each_invoke([this](node_* child_from, node_*& child_to) { copy_tree_(child_from, child_to); }, to->next);
+    from->next.for_each_invoke([this](node_* child_from, node_*& child_to) { copy_tree_(child_from, child_to); }, to->next);
   }
 
   constexpr void destroy_tree_recursive_(node_* root) noexcept
@@ -203,8 +202,7 @@ public:
   }
 };
 
-// Hash must map the given character to [0, DistinctCharCount) without any collisions, otherwise the behavior is
-// undefined
+// Hash must map the given character to [0, DistinctCharCount) without any collisions, otherwise the behavior is undefined
 template <typename Char, std::size_t DistinctCharCount, typename Hash>
 struct trie_default_hash_map
 {
@@ -278,10 +276,7 @@ struct trie_normal_hash_map
 
 export namespace fmia {
 
-template <
-  typename Char, std::size_t DistinctCharCount, std::regular_invocable<Char> Hash,
-  exception_safety E = exception_safety::strong
->
+template <typename Char, std::size_t DistinctCharCount, std::regular_invocable<Char> Hash, exception_safety E = exception_safety::strong>
 using trie = detail::trie_base<Char, detail::trie_default_hash_map<Char, DistinctCharCount, Hash>, E>;
 
 using binary_trie = trie<int, 2, decltype([](int x) constexpr noexcept { return x; })>;

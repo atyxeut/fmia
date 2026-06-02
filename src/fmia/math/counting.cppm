@@ -35,17 +35,17 @@ template <typename T>
     // coeff: 10^(weight of mid)
     const T high = n / (coeff * 10), mid = n_ % 10, low = n % coeff;
 
-    // pick h from [0, high - 1], then numbers in [h _ 0...0, h _ 9...9] (_ in [0, 9]) are also in [0, n], for example,
-    // n = 12345, coeff = 100 --> high = 12, mid = 3, low = 45, then numbers in intervals [0 0 00, 0 0 99], [0 1 00,
-    // 0 1 99], ..., [0 9 00, 0 9 99], [1 _ 00, 1 _ 99], ..., [11 _ 00, 11 _ 99] are all in [0, n]
+    // pick h from [0, high - 1], then numbers in [h _ 0...0, h _ 9...9] (_ in [0, 9]) are also in [0, n], for example, n = 12345,
+    // coeff = 100 --> high = 12, mid = 3, low = 45, then numbers in intervals [0 0 00, 0 0 99], [0 1 00, 0 1 99], ..., [0 9 00, 0 9 99],
+    // [1 _ 00, 1 _ 99], ..., [11 _ 00, 11 _ 99] are all in [0, n]
     //
-    // that is to say, for x > 0 cases, interval [h x 0...0, h x 9...9] contributes coeff occurrences of x, and there
-    // are h such intervals, so the total contribution is high * coeff, for x = 0 case, the contribution of interval
-    // [0 x 0...0, 0 x 9...9] (i.e. [0...0, 9...9]) is 0, the total contribution becomes (high - 1) * coeff
+    // that is to say, for x > 0 cases, interval [h x 0...0, h x 9...9] contributes coeff occurrences of x, and there are h such intervals,
+    // so the total contribution is high * coeff, for x = 0 case, the contribution of interval [0 x 0...0, 0 x 9...9] (i.e. [0...0, 9...9])
+    // is 0, the total contribution becomes (high - 1) * coeff
     //
-    // for h = high part, we only have interval [high x 0...0, high mid low], if x > mid, the contribution is 0, if
-    // x = mid, the contribution is (low + 1), if x < mid, the interval is complete: [high x 0...0, high x 9...9], and
-    // the contribution is coeff if high and x are not both 0, otherwise is 0
+    // for h = high part, we only have interval [high x 0...0, high mid low], if x > mid, the contribution is 0, if x = mid, the
+    // contribution is (low + 1), if x < mid, the interval is complete: [high x 0...0, high x 9...9], and the contribution is coeff if high
+    // and x are not both 0, otherwise is 0
 
     // h in [0, high - 1]
     if (x == 0 && high != 0)
@@ -71,9 +71,7 @@ template <typename T>
 export namespace fmia {
 
 template <meta::fixed_precision_integral T>
-[[nodiscard]] constexpr auto count_digit_occurrence(const T& l, const T& r, int x)
-  pre(0 <= l && l <= r)
-  pre(0 <= x && x <= 9)
+[[nodiscard]] constexpr auto count_digit_occurrence(const T& l, const T& r, int x) pre(0 <= l && l <= r) pre(0 <= x && x <= 9)
 {
   if (l == 0)
     return count_digit_occurrence_impl(r, x);
@@ -84,9 +82,7 @@ template <meta::fixed_precision_integral T>
 // count occurrences of digit x in n
 // time complexity: O(log n)
 template <meta::fixed_precision_integral T>
-[[nodiscard]] constexpr T count_digit_occurrence(T n, int x) noexcept
-  pre(n >= 0)
-  pre(0 <= x && x <= 9)
+[[nodiscard]] constexpr T count_digit_occurrence(T n, int x) noexcept pre(n >= 0) pre(0 <= x && x <= 9)
 {
   T ans = 0;
   while (n != 0) {

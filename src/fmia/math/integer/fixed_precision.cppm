@@ -119,51 +119,44 @@ template <meta::state_integral T>
 export namespace fmia {
 
 template <meta::state_integral T>
-[[nodiscard]] constexpr bool is_bit_set(T state, int index) noexcept
-  pre(is_valid_bit_index_for_state<T>(index))
+[[nodiscard]] constexpr bool is_bit_set(T state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index))
 {
   return static_cast<bool>(state & std::make_unsigned_t<T>(1) << index);
 }
 
 template <meta::state_integral T>
-constexpr void set_bit(T& state, int index) noexcept
-  pre(is_valid_bit_index_for_state<T>(index))
+constexpr void set_bit(T& state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index))
 {
   state |= std::make_unsigned_t<T>(1) << index;
 }
 
 template <meta::state_integral T>
-[[nodiscard]] constexpr T after_set_bit(T state, int index) noexcept
-  pre(is_valid_bit_index_for_state<T>(index))
+[[nodiscard]] constexpr T after_set_bit(T state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index))
 
 {
   return state | std::make_unsigned_t<T>(1) << index;
 }
 
 template <meta::state_integral T>
-constexpr void reset_bit(T& state, int index) noexcept
-  pre(is_valid_bit_index_for_state<T>(index))
+constexpr void reset_bit(T& state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index))
 {
   state &= ~(std::make_unsigned_t<T>(1) << index);
 }
 
 template <meta::state_integral T>
-[[nodiscard]] constexpr T after_reset_bit(T state, int index) noexcept
-  pre(is_valid_bit_index_for_state<T>(index))
+[[nodiscard]] constexpr T after_reset_bit(T state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index))
 {
   return state & ~(std::make_unsigned_t<T>(1) << index);
 }
 
 template <meta::state_integral T>
-constexpr void flip_bit(T& state, int index) noexcept
-  pre(is_valid_bit_index_for_state<T>(index))
+constexpr void flip_bit(T& state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index))
 {
   state ^= std::make_unsigned_t<T>(1) << index;
 }
 
 template <meta::state_integral T>
-[[nodiscard]] constexpr T after_flip_bit(T state, int index) noexcept
-  pre(is_valid_bit_index_for_state<T>(index))
+[[nodiscard]] constexpr T after_flip_bit(T state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index))
 {
   return state ^ std::make_unsigned_t<T>(1) << index;
 }
@@ -298,8 +291,7 @@ struct is_no_cv_custom_twos_complement_signed_integral<integer::i<Bits>> : std::
 };
 
 template <typename T>
-inline constexpr bool is_no_cv_custom_twos_complement_signed_integral_v =
-  is_no_cv_custom_twos_complement_signed_integral<T>::value;
+inline constexpr bool is_no_cv_custom_twos_complement_signed_integral_v = is_no_cv_custom_twos_complement_signed_integral<T>::value;
 
 template <typename T>
 using is_custom_twos_complement_signed_integral = is_no_cv_custom_twos_complement_signed_integral<std::remove_cv_t<T>>;
@@ -334,8 +326,7 @@ template <typename T>
 concept custom_twos_complement_signed_integral = is_custom_twos_complement_signed_integral_v<T>;
 
 template <typename T>
-concept unsigned_integral =
-  std::unsigned_integral<T> || std::same_as<std::remove_cv_t<T>, u128> || is_custom_unsigned_integral_v<T>;
+concept unsigned_integral = std::unsigned_integral<T> || std::same_as<std::remove_cv_t<T>, u128> || is_custom_unsigned_integral_v<T>;
 
 template <typename T>
 concept nonbool_unsigned_integral = unsigned_integral<T> && !boolean<T>;
@@ -467,16 +458,14 @@ template <meta::nonbool_potential_standard_integral T>
 
 // an extended version of std::bit_width
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr int bit_width(T x) noexcept
-  pre(x >= 0)
+[[nodiscard]] constexpr int bit_width(T x) noexcept pre(x >= 0)
 {
   return std::numeric_limits<meta::make_unsigned_t<T>>::digits - countl_zero(x);
 }
 
 // calculate floor(log_2 x), ilog2(0) has defined behavior and returns -1
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr int ilog2(T x) noexcept
-  pre(x >= 0)
+[[nodiscard]] constexpr int ilog2(T x) noexcept pre(x >= 0)
 {
   return bit_width(x) - 1;
 }

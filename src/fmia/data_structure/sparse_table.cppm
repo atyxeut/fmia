@@ -41,14 +41,12 @@ private:
   const size_type max_exp_p1_;
 
 public:
-  [[nodiscard]] constexpr auto&& operator [](this auto&& self, size_type i, size_type j) noexcept
-    pre(j * self.size_ + i < self.buffer_.size)
+  [[nodiscard]] constexpr auto&& operator [](this auto&& self, size_type i, size_type j) noexcept pre(j* self.size_ + i < self.buffer_.size)
   {
     return std::forward<decltype(self)>(self).buffer_[j * self.size_ + i];
   }
 
-  [[nodiscard]] constexpr auto query(size_type l, size_type r) const noexcept(std::is_nothrow_invocable_v<const MergeFn&, T, T>)
-    pre(l <= r)
+  [[nodiscard]] constexpr auto query(size_type l, size_type r) const noexcept(std::is_nothrow_invocable_v<const MergeFn&, T, T>) pre(l <= r)
   {
     if constexpr (meta::idempotent_operator<MergeFn, T>) {
       const size_type j = ilog2(r - l + 1);
@@ -82,7 +80,7 @@ public:
       std::ranges::move(r, this->buffer_.data);
     else
       std::ranges::copy(r, this->buffer_.data);
-      
+
     for (size_type j = 1; j < max_exp_p1_; ++j) {
       for (size_type i = 0, len = static_cast<size_type>(1) << j; i + len <= size_; ++i) {
         (*this)[i, j] = std::invoke(fn_, (*this)[i, j - 1], (*this)[i + (len >> 1), j - 1]);
@@ -93,8 +91,7 @@ public:
 
 template <std::ranges::forward_range R, typename F, typename Allocator = std::allocator<std::ranges::range_value_t<R>>>
 sparse_table(R&&, F&&, Allocator = Allocator {}) -> sparse_table<
-  std::ranges::range_value_t<R>, std::remove_reference_t<F>,
-  relaxed_heap_buffer<std::ranges::range_value_t<R>, std::size_t, Allocator>
+  std::ranges::range_value_t<R>, std::remove_reference_t<F>, relaxed_heap_buffer<std::ranges::range_value_t<R>, std::size_t, Allocator>
 >;
 
 } // export namespace fmia

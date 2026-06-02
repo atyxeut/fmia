@@ -50,8 +50,8 @@ constexpr auto uninitialized_construct_n(Allocator& alloc, InputIt first, std::s
 
   if !consteval {
     if constexpr (
-      std::same_as<Allocator, std::allocator<value_type>> && std::is_trivially_copyable_v<value_type>
-      && std::contiguous_iterator<InputIt> && std::contiguous_iterator<ForwardIt>
+      std::same_as<Allocator, std::allocator<value_type>> && std::is_trivially_copyable_v<value_type> && std::contiguous_iterator<InputIt>
+      && std::contiguous_iterator<ForwardIt>
     ) {
       std::memcpy(std::to_address(dest), std::to_address(first), count * sizeof(value_type));
       if constexpr (Category == uninitialized_construction_category::move)
@@ -158,8 +158,7 @@ private:
     [[nodiscard]] constexpr reference operator [](size_type i) noexcept { return data[i]; }
     [[nodiscard]] constexpr const_reference operator [](size_type i) const noexcept { return data[i]; }
 
-    constexpr void destroy(size_type count) noexcept
-      pre(count <= size)
+    constexpr void destroy(size_type count) noexcept pre(count <= size)
     {
       if constexpr (std::is_trivially_destructible_v<value_type>) {
         size -= count;
@@ -229,7 +228,7 @@ public:
 
   constexpr void recapacity(size_type count)
     requires (!capacity_fixed_)
-    pre(count > buffer_.capacity)
+  pre(count > buffer_.capacity)
   {
     if (buffer_.capacity == 0) {
       buffer_.data = allocator_traits::allocate(buffer_.allocator, count);
@@ -309,8 +308,8 @@ protected:
       return *this;
 
     if (
-      exception_safety_strong_ || (allocator_pocca_ && buffer_.allocator != other.buffer_.allocator)
-      || buffer_.data == nullptr || buffer_.capacity < other.buffer_.size
+      exception_safety_strong_ || (allocator_pocca_ && buffer_.allocator != other.buffer_.allocator) || buffer_.data == nullptr
+      || buffer_.capacity < other.buffer_.size
     ) {
       auto tmpbuf = buffer_type_(other.buffer_.size, allocator_pocca_ ? other.buffer_.allocator : buffer_.allocator);
       uninitialized_copy_n(tmpbuf.allocator, other.buffer_.data, other.buffer_.size, tmpbuf.data);
@@ -338,8 +337,7 @@ export namespace fmia {
 
 // contiguous heap memory whose size is determined at runtime
 template <typename T, meta::size_integral Size, typename Allocator>
-using relaxed_heap_buffer =
-  heap_buffer_base<T, Size, dynamic_storage_capacity<Size>, Allocator, exception_safety::basic>;
+using relaxed_heap_buffer = heap_buffer_base<T, Size, dynamic_storage_capacity<Size>, Allocator, exception_safety::basic>;
 
 template <typename T, meta::size_integral Size, typename Allocator>
 using heap_buffer = heap_buffer_base<T, Size, dynamic_storage_capacity<Size>, Allocator, exception_safety::strong>;

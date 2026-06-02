@@ -146,8 +146,7 @@ struct is_no_cv_basic_unweighted_graph : std::false_type
 };
 
 template <typename T>
-inline constexpr bool is_no_cv_basic_unweighted_graph_v =
-  is_no_cv_basic_unweighted_graph<T>::value || is_no_cv_unweighted_graph_v<T>;
+inline constexpr bool is_no_cv_basic_unweighted_graph_v = is_no_cv_basic_unweighted_graph<T>::value || is_no_cv_unweighted_graph_v<T>;
 
 template <typename T>
 concept basic_unweighted_graph = is_no_cv_basic_unweighted_graph_v<std::remove_cvref_t<T>>;
@@ -158,8 +157,7 @@ struct is_no_cv_basic_weighted_graph : std::false_type
 };
 
 template <typename T>
-inline constexpr bool is_no_cv_basic_weighted_graph_v =
-  is_no_cv_basic_weighted_graph<T>::value || is_no_cv_weighted_graph_v<T>;
+inline constexpr bool is_no_cv_basic_weighted_graph_v = is_no_cv_basic_weighted_graph<T>::value || is_no_cv_weighted_graph_v<T>;
 
 template <typename T>
 concept basic_weighted_graph = is_no_cv_basic_weighted_graph_v<std::remove_cvref_t<T>>;
@@ -251,10 +249,7 @@ struct basic_unweighted_edge_list : public basic_edge_list_base<Vertex, unweight
   constexpr void add_edge(Vertex u, Vertex v) { this->edges_.emplace_back(u, v, this->edge_size()); }
 };
 
-template <
-  std::signed_integral Vertex, meta::arithmetic Weight,
-  meta::precision_gteq<Vertex> Degree = meta::make_higher_precision_t<Vertex>
->
+template <std::signed_integral Vertex, meta::arithmetic Weight, meta::precision_gteq<Vertex> Degree = meta::make_higher_precision_t<Vertex>>
 struct basic_weighted_edge_list : public basic_edge_list_base<Vertex, weighted_edge<Vertex, Weight>, Degree>
 {
   using weight_type = Weight;
@@ -293,8 +288,7 @@ public:
 };
 
 template <
-  std::signed_integral Vertex, meta::arithmetic Weight,
-  meta::precision_gteq<Vertex> Degree = meta::make_higher_precision_t<Vertex>
+  std::signed_integral Vertex, meta::arithmetic Weight, meta::precision_gteq<Vertex> Degree = meta::make_higher_precision_t<Vertex>
 > class weighted_edge_list : public edge_list_base<Vertex, weighted_edge<Vertex, Weight>, Degree>
 {
 public:

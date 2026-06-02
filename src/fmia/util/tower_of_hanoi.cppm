@@ -33,11 +33,11 @@ namespace fmia::tower_of_hanoi {
 // proof:
 // 1. n = 1, obviously solvable
 // 2. assume that a valid state with n = k - 1 disks can become a state where all k - 1 disks are on one peg
-// 3. for n = k, if the biggest disk k is already in position, the k - 1 disks can be on the destination peg later
-//    (using the hypothesis), OK, otherwise, smaller k - 1 disks can be on one auxiliary peg, then disk k be on the
-//    destination, then the k - 1 disks be on the destination, OK
-// thus a general form problem guarantees a solution as described above, and any other solution that has the same
-// recursive structure is also valid
+// 3. for n = k, if the biggest disk k is already in position, the k - 1 disks can be on the destination peg later (using the hypothesis),
+//    otherwise, smaller k - 1 disks can be on one auxiliary peg, then disk k be on the destination, then the rest be on the destination
+//
+// thus a general form problem guarantees a solution as described above, and any other solution that has the same recursive structure is
+// also valid
 
 using move_cnt_type = std::uintmax_t;
 using peg_type = int;
@@ -56,18 +56,17 @@ export namespace fmia::tower_of_hanoi::count_move {
 [[nodiscard]] constexpr move_cnt_type from_one_to_one_case(peg_type disk_cnt) noexcept(nothrow_fn)
 {
   // denote the moves of a problem regarding n disks by T(n)
-  // 1. to move disk n to `to`, we can first move disk n - 1 to 1 the auxiliary (third) peg, from peg `from`
-  //    the problem of moving these n - 1 disks is the same as moving all n disks, so the move count is T(n - 1)
+  // 1. to move disk n to `to`, we can first move disk n - 1 to 1 the auxiliary (third) peg, from peg `from` the problem of moving these
+  //    n - 1 disks is the same as moving all n disks, so the move count is T(n - 1)
   // 2. after, only 1 move is required for n to be on `to` peg
-  // 3. then similarly, another (n - 1)-disk problem, from auxiliary peg to peg `to`, T(n - 1) more moves, so
-  //    2T(n - 1) + 1 moves guarantee a solution, T(n) <= 2T(n - 1) + 1, on the other hand, T(n - 1) moves are required
-  //    before moving n, so T(n) >= 2T(n - 1) + 1, then the result is T(n) = 2T(n - 1) + 1 = 2^n - 1
+  // 3. then similarly, another (n - 1)-disk problem, from auxiliary peg to peg `to`, T(n - 1) more moves, so 2T(n - 1) + 1 moves guarantee
+  //    a solution, T(n) <= 2T(n - 1) + 1, on the other hand, T(n - 1) moves are required before moving n, so T(n) >= 2T(n - 1) + 1, then
+  //    the result is T(n) = 2T(n - 1) + 1 = 2^n - 1
   return (move_cnt_type(1) << disk_cnt) - 1;
 
-  // moreover, let f(i) be the moves of the i-th disk,
-  // since the largest disk of a problem only moves once, clearly f(n) = 1,
-  // and the move count for a general i is the count that the i-th subproblem is called during the recursion,
-  // draw the recursive tree, we can easily see that f(i) = 2^(n - i):
+  // moreover, let f(i) be the moves of the i-th disk, since the largest disk of a problem only moves once, clearly f(n) = 1, and the move
+  // count for a general i is the count that the i-th subproblem is called during the recursion, draw the recursive tree, we can easily see
+  // that f(i) = 2^(n - i):
   //                   f(n)
   //      f(n - 1)              f(n - 1)
   // f(n - 2)   f(n - 2)   f(n - 2)   f(n - 2)
@@ -88,8 +87,7 @@ from_different_to_one_case(peg_type disk_cnt, std::span<const peg_type> from_lis
     return from_different_to_one_case(disk_cnt - 1, from_list, to);
 
   // 1. have to move all other disks to the auxiliary peg before the largest one is able to be moved to peg `to`
-  // 2. after moving the largest one, move the remaining from the auxiliary peg to peg `to`, this problem has "from
-  //    one to one" form
+  // 2. after moving the largest one, move the remaining from the auxiliary peg to peg `to`, this problem has "from one to one" form
   const peg_type aux = peg_cnt - from - to;
   return from_different_to_one_case(disk_cnt - 1, from_list, aux) + 1 + from_one_to_one_case(disk_cnt - 1);
 }
@@ -122,12 +120,10 @@ namespace fmia::tower_of_hanoi::count_move {
   // 1. move disks above the largest disk n and on peg `to[n]` to peg `aux`, so that disk n can move
   // 2. move disk n to the destination, then move the remaining n - 1 disks on peg `aux` to their destinations
   const peg_type aux = peg_cnt - from_list[disk_cnt - 1] - to_list[disk_cnt - 1];
-  return from_different_to_one_case(disk_cnt - 1, from_list, aux) + 1
-         + from_one_to_different_case(disk_cnt - 1, aux, to_list);
+  return from_different_to_one_case(disk_cnt - 1, from_list, aux) + 1 + from_one_to_different_case(disk_cnt - 1, aux, to_list);
 }
 
-// moving the largest disk n first from peg `from` to peg `aux`, then to `to`, using two steps, is sometimes better,
-// for example:
+// moving the largest disk n first from peg `from` to peg `aux`, then to `to`, using two steps, is sometimes better, for example:
 // initial state --> final state
 //   A: 3              A: 2 1
 //   B:                B:
@@ -168,9 +164,8 @@ namespace fmia::tower_of_hanoi::count_move {
 export namespace fmia::tower_of_hanoi::count_move {
 
 // initially all disks stack scatteredly, and finally they also stack scatteredly
-[[nodiscard]] constexpr move_cnt_type general_case(
-  peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list
-) noexcept(nothrow_fn)
+[[nodiscard]] constexpr move_cnt_type
+general_case(peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list) noexcept(nothrow_fn)
 {
   if (disk_cnt == 0)
     return 0;
@@ -181,8 +176,7 @@ export namespace fmia::tower_of_hanoi::count_move {
     return general_case(disk_cnt - 1, from_list, to_list);
 
   return std::min(
-    general_case_one_step_strategy(disk_cnt, from_list, to_list),
-    general_case_two_step_strategy(disk_cnt, from_list, to_list)
+    general_case_one_step_strategy(disk_cnt, from_list, to_list), general_case_two_step_strategy(disk_cnt, from_list, to_list)
   );
 }
 

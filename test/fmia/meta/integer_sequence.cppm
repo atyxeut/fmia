@@ -46,11 +46,12 @@ consteval void do_custom_integer_sequence_helpers_work() noexcept
       std::integer_sequence<int, 11, 12, 13, 14>
     >
   );
+  
+  // clang-format on
+  
   static_assert(
     std::same_as<shift_index_sequence_t<50, std::index_sequence<1, 2, 3, 4>>, std::index_sequence<51, 52, 53, 54>>
   );
-
-  // clang-format on
 }
 
 consteval void does_is_no_duplication_integer_sequence_work() noexcept

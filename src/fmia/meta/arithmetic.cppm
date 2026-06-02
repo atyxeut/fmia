@@ -71,8 +71,7 @@ constexpr usize precision_bits_v<ieee754::d<Bits>> = Bits;
 
 template <typename T, typename U>
 concept precision_comparable =
-  (twos_complement_signed_integral<T> && twos_complement_signed_integral<U>)
-  || (unsigned_integral<T> && unsigned_integral<U>)
+  (twos_complement_signed_integral<T> && twos_complement_signed_integral<U>) || (unsigned_integral<T> && unsigned_integral<U>)
   || (ieee754_binary_floating_point<T> && ieee754_binary_floating_point<U>)
   || (ieee754_decimal_floating_point<T> && ieee754_decimal_floating_point<U>);
 
@@ -142,9 +141,7 @@ struct make_higher_precision_selector_for_standard_integral_impl<T, 128>
 
 template <typename T>
 struct make_higher_precision_selector_for_standard_integral
-  : make_higher_precision_selector_for_standard_integral_impl<
-      T, (precision_bits_v<T>) < (precision_bits_v<i32>) ? 0 : precision_bits_v<T>
-    >
+  : make_higher_precision_selector_for_standard_integral_impl<T, (precision_bits_v<T>) < (precision_bits_v<i32>) ? 0 : precision_bits_v<T>>
 {
 };
 
@@ -162,14 +159,12 @@ struct make_higher_precision_selector_for_custom_integral<T, u128, false> : clai
 };
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_custom_integral<T, integer::i<Bits>, false>
-  : claim_cv<T, integer::i<Bits * 2>>
+struct make_higher_precision_selector_for_custom_integral<T, integer::i<Bits>, false> : claim_cv<T, integer::i<Bits * 2>>
 {
 };
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_custom_integral<T, integer::u<Bits>, false>
-  : claim_cv<T, integer::u<Bits * 2>>
+struct make_higher_precision_selector_for_custom_integral<T, integer::u<Bits>, false> : claim_cv<T, integer::u<Bits * 2>>
 {
 };
 
@@ -224,8 +219,7 @@ struct make_higher_precision_selector;
 template <integral T>
 struct make_higher_precision_selector<T>
   : std::conditional_t<
-      std::integral<T>, make_higher_precision_selector_for_standard_integral<T>,
-      make_higher_precision_selector_for_custom_integral<T>
+      std::integral<T>, make_higher_precision_selector_for_standard_integral<T>, make_higher_precision_selector_for_custom_integral<T>
     >
 {
 };
@@ -239,8 +233,8 @@ struct make_higher_precision_selector<T> : make_higher_precision_selector_for_fl
 
 export namespace fmia::meta {
 
-// for a fixed-precision integer type: obtain i/u32 if its precision is smaller than 32 bits, otherwise obtain a
-// fixed-precision integer type that has double precision
+// for a fixed-precision integer type: obtain i/u32 if its precision is smaller than 32 bits, otherwise obtain a fixed-precision integer
+// type that has double precision
 // for a big integer type: obtain itself
 // for a floating-point type: obtain a floating-point type that has double precision
 // for a big decimal type: obtain itself

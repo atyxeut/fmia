@@ -81,8 +81,7 @@ struct is_no_cv_custom_ieee754_binary_floating_point<ieee754::f<Bits>> : std::tr
 };
 
 template <typename T>
-inline constexpr bool is_no_cv_custom_ieee754_binary_floating_point_v =
-  is_no_cv_custom_ieee754_binary_floating_point<T>::value;
+inline constexpr bool is_no_cv_custom_ieee754_binary_floating_point_v = is_no_cv_custom_ieee754_binary_floating_point<T>::value;
 
 template <typename T>
 using is_custom_ieee754_binary_floating_point = is_no_cv_custom_ieee754_binary_floating_point<std::remove_cv_t<T>>;
@@ -105,8 +104,7 @@ struct is_no_cv_custom_ieee754_decimal_floating_point<ieee754::d<Bits>> : std::t
 };
 
 template <typename T>
-inline constexpr bool is_no_cv_custom_ieee754_decimal_floating_point_v =
-  is_no_cv_custom_ieee754_decimal_floating_point<T>::value;
+inline constexpr bool is_no_cv_custom_ieee754_decimal_floating_point_v = is_no_cv_custom_ieee754_decimal_floating_point<T>::value;
 
 template <typename T>
 using is_custom_ieee754_decimal_floating_point = is_no_cv_custom_ieee754_decimal_floating_point<std::remove_cv_t<T>>;

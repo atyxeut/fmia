@@ -23,8 +23,6 @@ using namespace fmia;
 
 export {
 
-void max_query_sparse_table() {
-  
-}
-  
+void max_query_sparse_table() {}
+
 } // export

@@ -21,11 +21,10 @@ export namespace fmia::meta {
 
 template <typename T>
 inline constexpr bool enable_idempotent_operator = false;
-  
+
 template <typename Operator, typename T>
-concept idempotent_operator = std::regular_invocable<Operator, T, T> 
-&& std::convertible_to<std::invoke_result_t<Operator, T, T>, T> 
-&& enable_idempotent_operator<std::remove_cvref_t<Operator>>;
+concept idempotent_operator = std::regular_invocable<Operator, T, T> && std::convertible_to<std::invoke_result_t<Operator, T, T>, T>
+                              && enable_idempotent_operator<std::remove_cvref_t<Operator>>;
 
 } // export namespace fmia::meta
 
@@ -36,13 +35,14 @@ class idempotent_operator_wrapper final
 {
 private:
   Operator f_;
+
 public:
   constexpr explicit idempotent_operator_wrapper(const Operator& f) : f_(f) {}
   constexpr explicit idempotent_operator_wrapper(Operator&& f) : f_(std::move(f)) {}
 
   template <typename... Args>
     requires std::regular_invocable<const Operator&, Args...>
-  constexpr decltype(auto) operator()(Args&&... args) const noexcept(std::is_nothrow_invocable_v<const Operator&, Args...>) 
+  constexpr decltype(auto) operator ()(Args&&... args) const noexcept(std::is_nothrow_invocable_v<const Operator&, Args...>)
   {
     return std::invoke(f_, std::forward<Args>(args)...);
   }

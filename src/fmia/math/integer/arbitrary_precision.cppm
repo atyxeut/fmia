@@ -190,9 +190,8 @@ void print(const sub_result& result, bool new_line = false)
   if (is_zero(a) || is_zero(b))
     return std::vector<int> {0};
 
-  // delayed carry is always safe here, ans[k] accumulates at most min(la, lb) additions, assume that every addition is
-  // ans[k] += 9 * 9, it still requires (2^31 - 1) / 81 > 1e7 additions to overflow, in such cases, the inputs are far
-  // beyond the capability of this O(n^2) algorithm
+  // delayed carry is always safe here, ans[k] accumulates at most min(la, lb) additions, assume that every addition is ans[k] += 9 * 9,
+  // it requires (2^31 - 1) / 81 > 1e7 additions to overflow, such inputs are far beyond the capability of this O(n^2) algorithm
   std::vector<int> ans(a.size() + b.size());
 
   for (auto i = 0uz; i < a.size(); ++i)
@@ -231,9 +230,7 @@ FMIA_WCONVERSION_PUSH()
   return {std::move(q), static_cast<int>(r)};
 }
 
-[[nodiscard]] constexpr floor_div_result<std::vector<int>>
-floor_div(const std::vector<int>& a, const std::vector<int>& b)
-  pre(!is_zero(b))
+[[nodiscard]] constexpr floor_div_result<std::vector<int>> floor_div(const std::vector<int>& a, const std::vector<int>& b) pre(!is_zero(b))
 {
   const int cmp_result = compare<int>(a, b);
   if (cmp_result < 0)
@@ -317,8 +314,7 @@ FMIA_WCONVERSION_PUSH()
 
 FMIA_WCONVERSION_POP()
 
-[[nodiscard]] constexpr std::vector<int> pow(std::vector<int> a, int n)
-  pre(n >= 0)
+[[nodiscard]] constexpr std::vector<int> pow(std::vector<int> a, int n) pre(n >= 0)
 {
   if (n == 0)
     return {1};
@@ -337,8 +333,7 @@ FMIA_WCONVERSION_POP()
 
 FMIA_WCONVERSION_PUSH()
 
-[[nodiscard]] constexpr std::vector<int> floor_root(const std::vector<int>& a, int n)
-  pre(n > 0)
+[[nodiscard]] constexpr std::vector<int> floor_root(const std::vector<int>& a, int n) pre(n > 0)
 {
   if (n == 1 || is_zero(a))
     return a;

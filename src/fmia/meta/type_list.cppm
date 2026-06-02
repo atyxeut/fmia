@@ -450,8 +450,7 @@ template <template <typename...> typename, typename>
 struct is_predicate_impl;
 
 template <template <typename...> typename T, std::size_t... Is>
-struct is_predicate_impl<T, std::index_sequence<Is...>>
-  : std::disjunction<is_predicate_tester<T, replicate_t<Is + 1, void>>...>
+struct is_predicate_impl<T, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<T, replicate_t<Is + 1, void>>...>
 {
 };
 
@@ -491,13 +490,11 @@ private:
   // 2. merge
   // use the 2 lists specialization of `concat_impl` to merge
   //
-  // placing this helper inside `concat_impl` improves compilation time significantly, since in this way we can avoid
-  // the unnecessary copies of pack `Ts...` during the recursion
+  // placing this helper inside `concat_impl` improves compilation time significantly, since in this way we can avoid the unnecessary copies
+  // of pack `Ts...` during the recursion
   template <std::size_t BeginIdx, std::size_t N>
   struct divide_helper_
-    : concat_impl<
-        typename divide_helper_<BeginIdx, N / 2>::type, typename divide_helper_<BeginIdx + N / 2, N - N / 2>::type
-      >
+    : concat_impl<typename divide_helper_<BeginIdx, N / 2>::type, typename divide_helper_<BeginIdx + N / 2, N - N / 2>::type>
   {
   };
 
@@ -537,8 +534,7 @@ struct concat_impl<type_list<Ts...>, type_list<Us...>>
 
 template <std::size_t... Is, typename... Ts, std::size_t... Js, typename... Us>
 struct concat_impl<
-  indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>,
-  indexed_type_list<std::index_sequence<Js...>, type_list<Us...>>
+  indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>, indexed_type_list<std::index_sequence<Js...>, type_list<Us...>>
 >
 {
   using type = indexed_type_list<std::index_sequence<Is..., Js...>, type_list<Ts..., Us...>>;
@@ -574,8 +570,7 @@ export namespace fmia::meta {
 // name after Haskell Data.List concat
 //
 // O(log n) time complexity for type_list, where n is the count of type lists to concatenate
-// O(Nlog N) time complexity for indexed_type_list (because of the validation for indices), where N is the count of
-// types over all given type lists
+// O(nlog n) time complexity for indexed_type_list (because of the validation for indices), where n is the sum of types over all given lists
 template <list_of_types... Ts>
 using concat = concat_get_result_helper<typename concat_impl<Ts...>::type>;
 
@@ -595,9 +590,7 @@ struct select_by_index_sequence<std::index_sequence<Is...>, type_list<Ts...>>
 };
 
 template <std::size_t... Is, std::size_t... Idxs, typename... Ts>
-struct select_by_index_sequence<
-  std::index_sequence<Is...>, indexed_type_list<std::index_sequence<Idxs...>, type_list<Ts...>>
->
+struct select_by_index_sequence<std::index_sequence<Is...>, indexed_type_list<std::index_sequence<Idxs...>, type_list<Ts...>>>
 {
   using type = indexed_type_list<std::index_sequence<Idxs...[Is]...>, type_list<Ts...[Is]...>>;
 };
@@ -784,8 +777,7 @@ struct drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>>
 template <template <typename> typename Pred, typename T, typename... Ts>
 struct drop_while_impl<Pred, type_list<T, Ts...>>
   : std::conditional_t<
-      Pred<T>::value, drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>>,
-      std::type_identity<type_list<T, Ts...>>
+      Pred<T>::value, drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>>, std::type_identity<type_list<T, Ts...>>
     >
 {
 };
