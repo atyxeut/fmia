@@ -328,7 +328,7 @@ export namespace fmia {
 // e.g. std::vector<int>, std::vector<std::string>
 template <std::ranges::input_range R, std::convertible_to<std::string> Delim = std::string, typename T = std::ranges::range_value_t<R>>
   requires (meta::cpp17::is_std_ostream_interactable_v<T> && !std::is_array_v<T>)
-int print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
+int print(std::ostream& ostr, R&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
   for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it)
     ostr << *it << (std::ranges::next(it) == it_end ? std::string {} : delim);
