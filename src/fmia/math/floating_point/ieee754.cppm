@@ -27,16 +27,26 @@ using f80 = long double; // precision: 18 to 20 decimal places (note that on MSV
 
 } // export namespace fmia
 
+namespace fmia::ieee754 {
+
+#ifdef __SIZEOF_FLOAT128__
+constexpr std::size_t min_precision_bits = 256;
+#else
+constexpr std::size_t min_precision_bits = 128;
+#endif
+
+} // namespace fmia::ieee754
+
 // forward declarations
 export namespace fmia::ieee754 {
 
 // IEEE 754 binary floating-point
-template <usize Bits>
-  requires (Bits >= 128 && std::has_single_bit(Bits))
+template <std::size_t Bits>
+  requires (Bits >= min_precision_bits && std::has_single_bit(Bits))
 class f;
 
 // IEEE 754 decimal floating-point
-template <usize Bits>
+template <std::size_t Bits>
   requires (Bits >= 32 && std::has_single_bit(Bits))
 class d;
 

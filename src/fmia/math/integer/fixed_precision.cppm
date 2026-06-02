@@ -170,15 +170,25 @@ template <meta::state_integral T>
 
 } // export namespace fmia
 
+namespace fmia::integer {
+
+#if defined(__SIZEOF_INT128__) || _MSC_VER >= 1934
+constexpr std::size_t min_precision_bits = 256;
+#else
+constexpr std::size_t min_precision_bits = 128;
+#endif
+
+} // namespace fmia::integer
+
 // forward declarations
 export namespace fmia::integer {
 
-template <usize Bits>
-  requires (Bits >= 128 && std::has_single_bit(Bits))
+template <std::size_t Bits>
+  requires (Bits >= min_precision_bits && std::has_single_bit(Bits))
 class i;
 
-template <usize Bits>
-  requires (Bits >= 128 && std::has_single_bit(Bits))
+template <std::size_t Bits>
+  requires (Bits >= min_precision_bits && std::has_single_bit(Bits))
 class u;
 
 } // export namespace fmia::integer
