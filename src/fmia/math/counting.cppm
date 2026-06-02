@@ -13,10 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-module;
-
-#include <cassert>
-
 export module fmia.math.counting;
 
 import std;
@@ -76,9 +72,9 @@ export namespace fmia {
 
 template <meta::fixed_precision_integral T>
 [[nodiscard]] constexpr auto count_digit_occurrence(const T& l, const T& r, int x)
+  pre(0 <= l && l <= r)
+  pre(0 <= x && x <= 9)
 {
-  assert(0 <= l && l <= r && 0 <= x && x <= 9);
-
   if (l == 0)
     return count_digit_occurrence_impl(r, x);
 
@@ -89,9 +85,9 @@ template <meta::fixed_precision_integral T>
 // time complexity: O(log n)
 template <meta::fixed_precision_integral T>
 [[nodiscard]] constexpr T count_digit_occurrence(T n, int x) noexcept
+  pre(n >= 0)
+  pre(0 <= x && x <= 9)
 {
-  assert(n >= 0 && 0 <= x && x <= 9);
-
   T ans = 0;
   while (n != 0) {
     ans += n % 10 == x;

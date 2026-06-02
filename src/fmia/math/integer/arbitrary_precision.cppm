@@ -15,8 +15,6 @@
 
 module;
 
-#include <cassert>
-
 #include <macro/wconversion_switch.hpp>
 
 export module fmia.math.integer.arbitrary_precision;
@@ -216,9 +214,8 @@ FMIA_WCONVERSION_PUSH()
 
 // used when b is way smaller than a
 [[nodiscard]] constexpr floor_div_result<int> floor_div(const std::vector<int>& a, int b)
+  pre(b != 0)
 {
-  assert(b != 0);
-
   std::vector<int> q(a.size());
   long long r = 0;
 
@@ -235,9 +232,8 @@ FMIA_WCONVERSION_PUSH()
 
 [[nodiscard]] constexpr floor_div_result<std::vector<int>>
 floor_div(const std::vector<int>& a, const std::vector<int>& b)
+  pre(!is_zero(b))
 {
-  assert(!is_zero(b));
-
   const int cmp_result = compare<int>(a, b);
   if (cmp_result < 0)
     return {{0}, a};
@@ -321,9 +317,8 @@ FMIA_WCONVERSION_PUSH()
 FMIA_WCONVERSION_POP()
 
 [[nodiscard]] constexpr std::vector<int> pow(std::vector<int> a, int n)
+  pre(n >= 0)
 {
-  assert(n >= 0);
-
   if (n == 0)
     return {1};
 
@@ -342,9 +337,8 @@ FMIA_WCONVERSION_POP()
 FMIA_WCONVERSION_PUSH()
 
 [[nodiscard]] constexpr std::vector<int> floor_root(const std::vector<int>& a, int n)
+  pre(n > 0)
 {
-  assert(n > 0);
-
   if (n == 1 || is_zero(a))
     return a;
 

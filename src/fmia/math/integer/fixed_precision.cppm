@@ -20,8 +20,6 @@ module;
   #include <__msvc_int128.hpp>
 #endif
 
-#include <cassert>
-
 export module fmia.math.integer.fixed_precision;
 
 import std;
@@ -122,50 +120,51 @@ export namespace fmia {
 
 template <meta::state_integral T>
 [[nodiscard]] constexpr bool is_bit_set(T state, int index) noexcept
+  pre(is_valid_bit_index_for_state<T>(index))
 {
-  assert(is_valid_bit_index_for_state<T>());
   return static_cast<bool>(state & std::make_unsigned_t<T>(1) << index);
 }
 
 template <meta::state_integral T>
 constexpr void set_bit(T& state, int index) noexcept
+  pre(is_valid_bit_index_for_state<T>(index))
 {
-  assert(is_valid_bit_index_for_state<T>());
   state |= std::make_unsigned_t<T>(1) << index;
 }
 
 template <meta::state_integral T>
 [[nodiscard]] constexpr T after_set_bit(T state, int index) noexcept
+  pre(is_valid_bit_index_for_state<T>(index))
+
 {
-  assert(is_valid_bit_index_for_state<T>());
   return state | std::make_unsigned_t<T>(1) << index;
 }
 
 template <meta::state_integral T>
 constexpr void reset_bit(T& state, int index) noexcept
+  pre(is_valid_bit_index_for_state<T>(index))
 {
-  assert(is_valid_bit_index_for_state<T>());
   state &= ~(std::make_unsigned_t<T>(1) << index);
 }
 
 template <meta::state_integral T>
 [[nodiscard]] constexpr T after_reset_bit(T state, int index) noexcept
+  pre(is_valid_bit_index_for_state<T>(index))
 {
-  assert(is_valid_bit_index_for_state<T>());
   return state & ~(std::make_unsigned_t<T>(1) << index);
 }
 
 template <meta::state_integral T>
 constexpr void flip_bit(T& state, int index) noexcept
+  pre(is_valid_bit_index_for_state<T>(index))
 {
-  assert(is_valid_bit_index_for_state<T>());
   state ^= std::make_unsigned_t<T>(1) << index;
 }
 
 template <meta::state_integral T>
 [[nodiscard]] constexpr T after_flip_bit(T state, int index) noexcept
+  pre(is_valid_bit_index_for_state<T>(index))
 {
-  assert(is_valid_bit_index_for_state<T>());
   return state ^ std::make_unsigned_t<T>(1) << index;
 }
 
@@ -459,16 +458,16 @@ template <meta::nonbool_potential_standard_integral T>
 // an extended version of std::bit_width
 template <meta::nonbool_potential_standard_integral T>
 [[nodiscard]] constexpr int bit_width(T x) noexcept
+  pre(x >= 0)
 {
-  assert(x >= 0 && "bit widths of negative numbers have no meaning");
   return std::numeric_limits<meta::make_unsigned_t<T>>::digits - countl_zero(x);
 }
 
 // calculate floor(log_2 x), ilog2(0) has defined behavior and returns -1
 template <meta::nonbool_potential_standard_integral T>
 [[nodiscard]] constexpr int ilog2(T x) noexcept
+  pre(x >= 0)
 {
-  assert(x >= 0);
   return bit_width(x) - 1;
 }
 
