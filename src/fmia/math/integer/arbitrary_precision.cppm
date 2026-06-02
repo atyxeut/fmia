@@ -21,6 +21,7 @@ export module fmia.math.integer.arbitrary_precision;
 
 import std;
 
+import fmia.contract;
 import fmia.data_structure.string.character.ascii;
 import fmia.math.integer.fixed_precision;
 
@@ -214,7 +215,7 @@ FMIA_WCONVERSION_PUSH()
 
 // used when b is way smaller than a
 [[nodiscard]] constexpr floor_div_result<int> floor_div(const std::vector<int>& a, int b)
-  pre(b != 0)
+//  pre(b != 0)
 {
   std::vector<int> q(a.size());
   long long r = 0;
