@@ -15,14 +15,15 @@
 
 export module fmia.math.op;
 
+export import fmia.op.property;
+
 import std;
 
 import fmia.meta;
-import fmia.util.enum_flag;
 
 export namespace fmia {
 
-enum class element_for_operator : enum_flag_underlying_type { add = 0, mul = 1 };
+enum class element_for_operator { add = 0, mul = 1 };
 
 template <element_for_operator Operator>
 struct neutral_element_tag
@@ -44,21 +45,6 @@ template <element_for_operator Operation, typename T>
 }
 
 } // export namespace fmia
-
-export namespace fmia {
-
-enum class operator_property : enum_flag_underlying_type { none = 0, associative = 1, commutative = 1 << 1 };
-
-} // export namespace fmia
-
-export namespace fmia::meta {
-
-template <>
-struct is_enum_flag<operator_property> : std::true_type
-{
-};
-
-} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
