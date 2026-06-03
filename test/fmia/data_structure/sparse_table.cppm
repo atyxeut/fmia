@@ -18,8 +18,8 @@ export module test.fmia.data_structure.sparse_table;
 import std;
 
 import fmia.data_structure.sparse_table;
+import fmia.math.algebra;
 import fmia.math.integer.fixed_precision;
-import fmia.op.property;
 import fmia.random;
 
 using namespace fmia;

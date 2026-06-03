@@ -15,6 +15,7 @@
 
 export module fmia.math;
 
+export import fmia.math.algebra;
 export import fmia.math.complex;
 export import fmia.math.counting;
 export import fmia.math.equation;
@@ -24,6 +25,5 @@ export import fmia.math.game_theory;
 export import fmia.math.geometry;
 export import fmia.math.integer;
 export import fmia.math.matrix;
-export import fmia.math.op;
 export import fmia.math.polynomial;
 export import fmia.math.quaternion;
