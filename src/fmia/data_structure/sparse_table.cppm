@@ -24,6 +24,7 @@ import fmia.op.property;
 export namespace fmia {
 
 template <typename T, typename MergeFn, typename Buffer = relaxed_heap_buffer<T, std::size_t, std::allocator<T>>>
+  requires std::regular_invocable<MergeFn, T, T>
 class sparse_table final : public Buffer
 {
 public:
@@ -34,7 +35,7 @@ public:
   using allocator_traits = Buffer::allocator_traits;
 
 private:
-  [[no_unique_address]] MergeFn fn_;
+  [[no_unique_address]] MergeFn f_;
 
   const size_type size_;
   const size_type max_exp_p1_;
@@ -63,7 +64,7 @@ public:
   {
     if constexpr (meta::idempotent_operator<MergeFn, T>) {
       const size_type j = ilog2(r - l + 1);
-      return std::invoke(fn_, (*this)[l, j], (*this)[r + 1 - (static_cast<size_type>(1) << j), j]);
+      return std::invoke(f_, (*this)[l, j], (*this)[r + 1 - (static_cast<size_type>(1) << j), j]);
     } else {
       const size_type d = r - l + 1;
       size_type j = ilog2(d);
@@ -73,7 +74,7 @@ public:
       while (l <= r) {
         --j;
         if (d >> j & 1) {
-          res = std::invoke(fn_, std::move(res), (*this)[l, j]);
+          res = std::invoke(f_, std::move(res), (*this)[l, j]);
           l += static_cast<size_type>(1) << j;
         }
       }
@@ -83,13 +84,17 @@ public:
   }
 
 public:
+  // clang-format off
+
   template <std::ranges::forward_range R, typename F = MergeFn>
-  constexpr explicit sparse_table(R&& r, F&& fn = MergeFn {}, const allocator_type& alloc = allocator_type {}) //
+  constexpr explicit sparse_table(R&& r, F&& f = MergeFn {}, const allocator_type& alloc = allocator_type {})
+    requires std::same_as<MergeFn, std::remove_cvref_t<F>>
     pre(std::ranges::size(r) > 0)
-    : Buffer(alloc), fn_(std::forward<F>(fn)), size_ {std::ranges::size(r)}, max_exp_p1_ {static_cast<size_type>(ilog2(size_) + 1)}
+    : Buffer(alloc), f_(std::forward<F>(f)), size_ {std::ranges::size(r)}, max_exp_p1_ {static_cast<size_type>(ilog2(size_) + 1)}
   {
     // sum_(j = 0)^(J) (n - 2^j + 1) = (n + 1)(j + 1) - (2^(j + 1) - 1)
     this->recapacity((size_ + 1) * max_exp_p1_ - (static_cast<size_type>(1) << max_exp_p1_) + 1);
+
     if constexpr (std::is_rvalue_reference_v<R&&> || std::is_rvalue_reference_v<std::ranges::range_reference_t<R>>)
       uninitialized_move_n(this->buffer_.allocator, std::ranges::begin(r), size_, this->buffer_.data);
     else
@@ -101,12 +106,14 @@ public:
       for (size_type i = 0; i + len <= size_; ++i) {
         allocator_traits::construct(
           this->buffer_.allocator, this->buffer_.data + static_cast<difference_type>(offset_(i, j)),
-          std::invoke(fn_, (*this)[i, j - 1], (*this)[i + (len >> 1), j - 1])
+          std::invoke(f_, (*this)[i, j - 1], (*this)[i + (len >> 1), j - 1])
         );
         ++this->buffer_.size;
       }
     }
   }
+
+  // clang-format on
 };
 
 template <std::ranges::forward_range R, typename F, typename Allocator = std::allocator<std::ranges::range_value_t<R>>>
