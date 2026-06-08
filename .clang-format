@@ -1,6 +1,5 @@
-# clang-format style options: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
-
 # require clang-format 22
+# clang-format style options: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
 # misc settings
 Language: Cpp
