@@ -214,6 +214,7 @@ public:
   [[nodiscard]] constexpr allocator_type get_allocator() const noexcept { return buffer_.allocator; }
 
   [[nodiscard]] constexpr pointer data() const noexcept { return buffer_.data; }
+  [[nodiscard]] constexpr pointer offset(size_type i) const noexcept { return buffer_.data + static_cast<difference_type>(i); }
 
   constexpr void clear() noexcept { buffer_.destroy(buffer_.size); }
 
