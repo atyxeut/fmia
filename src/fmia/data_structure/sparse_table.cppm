@@ -7,6 +7,7 @@ import std;
 
 import fmia.math.algebra;
 import fmia.math.integer.fixed_precision;
+import fmia.memory.allocator;
 import fmia.memory.storage_base;
 
 export namespace fmia {
