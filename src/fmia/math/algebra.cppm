@@ -12,7 +12,7 @@ export namespace fmia::meta {
 template <typename T>
 inline constexpr bool enable_idempotent_operator = false;
 
-template <typename Operator, typename T>
+template <typename T, typename Operator>
 concept idempotent_operator = std::regular_invocable<Operator, T, T> && std::convertible_to<std::invoke_result_t<Operator, T, T>, T>
                               && enable_idempotent_operator<std::remove_cvref_t<Operator>>;
 
@@ -63,8 +63,8 @@ struct neutral_element_tag
 
 // the default behavior for is_neutral_element, other classes must overload this function if they want this utility, this is an optimization
 // for large types for which constructing and copying is costly, e.g. identity matrix
-template <element_for_operator Operation, typename T>
-  requires (meta::arithmetic<T>)
+template <typename T, element_for_operator Operation>
+  requires meta::arithmetic<T>
 [[nodiscard]] constexpr bool is_neutral_element(const T& elem)
 {
   if constexpr (Operation == element_for_operator::add)

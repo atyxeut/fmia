@@ -28,7 +28,8 @@ private:
   const size_type size_;
   const size_type max_exp_p1_;
 
-  [[nodiscard]] constexpr size_type offset_(size_type i, size_type j) const noexcept
+private:
+  [[nodiscard]] constexpr size_type map_(size_type i, size_type j) const noexcept
   {
     // the jth row has only row_length - 2^j + 1 elements, so the jth row has 2^j - 1 unused slots, then from 0th row to the (j-1)th, the
     // total contribution is sum_(k = 0)^(j - 1) (2^k - 1) = 2^j - j - 1 spare slots, thus the offset is j * row_length + i - (2^j - j - 1)
@@ -38,37 +39,10 @@ private:
     return j * size_ + i + j + 1 - (static_cast<size_type>(1) << j);
   }
 
-public:
-  [[nodiscard]] constexpr auto&& operator [](this auto&& self, size_type i, size_type j) noexcept //
-    pre(self.offset_(i, j) < self.buffer_.size)
+  [[nodiscard]] constexpr auto&& access_(this auto&& self, size_type i, size_type j) noexcept //
+    pre(self.map_(i, j) < self.buffer_.size)
   {
-    return std::forward<decltype(self)>(self).buffer_[self.offset_(i, j)];
-  }
-
-  [[nodiscard]] constexpr T query(
-    size_type l, size_type r
-  ) const noexcept(std::is_nothrow_invocable_v<const MergeFn&, const T&, const T&>) //
-    pre(l <= r)
-  {
-    if constexpr (meta::idempotent_operator<MergeFn, T>) {
-      const size_type j = ilog2(r - l + 1);
-      return std::invoke(f_, (*this)[l, j], (*this)[r + 1 - (static_cast<size_type>(1) << j), j]);
-    } else {
-      const size_type d = r - l + 1;
-      size_type j = ilog2(d);
-
-      T res = (*this)[l, j];
-      l += static_cast<size_type>(1) << j;
-      while (l <= r) {
-        --j;
-        if (d >> j & 1) {
-          res = std::invoke(f_, std::move(res), (*this)[l, j]);
-          l += static_cast<size_type>(1) << j;
-        }
-      }
-
-      return res;
-    }
+    return std::forward<decltype(self)>(self).buffer_[self.map_(i, j)];
   }
 
 public:
@@ -81,7 +55,7 @@ public:
     : Buffer(alloc), f_(std::forward<F>(f)), size_ {std::ranges::size(r)}, max_exp_p1_ {static_cast<size_type>(ilog2(size_) + 1)}
   {
     // sum_(j = 0)^(J) (n - 2^j + 1) = (n + 1)(j + 1) - (2^(j + 1) - 1)
-    this->recapacity((size_ + 1) * max_exp_p1_ - (static_cast<size_type>(1) << max_exp_p1_) + 1);
+    this->recapacity((size_ + 1) * max_exp_p1_ + 1 - (static_cast<size_type>(1) << max_exp_p1_));
 
     if constexpr (std::is_rvalue_reference_v<R&&> || std::is_rvalue_reference_v<std::ranges::range_reference_t<R>>)
       uninitialized_move_n(this->buffer_.allocator, std::ranges::begin(r), size_, this->buffer_.data);
@@ -93,8 +67,8 @@ public:
       const auto len = static_cast<size_type>(1) << j;
       for (size_type i = 0; i + len <= size_; ++i) {
         allocator_traits::construct(
-          this->buffer_.allocator, this->buffer_.data + static_cast<difference_type>(offset_(i, j)),
-          std::invoke(f_, (*this)[i, j - 1], (*this)[i + (len >> 1), j - 1])
+          this->buffer_.allocator, this->buffer_.data + static_cast<difference_type>(map_(i, j)),
+          std::invoke(f_, access_(i, j - 1), access_(i + (len >> 1), j - 1))
         );
         ++this->buffer_.size;
       }
@@ -102,6 +76,33 @@ public:
   }
 
   // clang-format on
+
+public:
+  [[nodiscard]] constexpr T query(
+    size_type l, size_type r
+  ) const noexcept(std::is_nothrow_invocable_v<const MergeFn&, const T&, const T&>) //
+    pre(l <= r)
+  {
+    if constexpr (meta::idempotent_operator<T, MergeFn>) {
+      const size_type j = ilog2(r - l + 1);
+      return std::invoke(f_, access_(l, j), access_(r + 1 - (static_cast<size_type>(1) << j), j));
+    } else {
+      const size_type d = r - l + 1;
+      size_type j = ilog2(d);
+
+      T res = access_(l, j);
+      l += static_cast<size_type>(1) << j;
+      while (l <= r) {
+        --j;
+        if (d >> j & 1) {
+          res = std::invoke(f_, std::move(res), access_(l, j));
+          l += static_cast<size_type>(1) << j;
+        }
+      }
+
+      return res;
+    }
+  }
 };
 
 template <std::ranges::forward_range R, typename F, typename Allocator = std::allocator<std::ranges::range_value_t<R>>>
