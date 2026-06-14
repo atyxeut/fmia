@@ -35,7 +35,7 @@ namespace fmia::graph {
 enum class toposort_tag { none, lexicographical };
 
 template <toposort_tag Order, typename Graph, typename Fn>
-[[nodiscard]] constexpr auto toposort_impl(const Graph& g, Fn&& fn) -> std::expected<bool, toposort_error> {
+[[nodiscard]] constexpr std::expected<bool, toposort_error> toposort_impl(const Graph& g, Fn&& fn) {
   using vertex_type = Graph::vertex_type;
 
   using queue_type = std::conditional_t<

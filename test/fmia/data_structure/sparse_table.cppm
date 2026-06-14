@@ -15,7 +15,7 @@ using namespace fmia;
 constexpr usize element_count = 1e6;
 constexpr usize max_jump_count = ilog2(element_count);
 
-[[nodiscard]] auto make_array() -> std::vector<int> {
+[[nodiscard]] std::vector<int> make_array() {
   std::vector<int> ret(element_count);
   for (auto rand_elem = random::uniform_distribution(0, std::numeric_limits<int>::max()); int& elem : ret)
     elem = rand_elem(random::mt19937_engine);
@@ -24,7 +24,7 @@ constexpr usize max_jump_count = ilog2(element_count);
 
 constexpr usize query_count = 1e6;
 
-[[nodiscard]] auto make_query() -> std::vector<std::array<usize, 2>> {
+[[nodiscard]] std::vector<std::array<usize, 2>> make_query() {
   std::vector<std::array<usize, 2>> ret(query_count);
   for (auto rand_l = random::uniform_distribution(0uz, element_count - 1); auto& [l, r] : ret) {
     l = rand_l(random::mt19937_engine);

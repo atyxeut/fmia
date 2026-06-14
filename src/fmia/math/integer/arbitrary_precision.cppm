@@ -44,7 +44,7 @@ export namespace fmia::big_integer::naive {
 
 // +, -, *, /, %, power, root operations for nonnegative operands (radix 10^k) with free functions
 
-[[nodiscard]] constexpr auto parse(std::string_view s) -> std::vector<int> {
+[[nodiscard]] constexpr std::vector<int> parse(std::string_view s) {
   const auto n = s.size();
   std::vector<int> ret(n);
 
@@ -119,7 +119,7 @@ constexpr void remove_lz(std::vector<Limb>& num) noexcept {
     num.pop_back();
 }
 
-[[nodiscard]] constexpr auto add(const std::vector<int>& a, const std::vector<int>& b) -> std::vector<int> {
+[[nodiscard]] constexpr std::vector<int> add(const std::vector<int>& a, const std::vector<int>& b) {
   std::vector<int> ans(std::max(a.size(), b.size()) + 1);
 
   for (auto i = 0uz; i < a.size(); ++i)
@@ -158,7 +158,7 @@ void print(const sub_result& result, bool new_line = false) {
   return {sgn, std::move(ans)};
 }
 
-[[nodiscard]] constexpr auto mul(const std::vector<int>& a, const std::vector<int>& b) -> std::vector<int> {
+[[nodiscard]] constexpr std::vector<int> mul(const std::vector<int>& a, const std::vector<int>& b) {
   if (is_zero(a) || is_zero(b))
     return std::vector<int> {0};
 
@@ -184,9 +184,9 @@ struct floor_div_result {
 FMIA_WCONVERSION_PUSH()
 
 // used when b is way smaller than a
-[[nodiscard]] constexpr auto floor_div(const std::vector<int>& a, int b) -> floor_div_result<int>
-  // ICE:
-  // pre(b != 0)
+[[nodiscard]] constexpr floor_div_result<int> floor_div(const std::vector<int>& a, int b)
+// ICE:
+// pre(b != 0)
 {
   std::vector<int> q(a.size());
   long long r = 0;
@@ -202,8 +202,9 @@ FMIA_WCONVERSION_PUSH()
   return {std::move(q), static_cast<int>(r)};
 }
 
-[[nodiscard]] constexpr auto floor_div(const std::vector<int>& a, const std::vector<int>& b)
-  -> floor_div_result<std::vector<int>> pre(!is_zero(b)) {
+[[nodiscard]] constexpr floor_div_result<std::vector<int>> floor_div(const std::vector<int>& a, const std::vector<int>& b) pre(
+  !is_zero(b)
+) {
   const int cmp_result = compare<int>(a, b);
   if (cmp_result < 0)
     return {{0}, a};
@@ -283,7 +284,7 @@ FMIA_WCONVERSION_PUSH()
 
 FMIA_WCONVERSION_POP()
 
-[[nodiscard]] constexpr auto pow(std::vector<int> a, int n) -> std::vector<int> pre(n >= 0) {
+[[nodiscard]] constexpr std::vector<int> pow(std::vector<int> a, int n) pre(n >= 0) {
   if (n == 0)
     return {1};
 
@@ -301,7 +302,7 @@ FMIA_WCONVERSION_POP()
 
 FMIA_WCONVERSION_PUSH()
 
-[[nodiscard]] constexpr auto floor_root(const std::vector<int>& a, int n) -> std::vector<int> pre(n > 0) {
+[[nodiscard]] constexpr std::vector<int> floor_root(const std::vector<int>& a, int n) pre(n > 0) {
   if (n == 1 || is_zero(a))
     return a;
 

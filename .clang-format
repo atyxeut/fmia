@@ -1,4 +1,4 @@
-# require clang-format 22
+# require clang-format 23
 # clang-format style options: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
 # misc settings
@@ -71,7 +71,8 @@ AlignArrayOfStructures: Right
 
 # operator
 AlignOperands: Align
-BreakBinaryOperations: Never
+BreakBinaryOperations:
+  Default: Never
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeTernaryOperators: true
 
@@ -92,11 +93,14 @@ IndentGotoLabels: false
 # function
 AlignAfterOpenBracket: BlockIndent
 AllowShortFunctionsOnASingleLine: Inline
-BinPackArguments: true
+PackArguments:
+  BinPack: BinPack
+PackParameters:
+  BinPack: BinPack
 AllowAllArgumentsOnNextLine: true
-BinPackParameters: BinPack
 AllowAllParametersOfDeclarationOnNextLine: true
 BreakAfterAttributes: Leave
+BreakBeforeReturnType: None
 IndentWrappedFunctionNames: false
 SpaceAfterOperatorKeyword: true
 AllowBreakBeforeNoexceptSpecifier: OnlyWithParen
@@ -118,6 +122,8 @@ AlignConsecutiveBitFields:
   AcrossComments: true
 BitFieldColonSpacing: Both
 AllowShortEnumsOnASingleLine: true
+SpaceBeforeEnumUnderlyingTypeColon: true
+AllowShortRecordOnASingleLine: Always
 
 #namespace / extern / export
 IndentExternBlock: false

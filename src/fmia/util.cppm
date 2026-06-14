@@ -35,7 +35,7 @@ template <typename T, typename U>
 
 // same values map to the same rank
 template <std::ranges::forward_range Range>
-[[nodiscard]] constexpr auto get_compressed_indices_ordered(const Range& src) -> std::vector<int> {
+[[nodiscard]] constexpr std::vector<int> get_compressed_indices_ordered(const Range& src) {
   std::vector<std::ranges::range_value_t<Range>> tmp(std::ranges::begin(src), std::ranges::end(src));
   std::sort(tmp.begin(), tmp.end());
   const auto tmp_end = std::unique(tmp.begin(), tmp.end());
@@ -51,7 +51,7 @@ template <std::ranges::forward_range Range>
 
 // every value maps to a unique rank, the value that has smaller index in the original range maps to a lower rank
 template <std::ranges::input_range Range>
-[[nodiscard]] constexpr auto get_compressed_indices_ordered_unique(Range&& src) -> std::vector<int> {
+[[nodiscard]] constexpr std::vector<int> get_compressed_indices_ordered_unique(Range&& src) {
   const auto n = std::ranges::size(src);
   std::vector<std::pair<std::ranges::range_value_t<Range>, std::size_t>> tmp;
   tmp.reserve(n);

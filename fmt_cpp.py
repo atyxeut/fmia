@@ -11,7 +11,7 @@ from pathlib import Path
 #   1. if path is a folder, recursively format every subpath in it
 #   2. if path is a .hpp/.cppm/.cpp/ file, format it using clang-format, styles are defined in .clang-format
 parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument("path", type=str)
+parser.add_argument("path", nargs="*", type=str)
 argv = parser.parse_args()
 
 
@@ -25,7 +25,8 @@ def fmt_cpp(path: Path):
 
 
 def main():
-  fmt_cpp(Path(argv.path).resolve())
+  for path in argv.path:
+    fmt_cpp(Path(path).resolve())
   print("format done", file=sys.stderr)
 
 

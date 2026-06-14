@@ -39,7 +39,7 @@ enum class eulerian_graph_error { no_eulerian_trail, no_eulerian_circuit };
 namespace fmia::graph {
 
 template <direction GraphDirection, typename Graph, typename Vertex = Graph::vertex_type>
-[[nodiscard]] constexpr auto get_eulerian_trail_start_vertex(const Graph& g) noexcept -> std::pair<Vertex, bool> {
+[[nodiscard]] constexpr std::pair<Vertex, bool> get_eulerian_trail_start_vertex(const Graph& g) noexcept {
   const auto n = g.vertex_size();
   Vertex start = -1, end = -1;
 
@@ -91,7 +91,7 @@ template <direction GraphDirection, typename Graph, typename Vertex = Graph::ver
 }
 
 template <typename Graph, typename Vertex = Graph::vertex_type, typename Iterator = Graph::neighbor_iterator>
-[[nodiscard]] constexpr auto init_current_edge_iterators(const Graph& g) -> std::vector<Iterator> {
+[[nodiscard]] constexpr std::vector<Iterator> init_current_edge_iterators(const Graph& g) {
   const auto n = g.vertex_size();
 
   std::vector<Iterator> res(n);
@@ -171,7 +171,7 @@ constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start) {
 }
 
 template <graph_trail_tag TrailTag, direction GraphDirection, typename Graph, typename Vertex = Graph::vertex_type>
-[[nodiscard]] constexpr auto get_an_eulerian_trail(const Graph& g) -> std::expected<std::vector<Vertex>, eulerian_graph_error> {
+[[nodiscard]] constexpr std::expected<std::vector<Vertex>, eulerian_graph_error> get_an_eulerian_trail(const Graph& g) {
   std::vector<Vertex> path;
 
   const auto [start, is_circuit] = get_eulerian_trail_start_vertex<GraphDirection>(g);

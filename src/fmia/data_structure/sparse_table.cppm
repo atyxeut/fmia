@@ -30,8 +30,8 @@ private:
 
 private:
   [[nodiscard]] constexpr size_type map_(size_type i, size_type j) const noexcept
-    // ICE:
-    // post(idx : idx < this->buffer_.size)
+  // ICE:
+  // post(idx : idx < this->buffer_.size)
   {
     // the jth row has only row_length - 2^j + 1 elements, so the jth row has 2^j - 1 unused slots, then from 0th row to the (j-1)th, the
     // total contribution is sum_(k = 0)^(j - 1) (2^k - 1) = 2^j - j - 1 spare slots, thus the offset is j * row_length + i - (2^j - j - 1)

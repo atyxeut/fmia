@@ -94,7 +94,7 @@ template <typename T = int>
 
 // get the edge list of a random unweighted tree
 // template <bool GenerateStar = false, std::integral Vertex>
-// [[nodiscard]] auto rand_unweighted_tree(Vertex vertex_begin, Vertex vertex_end) -> graph::basic_unweighted_edge_list<Vertex> {
+// [[nodiscard]] graph::basic_unweighted_edge_list<Vertex> rand_unweighted_tree(Vertex vertex_begin, Vertex vertex_end) {
 //   if (vertex_begin > vertex_end)
 //     throw std::invalid_argument("invalid vertex index range");
 
@@ -116,8 +116,9 @@ template <typename T = int>
 
 // get the edge list of a random weighted tree
 // template <bool GenerateStar = false, std::integral Vertex, std::integral Weight>
-// [[nodiscard]] auto rand_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
-//   -> graph::basic_weighted_edge_list<Vertex, Weight> {
+// [[nodiscard]] graph::basic_weighted_edge_list<Vertex, Weight> rand_weighted_tree(
+//   Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end
+// ) {
 //   if (vertex_begin > vertex_end)
 //     throw std::invalid_argument("invalid vertex index range");
 
