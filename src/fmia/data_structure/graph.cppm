@@ -3,6 +3,7 @@
 
 export module fmia.data_structure.graph;
 
+export import fmia.data_structure.graph.cactus;
 export import fmia.data_structure.graph.connectivity;
 export import fmia.data_structure.graph.eulerian;
 export import fmia.data_structure.graph.functional;
