@@ -6,11 +6,10 @@ export module fmia.data_structure.graph.storage;
 import std;
 
 import fmia.meta.arithmetic;
-import fmia.util.enum_flag;
 
 export namespace fmia::graph {
 
-enum class category : enum_underlying_type { undirected, directed };
+enum class graph_category { undirected, directed };
 
 } // export namespace fmia::graph
 

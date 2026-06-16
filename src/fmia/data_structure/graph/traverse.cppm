@@ -6,226 +6,33 @@ export module fmia.data_structure.graph.traverse;
 import std;
 
 import fmia.data_structure.graph.storage;
-import fmia.util.enum_flag;
-
-namespace fmia::graph {
-
-enum class trail_tag : enum_underlying_type { none, circuit };
-enum class path_tag : enum_underlying_type { none, cycle };
-
-} // namespace fmia::graph
 
 export namespace fmia::graph {
 
-enum class eulerian_graph_error : enum_underlying_type { no_eulerian_trail, no_eulerian_circuit };
+// walk: a sequence of vertices and edges, must begin with a vertex and also end with a vertex
+// closed walk: a walk whose start is the same as the end
+// open walk: a walk whose start and end are different
+//
+// trail: a walk that has no duplicate edges
+// circuit: a closed trail
+//
+// path: a walk that has no duplicate vertices (which implies no duplicate edges)
+// cycle: a closed path
 
-} // export namespace fmia::graph
-
-namespace fmia::graph {
-
-template <category GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
-[[nodiscard]] constexpr auto get_eulerian_trail_start_vertex(const Graph& g) noexcept -> std::pair<Vertex, bool>
-{
-  const auto n = g.vertex_size();
-  Vertex start = -1, end = -1;
-
-  if constexpr (GraphTag == category::undirected) {
-    for (Vertex u = 0; u < n; ++u) {
-      if (g.degree(u) & 1) {
-        if (start == -1)
-          start = u;
-        else if (end == -1)
-          end = u;
-        else
-          return {-1, false};
-      }
-    }
-  }
-
-  if constexpr (GraphTag == category::directed) {
-    for (Vertex u = 0; u < n; ++u) {
-      const auto diff = g.in_degree(u) - g.out_degree(u);
-      if (diff < -1 | diff > 1 | (diff == -1 & start != -1) | (diff == 1 & end != -1))
-        return {-1, false};
-      if (diff == -1)
-        start = u;
-      else if (diff == 1)
-        end = u;
-    }
-  }
-
-  // no Eulerian trails
-  // for undirected graphs: missing the end
-  // for directed graphs: missing the start or missing the end
-  if (start == -1 ^ end == -1)
-    return {-1, false};
-
-  // has an Eulerian trail
-  if (start != -1)
-    return {start, false};
-
-  // both the start and the end are -1, meaning:
-  // for undirected graphs: every vertex has even degree
-  // for directed graphs: for every vertex, its in degree = its out degree
-  // check if there's an Eulerian circuit
-  for (Vertex u = 0; u < n; ++u)
-    if (g.degree(u) > 0)
-      return {u, true};
-
-  // every vertex is isolated, or the graph is a null graph, we consider it to have an empty Eulerian circuit
-  return {-1, true};
-}
-
-template <typename Graph, typename Vertex = Graph::vertex_type, typename Iterator = Graph::neighbor_iterator>
-[[nodiscard]] constexpr auto init_current_edge_iterators(const Graph& g) -> std::vector<Iterator>
-{
-  const auto n = g.vertex_size();
-
-  std::vector<Iterator> res(n);
-  for (Vertex u = 0; u < n; ++u)
-    res[u] = g.neighbors(u).begin();
-
-  return res;
-}
-
-} // namespace fmia::graph
-
-namespace fmia::graph {
-
-// Hierholzer's algorithm
-// time complexity: O(V + E)
-
-template <typename G, typename T, typename Y, typename U, typename I>
-constexpr void get_an_eulerian_trail_impl_for_undirected_recursive(const G& g, T u, Y& cur_edge_it, U& vis, I& path)
-{
-  for (const auto end_it = g.neighbors(u).end(); cur_edge_it[u] != end_it;) {
-    if (const auto [v, id] = *cur_edge_it[u]++; !vis[id]) {
-      vis[id] = true;
-      get_an_eulerian_trail_impl_for_undirected_recursive(g, v, cur_edge_it, vis, path);
-    }
-  }
-  path.emplace_back(u);
-}
-
-template <typename G, typename T, typename Y, typename U, typename I>
-constexpr void get_an_eulerian_trail_impl_for_undirected_iterative(const G& g, T start, Y& cur_edge_it, U& vis, I& path)
-{
-  std::vector<T> stack {start};
-  while (!stack.empty()) {
-    const auto u = stack.back();
-    if (const auto end_it = g.neighbors(u).end(); cur_edge_it[u] != end_it) {
-      if (const auto [v, id] = *cur_edge_it[u]++; !vis[id]) {
-        vis[id] = true;
-        stack.emplace_back(v);
-      }
-    } else {
-      path.emplace_back(u);
-      stack.pop_back();
-    }
-  }
-}
-
-template <typename G, typename T, typename Y, typename U>
-constexpr void get_an_eulerian_trail_impl_for_directed_recursive(const G& g, T u, Y& cur_edge_it, U& path)
-{
-  for (const auto end_it = g.neighbors(u).end(); cur_edge_it[u] != end_it;)
-    get_an_eulerian_trail_impl_for_directed_recursive(g, *cur_edge_it[u]++, cur_edge_it, path);
-  path.emplace_back(u);
-}
-
-template <typename G, typename T, typename Y, typename U>
-constexpr void get_an_eulerian_trail_impl_for_directed_iterative(const G& g, T start, Y& cur_edge_it, U& path)
-{
-  std::vector<T> stack {start};
-  while (!stack.empty()) {
-    const auto u = stack.back();
-    if (const auto end_it = g.neighbors(u).end(); cur_edge_it[u] != end_it)
-      stack.emplace_back(*cur_edge_it[u]++);
-    else {
-      path.emplace_back(u);
-      stack.pop_back();
-    }
-  }
-}
-
-template <category GraphTag, typename T, typename G, typename U>
-constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start)
-{
-  auto cur_edge_it = init_current_edge_iterators(g);
-
-  if constexpr (GraphTag == category::undirected) {
-    std::vector<bool> vis(g.edge_size() >> 1);
-    get_an_eulerian_trail_impl_for_undirected_iterative(g, start, cur_edge_it, vis, path);
-  }
-
-  if constexpr (GraphTag == category::directed)
-    get_an_eulerian_trail_impl_for_directed_iterative(g, start, cur_edge_it, path);
-}
-
-template <trail_tag TrailTag, category GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
-[[nodiscard]] constexpr auto get_an_eulerian_trail(const Graph& g) -> std::expected<std::vector<Vertex>, eulerian_graph_error>
-{
-  std::vector<Vertex> path;
-
-  const auto [start, is_circuit] = get_eulerian_trail_start_vertex<GraphTag>(g);
-
-  if constexpr (TrailTag == trail_tag::circuit)
-    if (!is_circuit)
-      return std::unexpected(eulerian_graph_error::no_eulerian_circuit);
-
-  if (start == -1) {
-    if (is_circuit)
-      return path;
-    else
-      return std::unexpected(eulerian_graph_error::no_eulerian_trail);
-  }
-
-  get_an_eulerian_trail_impl<GraphTag>(path, g, start);
-  std::ranges::reverse(path);
-  return path;
-}
-
-} // namespace fmia::graph
-
-export namespace fmia::graph {
-
-// leave isolated vertices, the rest of the graph must be (strongly) connected, otherwise the following functions have undefined behavior
-
-template <meta::graph T>
-[[nodiscard]] constexpr auto get_an_eulerian_trail_for_undirected(const T& g)
-{
-  return get_an_eulerian_trail<trail_tag::none, category::undirected>(g);
-}
-
-template <meta::graph T>
-[[nodiscard]] constexpr auto get_an_eulerian_circuit_for_undirected(const T& g)
-{
-  return get_an_eulerian_trail<trail_tag::circuit, category::undirected>(g);
-}
-
-template <meta::graph T>
-[[nodiscard]] constexpr auto get_an_eulerian_trail_for_directed(const T& g)
-{
-  return get_an_eulerian_trail<trail_tag::none, category::directed>(g);
-}
-
-template <meta::graph T>
-[[nodiscard]] constexpr auto get_an_eulerian_circuit_for_directed(const T& g)
-{
-  return get_an_eulerian_trail<trail_tag::circuit, category::directed>(g);
-}
+enum class graph_trail_tag { none, circuit };
+enum class graph_path_tag { none, cycle };
 
 } // export namespace fmia::graph
 
 export namespace fmia::graph {
 
-enum class toposort_error : enum_underlying_type { has_cycle };
+enum class toposort_error { has_cycle };
 
 } // export namespace fmia::graph
 
 namespace fmia::graph {
 
-enum class toposort_tag : enum_underlying_type { none, lexicographical };
+enum class toposort_tag { none, lexicographical };
 
 template <toposort_tag Order, typename Graph, typename Fn>
 [[nodiscard]] constexpr auto toposort_impl(const Graph& g, Fn&& fn) -> std::expected<bool, toposort_error>
@@ -244,11 +51,11 @@ template <toposort_tag Order, typename Graph, typename Fn>
     if (g.in_degree(u) == 0)
       q.push(u);
 
-  bool unique_order = true;
+  bool order_unique = true;
 
   while (!q.empty()) {
     if (q.size() > 1)
-      unique_order = false;
+      order_unique = false;
 
     const auto u = [&] {
       if constexpr (std::same_as<queue_type, std::queue<vertex_type>>)
@@ -269,7 +76,7 @@ template <toposort_tag Order, typename Graph, typename Fn>
   if (n != 0)
     return std::unexpected(toposort_error::has_cycle);
 
-  return unique_order;
+  return order_unique;
 }
 
 } // namespace fmia::graph
