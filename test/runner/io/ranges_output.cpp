@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Unlicense
 
-import test.fmia.util.std_container_extension;
+import test.fmia.io.ranges_output;
 
 int main()
 {

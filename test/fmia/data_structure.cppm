@@ -3,5 +3,7 @@
 
 export module test.fmia.data_structure;
 
+export import test.fmia.data_structure.array.multidimensional_std_array;
 export import test.fmia.data_structure.sparse_table;
 export import test.fmia.data_structure.string;
+export import test.fmia.data_structure.tuple;

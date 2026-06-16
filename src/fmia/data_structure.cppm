@@ -15,5 +15,6 @@ export import fmia.data_structure.segment_tree;
 export import fmia.data_structure.sparse_table;
 export import fmia.data_structure.stack;
 export import fmia.data_structure.string;
+export import fmia.data_structure.tuple;
 export import fmia.data_structure.union_find;
 export import fmia.data_structure.van_emde_boas_tree;

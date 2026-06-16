@@ -2,3 +2,5 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 export module fmia.data_structure.array;
+
+export import fmia.data_structure.array.multidimensional_std_array;
