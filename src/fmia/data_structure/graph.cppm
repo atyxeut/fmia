@@ -11,5 +11,6 @@ export import fmia.data_structure.graph.hamiltonian;
 export import fmia.data_structure.graph.multipartite;
 export import fmia.data_structure.graph.shortest_path;
 export import fmia.data_structure.graph.storage;
+export import fmia.data_structure.graph.tournament;
 export import fmia.data_structure.graph.traverse;
 export import fmia.data_structure.graph.unicyclic;
