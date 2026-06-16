@@ -11,6 +11,7 @@ export import fmia.io;
 export import fmia.math;
 export import fmia.memory;
 export import fmia.meta;
+export import fmia.misc;
 export import fmia.random;
 export import fmia.simd;
 export import fmia.system;

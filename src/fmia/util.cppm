@@ -8,4 +8,3 @@ export import fmia.util.enum_flag;
 export import fmia.util.search;
 export import fmia.util.sort;
 export import fmia.util.std_container_extension;
-export import fmia.util.tower_of_hanoi;
