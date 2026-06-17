@@ -61,14 +61,14 @@ template <typename EdgeList, typename Vertex, typename Weight = EdgeList::weight
 
 export namespace fmia::graph::sssp {
 
-template <typename Vertex, typename Weight>
-[[nodiscard]] constexpr auto bellman_ford(const basic_weighted_edge_list<Vertex, Weight>& edges, Vertex vertex_count, Vertex source)
+template <typename Edge, typename Vertex = typename Edge::vertex_size>
+[[nodiscard]] constexpr auto bellman_ford(const edge_list<Edge>& edges, Vertex vertex_count, Vertex source)
 {
   return bellman_ford_impl(edges, vertex_count, source);
 }
 
-template <typename Vertex, typename Weight>
-[[nodiscard]] constexpr auto bellman_ford(const weighted_edge_list<Vertex, Weight>& edges, Vertex source)
+template <typename Edge, typename Vertex = typename Edge::vertex_size>
+[[nodiscard]] constexpr auto bellman_ford(const edge_list<Edge>& edges, Vertex source)
 {
   return bellman_ford_impl(edges, edges.vertex_size(), source);
 }
