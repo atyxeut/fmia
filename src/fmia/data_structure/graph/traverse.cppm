@@ -83,13 +83,13 @@ template <toposort_tag Order, typename Graph, typename Fn>
 
 export namespace fmia::graph {
 
-template <meta::graph T, typename Fn>
+template <graph T, typename Fn>
 [[nodiscard]] constexpr auto toposort(const T& g, Fn&& fn)
 {
   return toposort_impl<toposort_tag::none>(g, std::forward<Fn>(fn));
 }
 
-template <meta::graph T, typename Fn>
+template <graph T, typename Fn>
 [[nodiscard]] constexpr auto toposort_lexicographical(const T& g, Fn&& fn)
 {
   return toposort_impl<toposort_tag::lexicographical>(g, std::forward<Fn>(fn));

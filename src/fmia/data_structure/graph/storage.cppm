@@ -9,7 +9,93 @@ import fmia.meta.arithmetic;
 
 export namespace fmia::graph {
 
-enum class graph_category { undirected, directed };
+enum class graph_direction { undirected, directed, mixed };
+enum class graph_weight { unweighted, weighted };
+
+} // export namespace fmia::graph
+
+namespace fmia::graph {
+
+template <typename T>
+concept internal_graph = requires {
+  typename T::vertex_size_type;
+  typename T::edge_size_type;
+  T::direction_tag;
+  T::weight_tag;
+};
+
+} // namespace fmia::graph
+
+export namespace fmia::graph {
+
+template <typename>
+struct graph_traits
+{
+};
+
+template <internal_graph T>
+struct graph_traits<T>
+{
+  static constexpr auto direction_tag = T::direction_tag;
+  static constexpr auto weight_tag = T::weight_tag;
+
+  using vertex_size_type = T::vertex_size_type;
+  using edge_size_type = T::edge_size_type;
+
+  using vertex_difference_type = std::make_signed_t<vertex_size_type>;
+  using edge_difference_type = std::make_signed_t<edge_size_type>;
+};
+
+template <typename T>
+inline constexpr auto graph_direction_tag_v = graph_traits<std::remove_cvref_t<T>>::direction_tag;
+
+template <typename T>
+inline constexpr auto graph_weight_tag_v = graph_traits<std::remove_cvref_t<T>>::weight_tag;
+
+template <typename T>
+using graph_vertex_size_t = graph_traits<std::remove_cvref_t<T>>::vertex_size_type;
+
+template <typename T>
+using graph_vertex_difference_t = graph_traits<std::remove_cvref_t<T>>::vertex_difference_type;
+
+template <typename T>
+using graph_edge_size_t = graph_traits<std::remove_cvref_t<T>>::edge_size_type;
+
+template <typename T>
+using graph_edge_difference_t = graph_traits<std::remove_cvref_t<T>>::edge_difference_type;
+
+template <typename T>
+concept graph = requires(std::remove_cvref_t<T> g) {
+  requires std::same_as<graph_direction, decltype(graph_direction_tag_v<T>)>;
+  requires std::same_as<graph_weight, decltype(graph_weight_tag_v<T>)>;
+
+  requires std::unsigned_integral<graph_vertex_size_t<T>>;
+  { g.vertex_size() } -> std::same_as<graph_vertex_size_t<T>>;
+
+  requires std::unsigned_integral<graph_edge_size_t<T>>;
+  { g.edge_size() } -> std::same_as<graph_edge_size_t<T>>;
+
+  requires std::signed_integral<graph_vertex_difference_t<T>>;
+  requires std::same_as<std::make_unsigned_t<graph_vertex_difference_t<T>>, graph_vertex_size_t<T>>;
+
+  requires std::signed_integral<graph_edge_difference_t<T>>;
+  requires std::same_as<std::make_unsigned_t<graph_edge_difference_t<T>>, graph_edge_size_t<T>>;
+};
+
+template <typename T>
+concept undirected_graph = graph<T> && graph_direction_tag_v<T> == graph_direction::undirected;
+
+template <typename T>
+concept directed_graph = graph<T> && graph_direction_tag_v<T> == graph_direction::directed;
+
+template <typename T>
+concept mixed_graph = graph<T> && graph_direction_tag_v<T> == graph_direction::mixed;
+
+template <typename T>
+concept unweighted_graph = graph<T> && graph_weight_tag_v<T> == graph_weight::unweighted;
+
+template <typename T>
+concept weighted_graph = graph<T> && graph_weight_tag_v<T> == graph_weight::weighted;
 
 } // export namespace fmia::graph
 
@@ -99,60 +185,6 @@ struct weighted_edge : edge_base<Vertex>, weight<Weight>
 };
 
 }; // export namespace fmia::graph
-
-export namespace fmia::meta {
-
-template <typename T>
-struct is_no_cv_unweighted_graph : std::false_type
-{
-};
-
-template <typename T>
-inline constexpr bool is_no_cv_unweighted_graph_v = is_no_cv_unweighted_graph<T>::value;
-
-template <typename T>
-concept unweighted_graph = is_no_cv_unweighted_graph_v<std::remove_cvref_t<T>>;
-
-template <typename T>
-struct is_no_cv_weighted_graph : std::false_type
-{
-};
-
-template <typename T>
-inline constexpr bool is_no_cv_weighted_graph_v = is_no_cv_weighted_graph<T>::value;
-
-template <typename T>
-concept weighted_graph = is_no_cv_weighted_graph_v<std::remove_cvref_t<T>>;
-
-template <typename T>
-concept graph = unweighted_graph<T> || weighted_graph<T>;
-
-template <typename T>
-struct is_no_cv_basic_unweighted_graph : std::false_type
-{
-};
-
-template <typename T>
-inline constexpr bool is_no_cv_basic_unweighted_graph_v = is_no_cv_basic_unweighted_graph<T>::value || is_no_cv_unweighted_graph_v<T>;
-
-template <typename T>
-concept basic_unweighted_graph = is_no_cv_basic_unweighted_graph_v<std::remove_cvref_t<T>>;
-
-template <typename T>
-struct is_no_cv_basic_weighted_graph : std::false_type
-{
-};
-
-template <typename T>
-inline constexpr bool is_no_cv_basic_weighted_graph_v = is_no_cv_basic_weighted_graph<T>::value || is_no_cv_weighted_graph_v<T>;
-
-template <typename T>
-concept basic_weighted_graph = is_no_cv_basic_weighted_graph_v<std::remove_cvref_t<T>>;
-
-template <typename T>
-concept basic_graph = basic_unweighted_graph<T> || basic_weighted_graph<T>;
-
-} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -295,17 +327,3 @@ public:
 };
 
 } // export namespace fmia::graph
-
-export namespace fmia::meta {
-
-template <typename Vertex>
-struct is_no_cv_edge_list<graph::unweighted_edge_list<Vertex>> : std::true_type
-{
-};
-
-template <typename Vertex, typename Weight>
-struct is_no_cv_edge_list<graph::weighted_edge_list<Vertex, Weight>> : std::true_type
-{
-};
-
-} // export namespace fmia::meta

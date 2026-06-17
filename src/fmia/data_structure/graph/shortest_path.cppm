@@ -80,7 +80,7 @@ template <typename Vertex, typename Weight>
 //
 // this implementation uses a queue to hold the vertices, guarantees to be not worse than the vanilla bellman-ford, because a normal queue
 // does not affect the original update order of the bellman-ford, and is faster in average cases
-template <meta::graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
+template <graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
 [[nodiscard]] constexpr auto bellman_ford_queue_optimized(const T& g, Vertex source) -> std::expected<std::vector<Weight>, error>
 {
   if (g.empty())
@@ -144,7 +144,7 @@ template <meta::graph T, typename Vertex = T::vertex_type, typename Weight = T::
 // Parallel Asynchronous Label-Correcting Methods for Shortest Paths
 // Dimitri P. Bertsekas, Francesca Guerriero, and Roberto Musmanno
 // https://web.mit.edu/dimitrib/www/parallelsp.pdf
-template <meta::graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
+template <graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
 [[nodiscard]] constexpr auto bellman_ford_deque_optimized(const T& g, Vertex source) -> std::expected<std::vector<Weight>, error>
 {
   if (g.empty())

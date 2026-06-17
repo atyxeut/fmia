@@ -9,7 +9,7 @@ import fmia.data_structure.graph.storage;
 
 export namespace fmia::graph {
 
-template <meta::graph T, typename V = T::vertex_type>
+template <graph T, typename V = T::vertex_type>
 [[nodiscard]] constexpr auto get_scc_tarjan_recursive(const T& g) -> std::vector<V>
 {
   std::vector<V> dfn(g.vertex_size()), low(g.vertex_size()), scc_id(g.vertex_size());
