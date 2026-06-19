@@ -80,52 +80,52 @@ template <std::integral T>
 }
 
 // get the edge list of a random unweighted tree
-template <bool GenerateStar = false, std::integral Vertex>
-[[nodiscard]] auto generate_unweighted_tree(Vertex vertex_begin, Vertex vertex_end) -> graph::basic_unweighted_edge_list<Vertex> {
-  if (vertex_begin > vertex_end)
-    throw std::invalid_argument("invalid vertex index range");
+// template <bool GenerateStar = false, std::integral Vertex>
+// [[nodiscard]] auto generate_unweighted_tree(Vertex vertex_begin, Vertex vertex_end) -> graph::basic_unweighted_edge_list<Vertex> {
+//   if (vertex_begin > vertex_end)
+//     throw std::invalid_argument("invalid vertex index range");
 
-  const auto p = permutation(vertex_begin, vertex_end);
+//   const auto p = permutation(vertex_begin, vertex_end);
 
-  const auto edge_cnt = vertex_end - vertex_begin;
-  graph::basic_unweighted_edge_list<Vertex> data;
-  data.reserve(edge_cnt);
+//   const auto edge_cnt = vertex_end - vertex_begin;
+//   graph::basic_unweighted_edge_list<Vertex> data;
+//   data.reserve(edge_cnt);
 
-  for (auto v = 1uz; v <= edge_cnt; ++v) {
-    if constexpr (GenerateStar)
-      data.add_edge(p[0], p[v]);
-    else
-      data.add_edge(p[rand(0uz, v - 1)], p[v]);
-  }
+//   for (auto v = 1uz; v <= edge_cnt; ++v) {
+//     if constexpr (GenerateStar)
+//       data.add_edge(p[0], p[v]);
+//     else
+//       data.add_edge(p[rand(0uz, v - 1)], p[v]);
+//   }
 
-  return data;
-}
+//   return data;
+// }
 
 // get the edge list of a random weighted tree
-template <bool GenerateStar = false, std::integral Vertex, std::integral Weight>
-[[nodiscard]] auto generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
-  -> graph::basic_weighted_edge_list<Vertex, Weight> {
-  if (vertex_begin > vertex_end)
-    throw std::invalid_argument("invalid vertex index range");
+// template <bool GenerateStar = false, std::integral Vertex, std::integral Weight>
+// [[nodiscard]] auto generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
+//   -> graph::basic_weighted_edge_list<Vertex, Weight> {
+//   if (vertex_begin > vertex_end)
+//     throw std::invalid_argument("invalid vertex index range");
 
-  if (weight_begin > weight_end)
-    throw std::invalid_argument("invalid weight range");
+//   if (weight_begin > weight_end)
+//     throw std::invalid_argument("invalid weight range");
 
-  const auto p = permutation(vertex_begin, vertex_end);
+//   const auto p = permutation(vertex_begin, vertex_end);
 
-  const auto edge_cnt = vertex_end - vertex_begin;
-  graph::basic_weighted_edge_list<Vertex, Weight> data;
-  data.reserve(edge_cnt);
+//   const auto edge_cnt = vertex_end - vertex_begin;
+//   graph::basic_weighted_edge_list<Vertex, Weight> data;
+//   data.reserve(edge_cnt);
 
-  auto w_dist = uniform_dist(weight_begin, weight_end);
-  for (auto v = 1uz; v <= edge_cnt; ++v) {
-    if constexpr (GenerateStar)
-      data.add_edge(p[0], p[v], w_dist(mt19937_engine));
-    else
-      data.add_edge(p[rand(0uz, v - 1)], p[v], w_dist(mt19937_engine));
-  }
+//   auto w_dist = uniform_dist(weight_begin, weight_end);
+//   for (auto v = 1uz; v <= edge_cnt; ++v) {
+//     if constexpr (GenerateStar)
+//       data.add_edge(p[0], p[v], w_dist(mt19937_engine));
+//     else
+//       data.add_edge(p[rand(0uz, v - 1)], p[v], w_dist(mt19937_engine));
+//   }
 
-  return data;
-}
+//   return data;
+// }
 
 } // export namespace fmia::random

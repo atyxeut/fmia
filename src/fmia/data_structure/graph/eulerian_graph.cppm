@@ -38,12 +38,12 @@ enum class eulerian_graph_error { no_eulerian_trail, no_eulerian_circuit };
 
 namespace fmia::graph {
 
-template <graph_direction GraphDirection, typename Graph, typename Vertex = Graph::vertex_type>
+template <direction GraphDirection, typename Graph, typename Vertex = Graph::vertex_type>
 [[nodiscard]] constexpr auto get_eulerian_trail_start_vertex(const Graph& g) noexcept -> std::pair<Vertex, bool> {
   const auto n = g.vertex_size();
   Vertex start = -1, end = -1;
 
-  if constexpr (GraphDirection == graph_direction::undirected) {
+  if constexpr (GraphDirection == direction::undirected) {
     for (Vertex u = 0; u < n; ++u) {
       if (g.degree(u) & 1) {
         if (start == -1)
@@ -56,7 +56,7 @@ template <graph_direction GraphDirection, typename Graph, typename Vertex = Grap
     }
   }
 
-  if constexpr (GraphDirection == graph_direction::directed) {
+  if constexpr (GraphDirection == direction::directed) {
     for (Vertex u = 0; u < n; ++u) {
       const auto diff = g.in_degree(u) - g.out_degree(u);
       if (diff < -1 | diff > 1 | (diff == -1 & start != -1) | (diff == 1 & end != -1))
@@ -157,20 +157,20 @@ constexpr void get_an_eulerian_trail_impl_for_directed_iterative(const G& g, T s
   }
 }
 
-template <graph_direction GraphDirection, typename T, typename G, typename U>
+template <direction GraphDirection, typename T, typename G, typename U>
 constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start) {
   auto cur_edge_it = init_current_edge_iterators(g);
 
-  if constexpr (GraphDirection == graph_direction::undirected) {
+  if constexpr (GraphDirection == direction::undirected) {
     std::vector<bool> vis(g.edge_size() >> 1);
     get_an_eulerian_trail_impl_for_undirected_iterative(g, start, cur_edge_it, vis, path);
   }
 
-  if constexpr (GraphDirection == graph_direction::directed)
+  if constexpr (GraphDirection == direction::directed)
     get_an_eulerian_trail_impl_for_directed_iterative(g, start, cur_edge_it, path);
 }
 
-template <graph_trail_tag TrailTag, graph_direction GraphDirection, typename Graph, typename Vertex = Graph::vertex_type>
+template <graph_trail_tag TrailTag, direction GraphDirection, typename Graph, typename Vertex = Graph::vertex_type>
 [[nodiscard]] constexpr auto get_an_eulerian_trail(const Graph& g) -> std::expected<std::vector<Vertex>, eulerian_graph_error> {
   std::vector<Vertex> path;
 
@@ -200,22 +200,22 @@ export namespace fmia::graph {
 
 template <graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_trail_for_undirected(const T& g) {
-  return get_an_eulerian_trail<graph_trail_tag::none, graph_direction::undirected>(g);
+  return get_an_eulerian_trail<graph_trail_tag::none, direction::undirected>(g);
 }
 
 template <graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_circuit_for_undirected(const T& g) {
-  return get_an_eulerian_trail<graph_trail_tag::circuit, graph_direction::undirected>(g);
+  return get_an_eulerian_trail<graph_trail_tag::circuit, direction::undirected>(g);
 }
 
 template <graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_trail_for_directed(const T& g) {
-  return get_an_eulerian_trail<graph_trail_tag::none, graph_direction::directed>(g);
+  return get_an_eulerian_trail<graph_trail_tag::none, direction::directed>(g);
 }
 
 template <graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_circuit_for_directed(const T& g) {
-  return get_an_eulerian_trail<graph_trail_tag::circuit, graph_direction::directed>(g);
+  return get_an_eulerian_trail<graph_trail_tag::circuit, direction::directed>(g);
 }
 
 } // export namespace fmia::graph
