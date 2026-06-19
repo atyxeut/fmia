@@ -41,9 +41,7 @@ using usize = std::size_t;
 export namespace fmia::meta {
 
 template <typename T>
-struct is_no_cv_boolean : std::bool_constant<std::same_as<T, bool>>
-{
-};
+struct is_no_cv_boolean : std::bool_constant<std::same_as<T, bool>> {};
 
 template <typename T>
 inline constexpr bool is_no_cv_boolean_v = is_no_cv_boolean<T>::value;
@@ -92,8 +90,7 @@ namespace fmia {
 //   63 ...       7 ...  0
 
 template <meta::state_integral T>
-[[nodiscard]] constexpr bool is_valid_bit_index_for_state(int index) noexcept
-{
+[[nodiscard]] constexpr bool is_valid_bit_index_for_state(int index) noexcept {
   if (index < 0)
     return false;
   if constexpr (meta::is_any_of_v<T, i32, u32>)
@@ -107,52 +104,37 @@ template <meta::state_integral T>
 export namespace fmia {
 
 template <meta::state_integral T>
-[[nodiscard]] constexpr bool is_bit_set(T state, int index) noexcept //
-  pre(is_valid_bit_index_for_state<T>(index))
-{
+[[nodiscard]] constexpr bool is_bit_set(T state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index)) {
   return static_cast<bool>(state & std::make_unsigned_t<T>(1) << index);
 }
 
 template <meta::state_integral T>
-constexpr void set_bit(T& state, int index) noexcept //
-  pre(is_valid_bit_index_for_state<T>(index))
-{
+constexpr void set_bit(T& state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index)) {
   state |= std::make_unsigned_t<T>(1) << index;
 }
 
 template <meta::state_integral T>
-[[nodiscard]] constexpr T after_set_bit(T state, int index) noexcept //
-  pre(is_valid_bit_index_for_state<T>(index))
-
-{
+[[nodiscard]] constexpr T after_set_bit(T state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index)) {
   return state | std::make_unsigned_t<T>(1) << index;
 }
 
 template <meta::state_integral T>
-constexpr void reset_bit(T& state, int index) noexcept //
-  pre(is_valid_bit_index_for_state<T>(index))
-{
+constexpr void reset_bit(T& state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index)) {
   state &= ~(std::make_unsigned_t<T>(1) << index);
 }
 
 template <meta::state_integral T>
-[[nodiscard]] constexpr T after_reset_bit(T state, int index) noexcept //
-  pre(is_valid_bit_index_for_state<T>(index))
-{
+[[nodiscard]] constexpr T after_reset_bit(T state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index)) {
   return state & ~(std::make_unsigned_t<T>(1) << index);
 }
 
 template <meta::state_integral T>
-constexpr void flip_bit(T& state, int index) noexcept //
-  pre(is_valid_bit_index_for_state<T>(index))
-{
+constexpr void flip_bit(T& state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index)) {
   state ^= std::make_unsigned_t<T>(1) << index;
 }
 
 template <meta::state_integral T>
-[[nodiscard]] constexpr T after_flip_bit(T state, int index) noexcept //
-  pre(is_valid_bit_index_for_state<T>(index))
-{
+[[nodiscard]] constexpr T after_flip_bit(T state, int index) noexcept pre(is_valid_bit_index_for_state<T>(index)) {
   return state ^ std::make_unsigned_t<T>(1) << index;
 }
 
@@ -276,14 +258,10 @@ template <typename T>
 concept nonbool_potential_standard_integral = potential_standard_integral<T> && !boolean<T>;
 
 template <typename>
-struct is_no_cv_custom_twos_complement_signed_integral : std::false_type
-{
-};
+struct is_no_cv_custom_twos_complement_signed_integral : std::false_type {};
 
 template <usize Bits>
-struct is_no_cv_custom_twos_complement_signed_integral<integer::i<Bits>> : std::true_type
-{
-};
+struct is_no_cv_custom_twos_complement_signed_integral<integer::i<Bits>> : std::true_type {};
 
 template <typename T>
 inline constexpr bool is_no_cv_custom_twos_complement_signed_integral_v = is_no_cv_custom_twos_complement_signed_integral<T>::value;
@@ -299,14 +277,10 @@ concept twos_complement_signed_integral =
   std::signed_integral<T> || std::same_as<std::remove_cv_t<T>, i128> || is_custom_twos_complement_signed_integral_v<T>;
 
 template <typename>
-struct is_no_cv_custom_unsigned_integral : std::false_type
-{
-};
+struct is_no_cv_custom_unsigned_integral : std::false_type {};
 
 template <usize Bits>
-struct is_no_cv_custom_unsigned_integral<integer::u<Bits>> : std::true_type
-{
-};
+struct is_no_cv_custom_unsigned_integral<integer::u<Bits>> : std::true_type {};
 
 template <typename T>
 inline constexpr bool is_no_cv_custom_unsigned_integral_v = is_no_cv_custom_unsigned_integral<T>::value;
@@ -340,29 +314,19 @@ concept nothrow_integral = fixed_precision_integral<T>;
 namespace fmia::meta {
 
 template <typename T, typename = std::remove_cv_t<T>>
-struct make_signed_selector : std::make_signed<T>
-{
-};
+struct make_signed_selector : std::make_signed<T> {};
 
 template <typename T>
-struct make_signed_selector<T, i128> : claim_cv<T, i128>
-{
-};
+struct make_signed_selector<T, i128> : claim_cv<T, i128> {};
 
 template <typename T>
-struct make_signed_selector<T, u128> : claim_cv<T, i128>
-{
-};
+struct make_signed_selector<T, u128> : claim_cv<T, i128> {};
 
 template <typename T, usize Bits>
-struct make_signed_selector<T, integer::i<Bits>> : claim_cv<T, integer::i<Bits>>
-{
-};
+struct make_signed_selector<T, integer::i<Bits>> : claim_cv<T, integer::i<Bits>> {};
 
 template <typename T, usize Bits>
-struct make_signed_selector<T, integer::u<Bits>> : claim_cv<T, integer::i<Bits>>
-{
-};
+struct make_signed_selector<T, integer::u<Bits>> : claim_cv<T, integer::i<Bits>> {};
 
 } // namespace fmia::meta
 
@@ -379,29 +343,19 @@ using make_signed_t = make_signed<T>::type;
 namespace fmia::meta {
 
 template <typename T, typename = std::remove_cv_t<T>>
-struct make_unsigned_selector : std::make_unsigned<T>
-{
-};
+struct make_unsigned_selector : std::make_unsigned<T> {};
 
 template <typename T>
-struct make_unsigned_selector<T, i128> : claim_cv<T, u128>
-{
-};
+struct make_unsigned_selector<T, i128> : claim_cv<T, u128> {};
 
 template <typename T>
-struct make_unsigned_selector<T, u128> : claim_cv<T, u128>
-{
-};
+struct make_unsigned_selector<T, u128> : claim_cv<T, u128> {};
 
 template <typename T, usize Bits>
-struct make_unsigned_selector<T, integer::i<Bits>> : claim_cv<T, integer::u<Bits>>
-{
-};
+struct make_unsigned_selector<T, integer::i<Bits>> : claim_cv<T, integer::u<Bits>> {};
 
 template <typename T, usize Bits>
-struct make_unsigned_selector<T, integer::u<Bits>> : claim_cv<T, integer::u<Bits>>
-{
-};
+struct make_unsigned_selector<T, integer::u<Bits>> : claim_cv<T, integer::u<Bits>> {};
 
 } // namespace fmia::meta
 
@@ -421,16 +375,14 @@ export namespace fmia {
 // no compilation error: unsigned int _ = abs(1u);
 // no overflow: unsigned int _ = abs(-2147483647 - 1);
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr auto abs(T x) noexcept
-{
+[[nodiscard]] constexpr auto abs(T x) noexcept {
   // for negative x, ~x + 1 is |x| if the bit representation is 2's complement
   return x >= 0 ? static_cast<meta::make_unsigned_t<T>>(x) : ~static_cast<meta::make_unsigned_t<T>>(x) + 1;
 }
 
 // an extended version of std::countl_zero
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr int countl_zero(T x) noexcept
-{
+[[nodiscard]] constexpr int countl_zero(T x) noexcept {
   if (x < 0)
     return 0;
 
@@ -442,8 +394,7 @@ template <meta::nonbool_potential_standard_integral T>
 
 // an extended version of std::countr_zero
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr int countr_zero(T x) noexcept
-{
+[[nodiscard]] constexpr int countr_zero(T x) noexcept {
   // -x has the same lowbit as x in 2's complement
   if constexpr (meta::nonbool_standard_integral<T>)
     return std::countr_zero<std::make_unsigned_t<T>>(x);
@@ -453,17 +404,13 @@ template <meta::nonbool_potential_standard_integral T>
 
 // an extended version of std::bit_width
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr int bit_width(T x) noexcept //
-  pre(x >= 0)
-{
+[[nodiscard]] constexpr int bit_width(T x) noexcept pre(x >= 0) {
   return std::numeric_limits<meta::make_unsigned_t<T>>::digits - countl_zero(x);
 }
 
 // calculate floor(log_2 x), ilog2(0) has defined behavior and returns -1
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr int ilog2(T x) noexcept //
-  pre(x >= 0)
-{
+[[nodiscard]] constexpr int ilog2(T x) noexcept pre(x >= 0) {
   return bit_width(x) - 1;
 }
 
@@ -473,9 +420,7 @@ export namespace fmia::meta {
 
 // unsigned integers implicitly modulo 2^(Bits)
 template <typename T>
-struct is_no_cv_modular_integral : std::bool_constant<std::same_as<T, std::remove_cv_t<T>> && unsigned_integral<T>>
-{
-};
+struct is_no_cv_modular_integral : std::bool_constant<std::same_as<T, std::remove_cv_t<T>> && unsigned_integral<T>> {};
 
 template <typename T>
 inline constexpr bool is_no_cv_modular_integral_v = is_no_cv_modular_integral<T>::value;

@@ -8,9 +8,7 @@ import std;
 export namespace fmia::meta {
 
 template <typename T, typename U>
-struct not_same : std::negation<std::is_same<T, U>>
-{
-};
+struct not_same : std::negation<std::is_same<T, U>> {};
 
 template <typename T, typename U>
 inline constexpr bool not_same_v = not_same<T, U>::value;

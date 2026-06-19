@@ -16,8 +16,6 @@ enum class fmt : enum_flag_underlying_type { none, endl };
 export namespace fmia::meta {
 
 template <>
-struct is_enum_flag<io::fmt> : std::true_type
-{
-};
+struct is_enum_flag<io::fmt> : std::true_type {};
 
 } // export namespace fmia::meta

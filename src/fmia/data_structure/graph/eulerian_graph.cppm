@@ -39,8 +39,7 @@ enum class eulerian_graph_error { no_eulerian_trail, no_eulerian_circuit };
 namespace fmia::graph {
 
 template <graph_direction GraphDirection, typename Graph, typename Vertex = Graph::vertex_type>
-[[nodiscard]] constexpr auto get_eulerian_trail_start_vertex(const Graph& g) noexcept -> std::pair<Vertex, bool>
-{
+[[nodiscard]] constexpr auto get_eulerian_trail_start_vertex(const Graph& g) noexcept -> std::pair<Vertex, bool> {
   const auto n = g.vertex_size();
   Vertex start = -1, end = -1;
 
@@ -92,8 +91,7 @@ template <graph_direction GraphDirection, typename Graph, typename Vertex = Grap
 }
 
 template <typename Graph, typename Vertex = Graph::vertex_type, typename Iterator = Graph::neighbor_iterator>
-[[nodiscard]] constexpr auto init_current_edge_iterators(const Graph& g) -> std::vector<Iterator>
-{
+[[nodiscard]] constexpr auto init_current_edge_iterators(const Graph& g) -> std::vector<Iterator> {
   const auto n = g.vertex_size();
 
   std::vector<Iterator> res(n);
@@ -111,8 +109,7 @@ namespace fmia::graph {
 // time complexity: O(V + E)
 
 template <typename G, typename T, typename Y, typename U, typename I>
-constexpr void get_an_eulerian_trail_impl_for_undirected_recursive(const G& g, T u, Y& cur_edge_it, U& vis, I& path)
-{
+constexpr void get_an_eulerian_trail_impl_for_undirected_recursive(const G& g, T u, Y& cur_edge_it, U& vis, I& path) {
   for (const auto end_it = g.neighbors(u).end(); cur_edge_it[u] != end_it;) {
     if (const auto [v, id] = *cur_edge_it[u]++; !vis[id]) {
       vis[id] = true;
@@ -123,8 +120,7 @@ constexpr void get_an_eulerian_trail_impl_for_undirected_recursive(const G& g, T
 }
 
 template <typename G, typename T, typename Y, typename U, typename I>
-constexpr void get_an_eulerian_trail_impl_for_undirected_iterative(const G& g, T start, Y& cur_edge_it, U& vis, I& path)
-{
+constexpr void get_an_eulerian_trail_impl_for_undirected_iterative(const G& g, T start, Y& cur_edge_it, U& vis, I& path) {
   std::vector<T> stack {start};
   while (!stack.empty()) {
     const auto u = stack.back();
@@ -141,16 +137,14 @@ constexpr void get_an_eulerian_trail_impl_for_undirected_iterative(const G& g, T
 }
 
 template <typename G, typename T, typename Y, typename U>
-constexpr void get_an_eulerian_trail_impl_for_directed_recursive(const G& g, T u, Y& cur_edge_it, U& path)
-{
+constexpr void get_an_eulerian_trail_impl_for_directed_recursive(const G& g, T u, Y& cur_edge_it, U& path) {
   for (const auto end_it = g.neighbors(u).end(); cur_edge_it[u] != end_it;)
     get_an_eulerian_trail_impl_for_directed_recursive(g, *cur_edge_it[u]++, cur_edge_it, path);
   path.emplace_back(u);
 }
 
 template <typename G, typename T, typename Y, typename U>
-constexpr void get_an_eulerian_trail_impl_for_directed_iterative(const G& g, T start, Y& cur_edge_it, U& path)
-{
+constexpr void get_an_eulerian_trail_impl_for_directed_iterative(const G& g, T start, Y& cur_edge_it, U& path) {
   std::vector<T> stack {start};
   while (!stack.empty()) {
     const auto u = stack.back();
@@ -164,8 +158,7 @@ constexpr void get_an_eulerian_trail_impl_for_directed_iterative(const G& g, T s
 }
 
 template <graph_direction GraphDirection, typename T, typename G, typename U>
-constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start)
-{
+constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start) {
   auto cur_edge_it = init_current_edge_iterators(g);
 
   if constexpr (GraphDirection == graph_direction::undirected) {
@@ -178,8 +171,7 @@ constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start)
 }
 
 template <graph_trail_tag TrailTag, graph_direction GraphDirection, typename Graph, typename Vertex = Graph::vertex_type>
-[[nodiscard]] constexpr auto get_an_eulerian_trail(const Graph& g) -> std::expected<std::vector<Vertex>, eulerian_graph_error>
-{
+[[nodiscard]] constexpr auto get_an_eulerian_trail(const Graph& g) -> std::expected<std::vector<Vertex>, eulerian_graph_error> {
   std::vector<Vertex> path;
 
   const auto [start, is_circuit] = get_eulerian_trail_start_vertex<GraphDirection>(g);
@@ -207,26 +199,22 @@ export namespace fmia::graph {
 // leave isolated vertices, the rest of the graph must be (strongly) connected, otherwise the following functions have undefined behavior
 
 template <graph T>
-[[nodiscard]] constexpr auto get_an_eulerian_trail_for_undirected(const T& g)
-{
+[[nodiscard]] constexpr auto get_an_eulerian_trail_for_undirected(const T& g) {
   return get_an_eulerian_trail<graph_trail_tag::none, graph_direction::undirected>(g);
 }
 
 template <graph T>
-[[nodiscard]] constexpr auto get_an_eulerian_circuit_for_undirected(const T& g)
-{
+[[nodiscard]] constexpr auto get_an_eulerian_circuit_for_undirected(const T& g) {
   return get_an_eulerian_trail<graph_trail_tag::circuit, graph_direction::undirected>(g);
 }
 
 template <graph T>
-[[nodiscard]] constexpr auto get_an_eulerian_trail_for_directed(const T& g)
-{
+[[nodiscard]] constexpr auto get_an_eulerian_trail_for_directed(const T& g) {
   return get_an_eulerian_trail<graph_trail_tag::none, graph_direction::directed>(g);
 }
 
 template <graph T>
-[[nodiscard]] constexpr auto get_an_eulerian_circuit_for_directed(const T& g)
-{
+[[nodiscard]] constexpr auto get_an_eulerian_circuit_for_directed(const T& g) {
   return get_an_eulerian_trail<graph_trail_tag::circuit, graph_direction::directed>(g);
 }
 

@@ -16,8 +16,7 @@ enum class direction { undirected, directed, mixed };
 namespace fmia::graph {
 
 template <direction Direction, typename VertexSize, typename Weight>
-struct common_trait_base
-{
+struct common_trait_base {
   static constexpr auto direction_tag = Direction;
 
   using vertex_size_type = VertexSize;
@@ -29,16 +28,14 @@ struct common_trait_base
 };
 
 template <direction Direction, typename Id, typename VertexSize, typename Weight>
-struct edge_trait_base : common_trait_base<Direction, VertexSize, Weight>
-{
+struct edge_trait_base : common_trait_base<Direction, VertexSize, Weight> {
   using id_type = Id;
 
   [[nodiscard]] static consteval bool has_id() noexcept { return !std::same_as<id_type, void>; }
 };
 
 template <direction Direction, typename VertexSize, typename Weight, typename EdgeSize>
-struct graph_trait_base : common_trait_base<Direction, VertexSize, Weight>
-{
+struct graph_trait_base : common_trait_base<Direction, VertexSize, Weight> {
   using edge_size_type = EdgeSize;
   using edge_difference_type = std::make_signed_t<edge_size_type>;
 };
@@ -48,9 +45,7 @@ struct graph_trait_base : common_trait_base<Direction, VertexSize, Weight>
 export namespace fmia::graph {
 
 template <typename>
-struct edge_traits
-{
-};
+struct edge_traits {};
 
 template <typename T>
 inline constexpr auto edge_direction_tag_v = edge_traits<std::remove_cvref_t<T>>::direction_tag;
@@ -68,9 +63,7 @@ template <typename T>
 using edge_id_t = edge_traits<std::remove_cvref_t<T>>::id_type;
 
 template <typename>
-struct graph_traits
-{
-};
+struct graph_traits {};
 
 template <typename T>
 inline constexpr auto graph_direction_tag_v = graph_traits<std::remove_cvref_t<T>>::direction_tag;
@@ -136,13 +129,10 @@ template <typename>
 struct edge_id;
 
 template <>
-struct edge_id<void>
-{
-};
+struct edge_id<void> {};
 
 template <std::unsigned_integral Id>
-struct edge_id<Id>
-{
+struct edge_id<Id> {
   Id id;
 };
 
@@ -150,19 +140,15 @@ template <typename>
 struct edge_source;
 
 template <>
-struct edge_source<void>
-{
-};
+struct edge_source<void> {};
 
 template <std::unsigned_integral VertexSize>
-struct edge_source<VertexSize>
-{
+struct edge_source<VertexSize> {
   VertexSize u;
 };
 
 template <std::unsigned_integral VertexSize>
-struct edge_destination
-{
+struct edge_destination {
   VertexSize v;
 };
 
@@ -170,32 +156,30 @@ template <typename>
 struct edge_weight;
 
 template <>
-struct edge_weight<void>
-{
+struct edge_weight<void> {
   static constexpr int w = 1;
 };
 
 template <meta::arithmetic Weight>
-struct edge_weight<Weight>
-{
+struct edge_weight<Weight> {
   Weight w;
 };
 
 template <direction Direction, typename Id, typename SourceVertexSize, std::unsigned_integral VertexSize, meta::arithmetic Weight>
   requires ((std::is_void_v<Id> || meta::precision_gteq<Id, VertexSize>)
             && (std::is_void_v<SourceVertexSize> || std::same_as<SourceVertexSize, VertexSize>))
-class edge_base : public edge_id<Id>, public edge_source<SourceVertexSize>, public edge_destination<VertexSize>, public edge_weight<Weight>
-{
-};
+class edge_base
+  : public edge_id<Id>,
+    public edge_source<SourceVertexSize>,
+    public edge_destination<VertexSize>,
+    public edge_weight<Weight> {};
 
 }; // namespace fmia::graph
 
 export namespace fmia::graph {
 
 template <direction Direction, typename Id, typename SourceVertexSize, typename VertexSize, typename Weight>
-struct edge_traits<edge_base<Direction, Id, SourceVertexSize, VertexSize, Weight>> : edge_trait_base<Direction, Id, VertexSize, Weight>
-{
-};
+struct edge_traits<edge_base<Direction, Id, SourceVertexSize, VertexSize, Weight>> : edge_trait_base<Direction, Id, VertexSize, Weight> {};
 
 template <typename Id = void, typename SourceVertexSize = std::size_t, typename VertexSize = std::size_t, typename Weight = void>
 using undirected_edge = edge_base<direction::undirected, Id, SourceVertexSize, VertexSize, Weight>;
@@ -211,8 +195,7 @@ template <typename Edge, typename EdgeSize = std::conditional_t<std::is_void_v<e
   requires (
     (std::is_void_v<edge_id_t<Edge>> && meta::precision_gteq<EdgeSize, edge_vertex_size_t<Edge>>) || std::same_as<edge_id_t<Edge>, EdgeSize>
   )
-class edge_list final : public graph_trait_base<edge_direction_tag_v<Edge>, edge_vertex_size_t<Edge>, edge_weight_t<Edge>, EdgeSize>
-{
+class edge_list final : public graph_trait_base<edge_direction_tag_v<Edge>, edge_vertex_size_t<Edge>, edge_weight_t<Edge>, EdgeSize> {
 private:
   edge_vertex_size_t<Edge> vertex_count_;
   std::vector<Edge> edges_;

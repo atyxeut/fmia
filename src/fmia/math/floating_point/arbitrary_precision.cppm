@@ -10,9 +10,7 @@ import fmia.math.floating_point.ieee754;
 export namespace fmia::meta {
 
 template <typename>
-struct is_no_cv_arbitrary_precision_floating_point : std::false_type
-{
-};
+struct is_no_cv_arbitrary_precision_floating_point : std::false_type {};
 
 template <typename T>
 inline constexpr bool is_no_cv_arbitrary_precision_floating_point_v = is_no_cv_arbitrary_precision_floating_point<T>::value;

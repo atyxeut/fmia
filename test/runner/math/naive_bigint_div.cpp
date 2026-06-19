@@ -2,7 +2,6 @@
 
 import test.fmia.math.integer.arbitrary_precision;
 
-int main()
-{
+int main() {
   check_naive_div_correctness();
 }

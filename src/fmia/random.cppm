@@ -16,21 +16,18 @@ inline std::mt19937 mt19937_engine(seed_generator());
 inline std::mt19937_64 mt19937_64_engine(seed_generator());
 
 template <std::integral T>
-[[nodiscard]] auto uniform_distribution(T l, T r)
-{
+[[nodiscard]] auto uniform_distribution(T l, T r) {
   return std::uniform_int_distribution<T>(l, r);
 }
 
 template <std::floating_point T>
-[[nodiscard]] auto uniform_distribution(T l, T r)
-{
+[[nodiscard]] auto uniform_distribution(T l, T r) {
   return std::uniform_real_distribution<T>(l, r);
 }
 
 template <typename T, typename Engine = std::mt19937>
   requires std::is_arithmetic_v<T>
-[[nodiscard]] auto rand(T l, T r, Engine& engine = mt19937_engine)
-{
+[[nodiscard]] auto rand(T l, T r, Engine& engine = mt19937_engine) {
   return uniform_distribution(l, r)(engine);
 }
 
@@ -41,8 +38,7 @@ namespace fmia::random {
 constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
 template <bool AllowNegative>
-[[nodiscard]] auto generate_integer_impl(std::size_t length) -> std::string
-{
+[[nodiscard]] auto generate_integer_impl(std::size_t length) -> std::string {
   if (length == 0)
     throw std::invalid_argument("length must be positive");
 
@@ -64,19 +60,16 @@ template <bool AllowNegative>
 
 export namespace fmia::random {
 
-[[nodiscard]] auto generate_positive_integer(std::size_t length)
-{
+[[nodiscard]] auto generate_positive_integer(std::size_t length) {
   return generate_integer_impl<false>(length);
 }
 
-[[nodiscard]] auto generate_integer(std::size_t length)
-{
+[[nodiscard]] auto generate_integer(std::size_t length) {
   return generate_integer_impl<true>(length);
 }
 
 template <std::integral T>
-[[nodiscard]] auto generate_permutation(T begin, T end) -> std::vector<T>
-{
+[[nodiscard]] auto generate_permutation(T begin, T end) -> std::vector<T> {
   if (begin > end)
     throw std::invalid_argument("invalid integer range");
 
@@ -88,8 +81,7 @@ template <std::integral T>
 
 // get the edge list of a random unweighted tree
 template <bool GenerateStar = false, std::integral Vertex>
-[[nodiscard]] auto generate_unweighted_tree(Vertex vertex_begin, Vertex vertex_end) -> graph::basic_unweighted_edge_list<Vertex>
-{
+[[nodiscard]] auto generate_unweighted_tree(Vertex vertex_begin, Vertex vertex_end) -> graph::basic_unweighted_edge_list<Vertex> {
   if (vertex_begin > vertex_end)
     throw std::invalid_argument("invalid vertex index range");
 
@@ -112,8 +104,7 @@ template <bool GenerateStar = false, std::integral Vertex>
 // get the edge list of a random weighted tree
 template <bool GenerateStar = false, std::integral Vertex, std::integral Weight>
 [[nodiscard]] auto generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
-  -> graph::basic_weighted_edge_list<Vertex, Weight>
-{
+  -> graph::basic_weighted_edge_list<Vertex, Weight> {
   if (vertex_begin > vertex_end)
     throw std::invalid_argument("invalid vertex index range");
 

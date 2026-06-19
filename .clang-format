@@ -150,10 +150,10 @@ BreakBeforeBraces: Custom
 BraceWrapping:
   AfterControlStatement: Never
   AfterExternBlock: false
-  AfterFunction: true
-  AfterClass: true
-  AfterStruct: true
-  AfterUnion: true
+  AfterFunction: false
+  AfterClass: false
+  AfterStruct: false
+  AfterUnion: false
   AfterEnum: false
   BeforeLambdaBody: false
   BeforeElse: false

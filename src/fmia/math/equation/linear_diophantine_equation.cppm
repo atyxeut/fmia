@@ -7,8 +7,6 @@ export module fmia.math.equation.linear_diophantine_equation;
 
 export namespace fmia {
 
-class linear_diophantine_equation
-{
-};
+class linear_diophantine_equation {};
 
 } // export namespace fmia

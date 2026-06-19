@@ -11,11 +11,9 @@ import fmia.meta;
 namespace fmia::detail {
 
 template <typename Char, typename HashMap, exception_safety E>
-class trie_base
-{
+class trie_base {
 private:
-  struct node_
-  {
+  struct node_ {
     std::size_t pass = 0; // count of strings that pass this node
     std::size_t end = 0;  // count of strings that end with this node
     typename HashMap::template type<node_*> next;
@@ -26,8 +24,7 @@ private:
 public:
   constexpr trie_base() noexcept = default;
 
-  constexpr trie_base(const trie_base& other)
-  {
+  constexpr trie_base(const trie_base& other) {
     try {
       copy_tree_(other.root_, root_);
     } catch (...) {
@@ -36,8 +33,7 @@ public:
     }
   };
 
-  constexpr trie_base& operator =(const trie_base& other)
-  {
+  constexpr trie_base& operator =(const trie_base& other) {
     if (this != std::addressof(other))
       *this = trie_base(other);
     return *this;
@@ -45,8 +41,7 @@ public:
 
   constexpr trie_base(trie_base&& other) noexcept : root_ {std::exchange(other.root_, nullptr)} {};
 
-  constexpr trie_base& operator =(trie_base&& other) noexcept
-  {
+  constexpr trie_base& operator =(trie_base&& other) noexcept {
     if (this != std::addressof(other)) {
       destroy_tree_(root_);
       root_ = std::exchange(other.root_, nullptr);
@@ -55,8 +50,7 @@ public:
   };
 
 private:
-  constexpr void copy_tree_(node_* from, node_*& to)
-  {
+  constexpr void copy_tree_(node_* from, node_*& to) {
     if (!from) {
       if (to) {
         destroy_tree_(to);
@@ -71,8 +65,7 @@ private:
     from->next.for_each_invoke([this](node_* child_from, node_*& child_to) { copy_tree_(child_from, child_to); }, to->next);
   }
 
-  constexpr void destroy_tree_recursive_(node_* root) noexcept
-  {
+  constexpr void destroy_tree_recursive_(node_* root) noexcept {
     if (!root)
       return;
 
@@ -81,8 +74,7 @@ private:
   }
 
   // pending update: using a custom stack instead of std::vector
-  constexpr void destroy_tree_iterative_(node_* root) noexcept
-  {
+  constexpr void destroy_tree_iterative_(node_* root) noexcept {
     if (!root)
       return;
 
@@ -104,15 +96,13 @@ private:
 public:
   constexpr ~trie_base() noexcept { destroy_tree_(root_); }
 
-  constexpr void clear() noexcept
-  {
+  constexpr void clear() noexcept {
     destroy_tree_(root_);
     root_ = nullptr;
   }
 
   template <meta::input_range_of<Char> T>
-  constexpr void insert(T&& str)
-  {
+  constexpr void insert(T&& str) {
     if (!root_)
       root_ = new node_;
 
@@ -133,8 +123,7 @@ private:
   enum class count_type_ { full_string, prefix };
 
   template <count_type_ CountType, typename T>
-  constexpr auto count_impl_(T&& str) const noexcept -> std::size_t
-  {
+  constexpr auto count_impl_(T&& str) const noexcept -> std::size_t {
     if (!root_)
       return 0;
 
@@ -154,20 +143,17 @@ private:
 
 public:
   template <meta::input_range_of<Char> T>
-  constexpr auto count(T&& str) const noexcept
-  {
+  constexpr auto count(T&& str) const noexcept {
     return count_impl_<count_type_::full_string>(std::forward<T>(str));
   }
 
   template <meta::input_range_of<Char> T>
-  constexpr auto count_has_prefix(T&& str) const noexcept
-  {
+  constexpr auto count_has_prefix(T&& str) const noexcept {
     return count_impl_<count_type_::prefix>(std::forward<T>(str));
   }
 
   template <meta::input_range_of<Char> T>
-  constexpr void erase(T&& str) noexcept
-  {
+  constexpr void erase(T&& str) noexcept {
     if (!root_ || count(str) == 0)
       return;
 
@@ -192,11 +178,9 @@ public:
 
 // Hash must map the given character to [0, DistinctCharCount) without any collisions, otherwise the behavior is undefined
 template <typename Char, std::size_t DistinctCharCount, typename Hash>
-struct trie_default_hash_map
-{
+struct trie_default_hash_map {
   template <typename NodePtr>
-  class type
-  {
+  class type {
   private:
     std::array<NodePtr, DistinctCharCount> map_ {};
     [[no_unique_address]] Hash hash_;
@@ -208,8 +192,7 @@ struct trie_default_hash_map
     constexpr auto& operator [](const Char& ch) const noexcept { return map_[hash_(ch)]; };
 
     template <typename Fn>
-    constexpr void for_each_invoke(Fn&& f) noexcept
-    {
+    constexpr void for_each_invoke(Fn&& f) noexcept {
       for (auto child : map_) {
         if (child)
           f(child);
@@ -217,8 +200,7 @@ struct trie_default_hash_map
     }
 
     template <typename Fn>
-    constexpr void for_each_invoke(Fn&& f, type& to) const
-    {
+    constexpr void for_each_invoke(Fn&& f, type& to) const {
       for (auto i = 0uz; auto child : map_)
         f(child, to.map_[i++]);
     }
@@ -226,11 +208,9 @@ struct trie_default_hash_map
 };
 
 template <typename Char, typename Hash, template <typename...> typename HashMap>
-struct trie_normal_hash_map
-{
+struct trie_normal_hash_map {
   template <typename NodePtr>
-  class type
-  {
+  class type {
   private:
     HashMap<Char, NodePtr, Hash> map_;
 
@@ -241,8 +221,7 @@ struct trie_normal_hash_map
     constexpr auto& operator [](const Char& ch) const noexcept { return map_[ch]; };
 
     template <typename Fn>
-    constexpr void for_each_invoke(Fn&& f) noexcept
-    {
+    constexpr void for_each_invoke(Fn&& f) noexcept {
       for (auto [_, child] : map_) {
         if (child)
           f(child);
@@ -250,8 +229,7 @@ struct trie_normal_hash_map
     }
 
     template <typename Fn>
-    constexpr void for_each_invoke(Fn&& f, type& to) const
-    {
+    constexpr void for_each_invoke(Fn&& f, type& to) const {
       for (auto [ch, child] : map_) {
         if (child)
           f(child, to[ch]);

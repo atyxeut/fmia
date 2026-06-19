@@ -12,8 +12,7 @@ import fmia.memory.storage_base;
 export namespace fmia {
 
 template <typename T, typename Merge, typename Project, typename I = std::size_t>
-struct binary_lifting_policy_base
-{
+struct binary_lifting_policy_base {
   using value_type = T;
   using merge_type = Merge;
   using project_type = Project;
@@ -43,8 +42,7 @@ export namespace fmia {
 
 template <typename T, meta::binary_lifting_policy Policy, typename Buffer = relaxed_heap_buffer<T, std::size_t, std::allocator<T>>>
   requires std::same_as<T, typename Policy::value_type>
-class binary_lifting_table final : private Policy, public Buffer
-{
+class binary_lifting_table final : private Policy, public Buffer {
 public:
   using merge_type = Policy::merge_type;
   using project_type = Policy::project_type;
@@ -68,11 +66,9 @@ private:
 public:
   template <std::ranges::forward_range R, typename P = Policy>
     requires std::same_as<Policy, std::remove_cvref_t<P>>
-  constexpr explicit binary_lifting_table(R&& r, P&& p, const allocator_type& alloc = allocator_type {}) //
-    pre(std::ranges::distance(r) > 0)
+  constexpr explicit binary_lifting_table(R&& r, P&& p, const allocator_type& alloc = allocator_type {}) pre(std::ranges::distance(r) > 0)
     : Policy(std::forward<P>(p)), Buffer(alloc), size_ {static_cast<size_type>(std::ranges::distance(r))},
-      max_exp_p1_ {static_cast<size_type>(ilog2(size_) + 1)}
-  {
+      max_exp_p1_ {static_cast<size_type>(ilog2(size_) + 1)} {
     this->recapacity(size_ * max_exp_p1_);
 
     size_type row = 0;
@@ -114,8 +110,7 @@ public:
 public:
   [[nodiscard]] constexpr auto query(size_type i, size_type distance, T identity_element) const noexcept(
     noexcept(std::is_nothrow_invocable_v<merge_type, T, T> && std::is_nothrow_invocable_v<project_type, T>)
-  )
-  {
+  ) {
     T result = std::move(identity_element);
     for (size_type j = max_exp_p1_; j > 0;) {
       --j;

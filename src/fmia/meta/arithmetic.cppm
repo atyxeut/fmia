@@ -65,8 +65,7 @@ concept precision_comparable =
 
 template <typename T, typename U>
   requires precision_comparable<T, U>
-struct compare_precision
-{
+struct compare_precision {
   static constexpr int value = [] {
     constexpr auto x = precision_bits_v<T>, y = precision_bits_v<U>;
     return (x > y) - (x < y);
@@ -104,61 +103,44 @@ struct make_higher_precision_selector_for_standard_integral_impl;
 
 template <typename T>
 struct make_higher_precision_selector_for_standard_integral_impl<T, 0>
-  : std::conditional<std::signed_integral<T>, claim_cv_t<T, i32>, claim_cv_t<T, u32>>
-{
-};
+  : std::conditional<std::signed_integral<T>, claim_cv_t<T, i32>, claim_cv_t<T, u32>> {};
 
 template <typename T>
 struct make_higher_precision_selector_for_standard_integral_impl<T, 32>
-  : std::conditional<std::signed_integral<T>, claim_cv_t<T, i64>, claim_cv_t<T, u64>>
-{
-};
+  : std::conditional<std::signed_integral<T>, claim_cv_t<T, i64>, claim_cv_t<T, u64>> {};
 
 template <typename T>
 struct make_higher_precision_selector_for_standard_integral_impl<T, 64>
-  : std::conditional<std::signed_integral<T>, claim_cv_t<T, i128>, claim_cv_t<T, u128>>
-{
-};
+  : std::conditional<std::signed_integral<T>, claim_cv_t<T, i128>, claim_cv_t<T, u128>> {};
 
 // in case std::integral treats i/u128 as a standard integer type (e.g. -std=gnu++ mode)
 template <typename T>
 struct make_higher_precision_selector_for_standard_integral_impl<T, 128>
-  : std::conditional<twos_complement_signed_integral<T>, claim_cv_t<T, integer::i<256>>, claim_cv_t<T, integer::u<256>>>
-{
-};
+  : std::conditional<twos_complement_signed_integral<T>, claim_cv_t<T, integer::i<256>>, claim_cv_t<T, integer::u<256>>> {};
 
 template <typename T>
 struct make_higher_precision_selector_for_standard_integral
-  : make_higher_precision_selector_for_standard_integral_impl<T, (precision_bits_v<T>) < (precision_bits_v<i32>) ? 0 : precision_bits_v<T>>
-{
-};
+  : make_higher_precision_selector_for_standard_integral_impl<
+      T, (precision_bits_v<T>) < (precision_bits_v<i32>) ? 0 : precision_bits_v<T>
+    > {};
 
 template <typename T, typename = std::remove_cv_t<T>, bool = arbitrary_precision_integral<T>>
 struct make_higher_precision_selector_for_custom_integral;
 
 template <typename T>
-struct make_higher_precision_selector_for_custom_integral<T, i128, false> : claim_cv<T, integer::i<256>>
-{
-};
+struct make_higher_precision_selector_for_custom_integral<T, i128, false> : claim_cv<T, integer::i<256>> {};
 
 template <typename T>
-struct make_higher_precision_selector_for_custom_integral<T, u128, false> : claim_cv<T, integer::u<256>>
-{
-};
+struct make_higher_precision_selector_for_custom_integral<T, u128, false> : claim_cv<T, integer::u<256>> {};
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_custom_integral<T, integer::i<Bits>, false> : claim_cv<T, integer::i<Bits * 2>>
-{
-};
+struct make_higher_precision_selector_for_custom_integral<T, integer::i<Bits>, false> : claim_cv<T, integer::i<Bits * 2>> {};
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_custom_integral<T, integer::u<Bits>, false> : claim_cv<T, integer::u<Bits * 2>>
-{
-};
+struct make_higher_precision_selector_for_custom_integral<T, integer::u<Bits>, false> : claim_cv<T, integer::u<Bits * 2>> {};
 
 template <typename T>
-struct make_higher_precision_selector_for_custom_integral<T, std::remove_cv_t<T>, true>
-{
+struct make_higher_precision_selector_for_custom_integral<T, std::remove_cv_t<T>, true> {
   using type = T;
 };
 
@@ -166,38 +148,25 @@ template <typename T, typename = std::remove_cv_t<T>, bool = arbitrary_precision
 struct make_higher_precision_selector_for_floating_point;
 
 template <typename T>
-struct make_higher_precision_selector_for_floating_point<T, f32, false> : claim_cv<T, f64>
-{
-};
+struct make_higher_precision_selector_for_floating_point<T, f32, false> : claim_cv<T, f64> {};
 
 template <typename T>
-struct make_higher_precision_selector_for_floating_point<T, f64, false> : claim_cv<T, f80>
-{
-};
+struct make_higher_precision_selector_for_floating_point<T, f64, false> : claim_cv<T, f80> {};
 
 template <typename T>
-struct make_higher_precision_selector_for_floating_point<T, f80, false> : claim_cv<T, f128>
-{
-};
+struct make_higher_precision_selector_for_floating_point<T, f80, false> : claim_cv<T, f128> {};
 
 template <typename T>
-struct make_higher_precision_selector_for_floating_point<T, f128, false> : claim_cv<T, ieee754::f<256>>
-{
-};
+struct make_higher_precision_selector_for_floating_point<T, f128, false> : claim_cv<T, ieee754::f<256>> {};
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_floating_point<T, ieee754::f<Bits>, false> : claim_cv<T, ieee754::f<Bits * 2>>
-{
-};
+struct make_higher_precision_selector_for_floating_point<T, ieee754::f<Bits>, false> : claim_cv<T, ieee754::f<Bits * 2>> {};
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_floating_point<T, ieee754::d<Bits>, false> : claim_cv<T, ieee754::d<Bits * 2>>
-{
-};
+struct make_higher_precision_selector_for_floating_point<T, ieee754::d<Bits>, false> : claim_cv<T, ieee754::d<Bits * 2>> {};
 
 template <typename T>
-struct make_higher_precision_selector_for_floating_point<T, std::remove_cv_t<T>, true>
-{
+struct make_higher_precision_selector_for_floating_point<T, std::remove_cv_t<T>, true> {
   using type = T;
 };
 
@@ -208,14 +177,10 @@ template <integral T>
 struct make_higher_precision_selector<T>
   : std::conditional_t<
       std::integral<T>, make_higher_precision_selector_for_standard_integral<T>, make_higher_precision_selector_for_custom_integral<T>
-    >
-{
-};
+    > {};
 
 template <floating_point T>
-struct make_higher_precision_selector<T> : make_higher_precision_selector_for_floating_point<T>
-{
-};
+struct make_higher_precision_selector<T> : make_higher_precision_selector_for_floating_point<T> {};
 
 } // namespace fmia::meta
 

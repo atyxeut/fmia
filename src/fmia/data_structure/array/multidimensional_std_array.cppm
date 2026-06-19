@@ -14,15 +14,12 @@ template <typename, std::size_t...>
 struct array_impl;
 
 template <typename T, std::size_t Dim>
-struct array_impl<T, Dim>
-{
+struct array_impl<T, Dim> {
   using type = std::array<T, Dim>;
 };
 
 template <typename T, std::size_t Dim, std::size_t... Dims>
-struct array_impl<T, Dim, Dims...> : array_impl<typename array_impl<T, Dims...>::type, Dim>
-{
-};
+struct array_impl<T, Dim, Dims...> : array_impl<typename array_impl<T, Dims...>::type, Dim> {};
 
 } // namespace fmia
 
@@ -38,14 +35,10 @@ using array = array_impl<T, Dims...>::type;
 export namespace fmia::meta {
 
 template <typename>
-struct is_no_cv_std_array : std::false_type
-{
-};
+struct is_no_cv_std_array : std::false_type {};
 
 template <typename T, std::size_t N>
-struct is_no_cv_std_array<std::array<T, N>> : std::true_type
-{
-};
+struct is_no_cv_std_array<std::array<T, N>> : std::true_type {};
 
 template <typename T>
 inline constexpr bool is_no_cv_std_array_v = is_no_cv_std_array<T>::value;
@@ -65,8 +58,7 @@ export namespace fmia {
 // int val = -1;
 // fmia::fill_array(arr4d, val);
 template <typename Elem, std::size_t Dim, typename T>
-constexpr void fill_array(std::array<Elem, Dim>& arr, const T& val)
-{
+constexpr void fill_array(std::array<Elem, Dim>& arr, const T& val) {
   if constexpr (meta::is_no_cv_std_array_v<Elem>)
     for (auto& inner_arr : arr)
       fill_array(inner_arr, val);
@@ -76,8 +68,7 @@ constexpr void fill_array(std::array<Elem, Dim>& arr, const T& val)
 
 // same as above, for C-style arrays
 template <typename Elem, std::size_t N, typename T>
-constexpr void fill_array(Elem (&arr)[N], const T& val)
-{
+constexpr void fill_array(Elem (&arr)[N], const T& val) {
   if constexpr (std::is_array_v<Elem>)
     for (auto& inner_arr : arr)
       fill_array(inner_arr, val);
@@ -88,8 +79,7 @@ constexpr void fill_array(Elem (&arr)[N], const T& val)
 // auto arr4d = fmia::make_array<int, 5, 8, 3, 2>(val);
 // combines `fmia::array<int, 5, 8, 3, 2> arr4d` and `fmia::fill_array(arr4d, val)`
 template <typename Elem, std::size_t... Dims, typename T>
-[[nodiscard]] constexpr auto make_array(const T& val) -> array<Elem, Dims...>
-{
+[[nodiscard]] constexpr auto make_array(const T& val) -> array<Elem, Dims...> {
   array<Elem, Dims...> arr;
   fill_array(arr, static_cast<Elem>(val));
   return arr;
@@ -101,20 +91,17 @@ namespace fmia::meta {
 
 // allocator type order: dim_n, dim_(n - 1), ..., dim_1
 template <typename Elem, nonempty_list_of_types AllocatorList, typename LastAllocator = last_t<AllocatorList>>
-struct cur_dim_allocator
-{
+struct cur_dim_allocator {
   using type = LastAllocator;
 };
 
 template <typename Elem, typename AllocatorList>
-struct cur_dim_allocator<Elem, AllocatorList, std_allocator_tag>
-{
+struct cur_dim_allocator<Elem, AllocatorList, std_allocator_tag> {
   using type = std::allocator<Elem>;
 };
 
 template <typename Elem, typename AllocatorList>
-struct cur_dim_allocator<Elem, AllocatorList, std_pmr_allocator_tag>
-{
+struct cur_dim_allocator<Elem, AllocatorList, std_pmr_allocator_tag> {
   using type = std::pmr::polymorphic_allocator<Elem>;
 };
 
@@ -124,9 +111,7 @@ using cur_dim_allocator_t = cur_dim_allocator<Elem, AllocatorList>::type;
 // used in recursion, add a default std::allocator, if the length of the allocator type list < dim count
 template <list_of_types CurAllocatorList, std::size_t DimCnt>
 struct adjust_allocator_type_list
-  : concat<CurAllocatorList, std::conditional_t<(length_v<CurAllocatorList>) < DimCnt, type_list<std_allocator_tag>, empty_type_list>>
-{
-};
+  : concat<CurAllocatorList, std::conditional_t<(length_v<CurAllocatorList>) < DimCnt, type_list<std_allocator_tag>, empty_type_list>> {};
 
 template <typename CurAllocatorList, std::size_t DimCnt>
 using adjust_allocator_type_list_t = adjust_allocator_type_list<CurAllocatorList, DimCnt>::type;
@@ -140,8 +125,7 @@ template <typename, std::size_t DimCnt, typename>
 class vector_impl;
 
 template <typename T, std::size_t DimCnt, typename InnermostDimAllocator, typename... Allocators>
-class vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>
-{
+class vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>> {
 private:
   using adjusted_allocator_type_list_ = meta::adjust_allocator_type_list_t<meta::type_list<InnermostDimAllocator, Allocators...>, DimCnt>;
 
@@ -152,8 +136,7 @@ public:
 };
 
 template <typename T, typename Allocator>
-class vector_impl<T, 1, meta::type_list<Allocator>>
-{
+class vector_impl<T, 1, meta::type_list<Allocator>> {
 public:
   using type = std::vector<T, meta::cur_dim_allocator_t<T, meta::type_list<Allocator>>>;
 };
@@ -176,8 +159,7 @@ using vector = vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, All
 namespace fmia {
 
 template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
-[[nodiscard]] constexpr auto make_vector_impl(Dim first_dim_size, Ts&&... args)
-{
+[[nodiscard]] constexpr auto make_vector_impl(Dim first_dim_size, Ts&&... args) {
   using adjusted_allocator_type_list = meta::adjust_allocator_type_list_t<AllocatorList, sizeof...(Ts)>;
   if constexpr (sizeof...(Ts) == 1) {
     using cur_dim_allocator_type = meta::cur_dim_allocator_t<Elem, adjusted_allocator_type_list>;
@@ -209,8 +191,7 @@ export namespace fmia {
 // }(fmia::make_vector<int>(10, -1)) << "\n";
 template <typename Elem, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators, std::integral Dim, typename... Ts>
   requires (sizeof(Dim) <= sizeof(std::size_t) && sizeof...(Ts) > 0 && sizeof...(Allocators) < sizeof...(Ts))
-[[nodiscard]] constexpr auto make_vector(Dim first_dim_size, Ts&&... args)
-{
+[[nodiscard]] constexpr auto make_vector(Dim first_dim_size, Ts&&... args) {
   return make_vector_impl<Elem, meta::type_list<InnermostDimAllocator, Allocators...>>(first_dim_size, std::forward<Ts>(args)...);
 }
 

@@ -27,8 +27,7 @@ namespace fmia::graph::sssp {
 // time complexity: O(VE)
 template <typename EdgeList, typename Vertex, typename Weight = EdgeList::weight_type>
 [[nodiscard]] constexpr auto bellman_ford_impl(const EdgeList& edges, Vertex vertex_count, Vertex source)
-  -> std::expected<std::vector<Weight>, shortest_path_error>
-{
+  -> std::expected<std::vector<Weight>, shortest_path_error> {
   if (edges.empty())
     return std::unexpected(shortest_path_error::empty_graph);
 
@@ -62,14 +61,12 @@ template <typename EdgeList, typename Vertex, typename Weight = EdgeList::weight
 export namespace fmia::graph::sssp {
 
 template <typename Edge, typename Vertex = typename Edge::vertex_size>
-[[nodiscard]] constexpr auto bellman_ford(const edge_list<Edge>& edges, Vertex vertex_count, Vertex source)
-{
+[[nodiscard]] constexpr auto bellman_ford(const edge_list<Edge>& edges, Vertex vertex_count, Vertex source) {
   return bellman_ford_impl(edges, vertex_count, source);
 }
 
 template <typename Edge, typename Vertex = typename Edge::vertex_size>
-[[nodiscard]] constexpr auto bellman_ford(const edge_list<Edge>& edges, Vertex source)
-{
+[[nodiscard]] constexpr auto bellman_ford(const edge_list<Edge>& edges, Vertex source) {
   return bellman_ford_impl(edges, edges.vertex_size(), source);
 }
 
@@ -84,8 +81,7 @@ template <typename Edge, typename Vertex = typename Edge::vertex_size>
 // does not affect the original update order of the bellman-ford, and is faster in average cases
 template <graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
 [[nodiscard]] constexpr auto bellman_ford_queue_optimized(const T& g, Vertex source)
-  -> std::expected<std::vector<Weight>, shortest_path_error>
-{
+  -> std::expected<std::vector<Weight>, shortest_path_error> {
   if (g.empty())
     return std::unexpected(shortest_path_error::empty_graph);
 
@@ -149,8 +145,7 @@ template <graph T, typename Vertex = T::vertex_type, typename Weight = T::weight
 // https://web.mit.edu/dimitrib/www/parallelsp.pdf
 template <graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
 [[nodiscard]] constexpr auto bellman_ford_deque_optimized(const T& g, Vertex source)
-  -> std::expected<std::vector<Weight>, shortest_path_error>
-{
+  -> std::expected<std::vector<Weight>, shortest_path_error> {
   if (g.empty())
     return std::unexpected(shortest_path_error::empty_graph);
 

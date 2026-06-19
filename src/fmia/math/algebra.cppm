@@ -21,8 +21,7 @@ concept idempotent_operator = std::regular_invocable<Operator, T, T> && std::con
 export namespace fmia {
 
 template <typename Operator>
-class idempotent_operator_wrapper final
-{
+class idempotent_operator_wrapper final {
 private:
   Operator f_;
 
@@ -32,8 +31,7 @@ public:
 
   template <typename... Args>
     requires std::regular_invocable<const Operator&, Args...>
-  constexpr decltype(auto) operator ()(Args&&... args) const noexcept(std::is_nothrow_invocable_v<const Operator&, Args...>)
-  {
+  constexpr decltype(auto) operator ()(Args&&... args) const noexcept(std::is_nothrow_invocable_v<const Operator&, Args...>) {
     return std::invoke(f_, std::forward<Args>(args)...);
   }
 };
@@ -55,8 +53,7 @@ export namespace fmia {
 enum class element_for_operator { add = 0, mul = 1 };
 
 template <element_for_operator Operator>
-struct neutral_element_tag
-{
+struct neutral_element_tag {
   // allow an object of this tag to be implicitly converted to int, for creating neutral elements of arithmetic types
   constexpr operator int() noexcept { return static_cast<int>(Operator); }
 };
@@ -65,8 +62,7 @@ struct neutral_element_tag
 // for large types for which constructing and copying is costly, e.g. identity matrix
 template <typename T, element_for_operator Operation>
   requires meta::arithmetic<T>
-[[nodiscard]] constexpr bool is_neutral_element(const T& elem)
-{
+[[nodiscard]] constexpr bool is_neutral_element(const T& elem) {
   if constexpr (Operation == element_for_operator::add)
     return elem == 0;
   else if constexpr (Operation == element_for_operator::mul)

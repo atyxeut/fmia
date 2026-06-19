@@ -59,14 +59,10 @@ export namespace fmia {
 export namespace fmia::meta {
 
 template <typename>
-struct is_no_cv_custom_ieee754_binary_floating_point : std::false_type
-{
-};
+struct is_no_cv_custom_ieee754_binary_floating_point : std::false_type {};
 
 template <usize Bits>
-struct is_no_cv_custom_ieee754_binary_floating_point<ieee754::f<Bits>> : std::true_type
-{
-};
+struct is_no_cv_custom_ieee754_binary_floating_point<ieee754::f<Bits>> : std::true_type {};
 
 template <typename T>
 inline constexpr bool is_no_cv_custom_ieee754_binary_floating_point_v = is_no_cv_custom_ieee754_binary_floating_point<T>::value;
@@ -82,14 +78,10 @@ concept ieee754_binary_floating_point =
   std::floating_point<T> || std::same_as<std::remove_cv_t<T>, f128> || is_custom_ieee754_binary_floating_point_v<T>;
 
 template <typename>
-struct is_no_cv_custom_ieee754_decimal_floating_point : std::false_type
-{
-};
+struct is_no_cv_custom_ieee754_decimal_floating_point : std::false_type {};
 
 template <usize Bits>
-struct is_no_cv_custom_ieee754_decimal_floating_point<ieee754::d<Bits>> : std::true_type
-{
-};
+struct is_no_cv_custom_ieee754_decimal_floating_point<ieee754::d<Bits>> : std::true_type {};
 
 template <typename T>
 inline constexpr bool is_no_cv_custom_ieee754_decimal_floating_point_v = is_no_cv_custom_ieee754_decimal_floating_point<T>::value;

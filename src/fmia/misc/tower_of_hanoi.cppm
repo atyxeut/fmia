@@ -41,8 +41,7 @@ constexpr auto peg_name_lower = "abc";
 export namespace fmia::tower_of_hanoi::count_move {
 
 // initially all disks stack on one peg `from`, finally they all stack on one peg `to`
-[[nodiscard]] constexpr move_cnt_type from_one_to_one_case(peg_type disk_cnt) noexcept(nothrow_fn)
-{
+[[nodiscard]] constexpr move_cnt_type from_one_to_one_case(peg_type disk_cnt) noexcept(nothrow_fn) {
   // denote the moves of a problem regarding n disks by T(n)
   // 1. to move disk n to `to`, we can first move disk n - 1 to 1 the auxiliary (third) peg, from peg `from` the problem of moving these
   //    n - 1 disks is the same as moving all n disks, so the move count is T(n - 1)
@@ -65,8 +64,7 @@ export namespace fmia::tower_of_hanoi::count_move {
 // from_list[i]: the (i + 1)-th disk's initial peg
 [[nodiscard]] constexpr move_cnt_type from_different_to_one_case(
   peg_type disk_cnt, std::span<const peg_type> from_list, peg_type to
-) noexcept(nothrow_fn)
-{
+) noexcept(nothrow_fn) {
   if (disk_cnt == 0)
     return 0;
 
@@ -85,8 +83,7 @@ export namespace fmia::tower_of_hanoi::count_move {
 // to_list[i]: the (i + 1)-th disk's destination peg
 [[nodiscard]] constexpr move_cnt_type from_one_to_different_case(
   peg_type disk_cnt, peg_type from, std::span<const peg_type> to_list
-) noexcept(nothrow_fn)
-{
+) noexcept(nothrow_fn) {
   if (disk_cnt == 0)
     return 0;
 
@@ -105,8 +102,7 @@ namespace fmia::tower_of_hanoi::count_move {
 // move the largest disk from peg `from` to peg `to` using only one step (in most cases this is optimal)
 [[nodiscard]] constexpr move_cnt_type general_case_one_step_strategy(
   peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list
-) noexcept(nothrow_fn)
-{
+) noexcept(nothrow_fn) {
   // 1. move disks above the largest disk n and on peg `to[n]` to peg `aux`, so that disk n can move
   // 2. move disk n to the destination, then move the remaining n - 1 disks on peg `aux` to their destinations
   const peg_type aux = peg_cnt - from_list[disk_cnt - 1] - to_list[disk_cnt - 1];
@@ -136,8 +132,7 @@ namespace fmia::tower_of_hanoi::count_move {
 // move 3 from B to A (the second move)
 [[nodiscard]] constexpr move_cnt_type general_case_two_step_strategy(
   peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list
-) noexcept(nothrow_fn)
-{
+) noexcept(nothrow_fn) {
   // 1. clear disks above the largest disk n and on peg `aux`, move them to peg `to[n]`
   // 2. move disk n to peg `aux` (the first move)
   // 3. move the remaining n - 1 disks on peg `to[n]` to `from[n]`, this problem has "from one to one" form
@@ -156,8 +151,7 @@ export namespace fmia::tower_of_hanoi::count_move {
 // initially all disks stack scatteredly, and finally they also stack scatteredly
 [[nodiscard]] constexpr move_cnt_type general_case(
   peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list
-) noexcept(nothrow_fn)
-{
+) noexcept(nothrow_fn) {
   if (disk_cnt == 0)
     return 0;
 
@@ -175,8 +169,7 @@ export namespace fmia::tower_of_hanoi::count_move {
 
 namespace fmia::tower_of_hanoi::print_move {
 
-void move(peg_type disk, peg_type from, peg_type to, bool upper_case = true)
-{
+void move(peg_type disk, peg_type from, peg_type to, bool upper_case = true) {
   const auto& peg_name = upper_case ? peg_name_upper : peg_name_lower;
   std::println("move {} from {} to {}", disk, peg_name[from], peg_name[to]);
 }
@@ -185,8 +178,7 @@ void move(peg_type disk, peg_type from, peg_type to, bool upper_case = true)
 
 export namespace fmia::tower_of_hanoi::print_move {
 
-void from_one_to_one_case(peg_type disk_cnt, peg_type from, peg_type to)
-{
+void from_one_to_one_case(peg_type disk_cnt, peg_type from, peg_type to) {
   if (disk_cnt == 0)
     return;
 
@@ -196,8 +188,7 @@ void from_one_to_one_case(peg_type disk_cnt, peg_type from, peg_type to)
   from_one_to_one_case(disk_cnt - 1, aux, to);
 }
 
-void from_different_to_one_case(peg_type disk_cnt, std::span<const peg_type> from_list, peg_type to)
-{
+void from_different_to_one_case(peg_type disk_cnt, std::span<const peg_type> from_list, peg_type to) {
   if (disk_cnt == 0)
     return;
 
@@ -213,8 +204,7 @@ void from_different_to_one_case(peg_type disk_cnt, std::span<const peg_type> fro
   from_one_to_one_case(disk_cnt - 1, aux, to);
 }
 
-void from_one_to_different_case(peg_type disk_cnt, peg_type from, std::span<const peg_type> to_list)
-{
+void from_one_to_different_case(peg_type disk_cnt, peg_type from, std::span<const peg_type> to_list) {
   if (disk_cnt == 0)
     return;
 
@@ -230,8 +220,7 @@ void from_one_to_different_case(peg_type disk_cnt, peg_type from, std::span<cons
   from_one_to_different_case(disk_cnt - 1, aux, to_list);
 }
 
-void general_case(peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list)
-{
+void general_case(peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list) {
   if (disk_cnt == 0)
     return;
 

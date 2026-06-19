@@ -12,8 +12,7 @@ using namespace fmia;
 
 export {
 
-void cstyle_string_literal_output_no_ambiguous_overloads() noexcept
-{
+void cstyle_string_literal_output_no_ambiguous_overloads() noexcept {
   print(std::cout, "hello", "", true);
   print(std::cout, "hello", " | ", true);
 
@@ -24,8 +23,7 @@ void cstyle_string_literal_output_no_ambiguous_overloads() noexcept
   std::cout << '\n';
 }
 
-void common_ranges_output_with_custom_print_and_std_ostream() noexcept
-{
+void common_ranges_output_with_custom_print_and_std_ostream() noexcept {
   int arr1[] {1, 2, 3, 4, 5, 6, 7};
   print(std::cout, arr1, " | ", true);
   std::cout << arr1 << '\n';
@@ -89,8 +87,7 @@ void common_ranges_output_with_custom_print_and_std_ostream() noexcept
   std::cout << '\n';
 }
 
-void multidimensional_ranges_output_with_custom_print_and_std_ostream() noexcept
-{
+void multidimensional_ranges_output_with_custom_print_and_std_ostream() noexcept {
 
   auto vec2d = make_vector<double>(3, 4, 3.14);
   print(std::cout, vec2d, " | ", true);

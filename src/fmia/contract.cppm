@@ -5,7 +5,6 @@ export module fmia.contract;
 
 import std;
 
-export void handle_contract_violation(const std::contracts::contract_violation&)
-{
+export void handle_contract_violation(const std::contracts::contract_violation&) {
   std::println(std::cerr, "contract violation detected");
 }

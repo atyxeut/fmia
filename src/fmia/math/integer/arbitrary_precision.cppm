@@ -16,9 +16,7 @@ import fmia.math.integer.fixed_precision;
 export namespace fmia::meta {
 
 template <typename>
-struct is_no_cv_arbitrary_precision_integral : std::false_type
-{
-};
+struct is_no_cv_arbitrary_precision_integral : std::false_type {};
 
 template <typename T>
 inline constexpr bool is_no_cv_arbitrary_precision_integral_v = is_no_cv_arbitrary_precision_integral<T>::value;
@@ -47,8 +45,7 @@ export namespace fmia::big_integer::naive {
 
 // +, -, *, /, %, power, root operations for nonnegative operands (radix 10^k) with free functions
 
-[[nodiscard]] constexpr auto parse(std::string_view s) -> std::vector<int>
-{
+[[nodiscard]] constexpr auto parse(std::string_view s) -> std::vector<int> {
   const auto n = s.size();
   std::vector<int> ret(n);
 
@@ -58,8 +55,7 @@ export namespace fmia::big_integer::naive {
   return ret;
 }
 
-[[nodiscard]] auto input()
-{
+[[nodiscard]] auto input() {
   std::string s;
   std::cin >> s;
 
@@ -67,8 +63,7 @@ export namespace fmia::big_integer::naive {
 }
 
 template <std::ranges::input_range R>
-void print(R&& num, bool new_line = false)
-{
+void print(R&& num, bool new_line = false) {
   for (const auto digit : num | std::views::reverse)
     std::cout << digit;
   if (new_line)
@@ -76,15 +71,13 @@ void print(R&& num, bool new_line = false)
 }
 
 template <typename Limb>
-[[nodiscard]] constexpr bool is_zero(const std::vector<Limb>& num) noexcept
-{
+[[nodiscard]] constexpr bool is_zero(const std::vector<Limb>& num) noexcept {
   return num.size() == 1 && num[0] == 0;
 }
 
 // a < b : -1, a = b: 0, a > b: 1
 template <typename Limb>
-[[nodiscard]] constexpr int compare(std::span<const Limb> a, std::span<const Limb> b) noexcept
-{
+[[nodiscard]] constexpr int compare(std::span<const Limb> a, std::span<const Limb> b) noexcept {
   const auto la = a.size(), lb = b.size();
   if (la == lb) {
     for (auto i = la; i > 0;) {
@@ -97,8 +90,7 @@ template <typename Limb>
 }
 
 template <typename Limb, Limb Radix = 10, std::ranges::forward_range R>
-constexpr auto carry_positive(R&& num) noexcept
-{
+constexpr auto carry_positive(R&& num) noexcept {
   Limb c = 0;
   for (auto& limb : num) {
     limb += c;
@@ -110,8 +102,7 @@ constexpr auto carry_positive(R&& num) noexcept
 }
 
 template <typename Limb, Limb Radix = 10, std::ranges::forward_range R>
-constexpr Limb carry(R&& num) noexcept
-{
+constexpr Limb carry(R&& num) noexcept {
   Limb c = 0;
   for (Limb r; auto& limb : num) {
     limb += c;
@@ -124,14 +115,12 @@ constexpr Limb carry(R&& num) noexcept
 }
 
 template <typename Limb>
-constexpr void remove_lz(std::vector<Limb>& num) noexcept
-{
+constexpr void remove_lz(std::vector<Limb>& num) noexcept {
   while (num.size() > 1 && num.back() == 0)
     num.pop_back();
 }
 
-[[nodiscard]] constexpr auto add(const std::vector<int>& a, const std::vector<int>& b) -> std::vector<int>
-{
+[[nodiscard]] constexpr auto add(const std::vector<int>& a, const std::vector<int>& b) -> std::vector<int> {
   std::vector<int> ans(std::max(a.size(), b.size()) + 1);
 
   for (auto i = 0uz; i < a.size(); ++i)
@@ -144,21 +133,18 @@ constexpr void remove_lz(std::vector<Limb>& num) noexcept
   return ans;
 }
 
-struct sub_result
-{
+struct sub_result {
   int sgn;
   std::vector<int> mag;
 };
 
-void print(const sub_result& result, bool new_line = false)
-{
+void print(const sub_result& result, bool new_line = false) {
   if (result.sgn < 0)
     std::cout << '-';
   print(result.mag, new_line);
 }
 
-[[nodiscard]] constexpr sub_result sub(const std::vector<int>& a, const std::vector<int>& b)
-{
+[[nodiscard]] constexpr sub_result sub(const std::vector<int>& a, const std::vector<int>& b) {
   std::vector<int> ans(std::max(a.size(), b.size()));
 
   const int sgn = compare<int>(a, b);
@@ -173,8 +159,7 @@ void print(const sub_result& result, bool new_line = false)
   return {sgn, std::move(ans)};
 }
 
-[[nodiscard]] constexpr auto mul(const std::vector<int>& a, const std::vector<int>& b) -> std::vector<int>
-{
+[[nodiscard]] constexpr auto mul(const std::vector<int>& a, const std::vector<int>& b) -> std::vector<int> {
   if (is_zero(a) || is_zero(b))
     return std::vector<int> {0};
 
@@ -192,8 +177,7 @@ void print(const sub_result& result, bool new_line = false)
 }
 
 template <typename Remainder>
-struct floor_div_result
-{
+struct floor_div_result {
   std::vector<int> q;
   Remainder r;
 };
@@ -202,7 +186,7 @@ FMIA_WCONVERSION_PUSH()
 
 // used when b is way smaller than a
 [[nodiscard]] constexpr auto floor_div(const std::vector<int>& a, int b) -> floor_div_result<int>
-// pre(b != 0) unknown linking error
+  // pre(b != 0) unknown linking error
 {
   std::vector<int> q(a.size());
   long long r = 0;
@@ -218,9 +202,8 @@ FMIA_WCONVERSION_PUSH()
   return {std::move(q), static_cast<int>(r)};
 }
 
-[[nodiscard]] constexpr auto floor_div(const std::vector<int>& a, const std::vector<int>& b) -> floor_div_result<std::vector<int>> //
-  pre(!is_zero(b))
-{
+[[nodiscard]] constexpr auto floor_div(const std::vector<int>& a, const std::vector<int>& b)
+  -> floor_div_result<std::vector<int>> pre(!is_zero(b)) {
   const int cmp_result = compare<int>(a, b);
   if (cmp_result < 0)
     return {{0}, a};
@@ -249,14 +232,12 @@ FMIA_WCONVERSION_PUSH()
 
 FMIA_WCONVERSION_POP()
 
-struct div_result
-{
+struct div_result {
   std::vector<int> q_int;
   std::vector<int> q_frac; // not store the digits in reverse order
 };
 
-void print(const div_result& result, bool new_line = false)
-{
+void print(const div_result& result, bool new_line = false) {
   print(result.q_int, false);
   if (!result.q_frac.empty())
     std::cout << '.';
@@ -266,8 +247,7 @@ void print(const div_result& result, bool new_line = false)
 FMIA_WCONVERSION_PUSH()
 
 // will calculate to precision + 1 decimal digits and round to the nearest
-[[nodiscard]] constexpr div_result div(const std::vector<int>& a, int b, usize precision = 16)
-{
+[[nodiscard]] constexpr div_result div(const std::vector<int>& a, int b, usize precision = 16) {
   auto [q_int, r_] = floor_div(a, b);
   long long r = r_;
 
@@ -303,9 +283,7 @@ FMIA_WCONVERSION_PUSH()
 
 FMIA_WCONVERSION_POP()
 
-[[nodiscard]] constexpr auto pow(std::vector<int> a, int n) -> std::vector<int> //
-  pre(n >= 0)
-{
+[[nodiscard]] constexpr auto pow(std::vector<int> a, int n) -> std::vector<int> pre(n >= 0) {
   if (n == 0)
     return {1};
 
@@ -323,9 +301,7 @@ FMIA_WCONVERSION_POP()
 
 FMIA_WCONVERSION_PUSH()
 
-[[nodiscard]] constexpr auto floor_root(const std::vector<int>& a, int n) -> std::vector<int> //
-  pre(n > 0)
-{
+[[nodiscard]] constexpr auto floor_root(const std::vector<int>& a, int n) -> std::vector<int> pre(n > 0) {
   if (n == 1 || is_zero(a))
     return a;
 
@@ -342,13 +318,11 @@ FMIA_WCONVERSION_PUSH()
 
 FMIA_WCONVERSION_POP()
 
-[[nodiscard]] constexpr auto floor_sqrt(const std::vector<int>& a)
-{
+[[nodiscard]] constexpr auto floor_sqrt(const std::vector<int>& a) {
   return floor_root(a, 2);
 }
 
-[[nodiscard]] constexpr auto floor_cbrt(const std::vector<int>& a)
-{
+[[nodiscard]] constexpr auto floor_cbrt(const std::vector<int>& a) {
   return floor_root(a, 3);
 }
 
@@ -356,8 +330,7 @@ FMIA_WCONVERSION_POP()
 
 namespace fmia::big_integer {
 
-[[nodiscard]] constexpr auto preprocess_input_string(std::string_view s)
-{
+[[nodiscard]] constexpr auto preprocess_input_string(std::string_view s) {
   if (s.empty() || (s.size() == 1) & !is_ascii_digit(s[0]))
     throw std::invalid_argument("invalid integer: no digits");
 
@@ -372,14 +345,12 @@ namespace fmia::big_integer {
 }
 
 template <typename Limb, Limb DigitsPerLimb>
-[[nodiscard]] constexpr auto get_digit_limb_count(std::string_view s_after_preprocess)
-{
+[[nodiscard]] constexpr auto get_digit_limb_count(std::string_view s_after_preprocess) {
   return (s_after_preprocess.size() + DigitsPerLimb - 1) / DigitsPerLimb;
 }
 
 template <typename Limb, Limb DigitsPerLimb>
-constexpr void set_digit_limbs(std::string_view s_after_preprocess, std::span<Limb> dest)
-{
+constexpr void set_digit_limbs(std::string_view s_after_preprocess, std::span<Limb> dest) {
   for (const char *l, *r = s_after_preprocess.data() + s_after_preprocess.size(); auto& limb : dest) {
     l = std::max(r - DigitsPerLimb, s_after_preprocess.data());
     if (const auto res = std::from_chars(l, r, limb); res.ptr != r)
@@ -389,8 +360,7 @@ constexpr void set_digit_limbs(std::string_view s_after_preprocess, std::span<Li
 }
 
 template <typename Limb, Limb DigitsPerLimb>
-void print_digit_limbs(std::ostream& ostr, std::span<const Limb> num)
-{
+void print_digit_limbs(std::ostream& ostr, std::span<const Limb> num) {
   auto i = num.size();
   ostr << num[--i]; // the first limb doesn't need padding zeros
 
@@ -404,8 +374,7 @@ void print_digit_limbs(std::ostream& ostr, std::span<const Limb> num)
 
 export namespace fmia::big_integer::naive {
 
-class digit_storage
-{
+class digit_storage {
 public:
   using limb_type = i64;
 
@@ -420,24 +389,21 @@ private:
 public:
   constexpr digit_storage() noexcept = default;
 
-  explicit constexpr digit_storage(std::string_view s)
-  {
+  explicit constexpr digit_storage(std::string_view s) {
     const auto ns = preprocess_input_string(s);
     sgn_ = s[0] == '-' ? -1 : 1;
     mag_.resize(get_digit_limb_count<limb_type, digits_per_limb>(ns));
     set_digit_limbs<limb_type, digits_per_limb>(ns, mag_);
   }
 
-  friend auto& operator >>(std::istream& istr, digit_storage& n)
-  {
+  friend auto& operator >>(std::istream& istr, digit_storage& n) {
     std::string s;
     istr >> s;
     n = digit_storage(s);
     return istr;
   }
 
-  friend auto& operator <<(std::ostream& ostr, const digit_storage& n)
-  {
+  friend auto& operator <<(std::ostream& ostr, const digit_storage& n) {
     if (n.sgn_ < 0)
       ostr << '-';
     print_digit_limbs<limb_type, digits_per_limb>(ostr, n.mag_);
@@ -450,8 +416,6 @@ public:
 export namespace fmia::meta {
 
 template <>
-struct is_no_cv_arbitrary_precision_integral<big_integer::naive::digit_storage> : std::true_type
-{
-};
+struct is_no_cv_arbitrary_precision_integral<big_integer::naive::digit_storage> : std::true_type {};
 
 } // export namespace fmia::meta

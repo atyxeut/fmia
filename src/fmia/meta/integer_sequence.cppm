@@ -18,8 +18,7 @@ template <typename>
 struct make_reversed_integer_sequence_impl;
 
 template <typename Int, Int... Is>
-struct make_reversed_integer_sequence_impl<std::integer_sequence<Int, Is...>>
-{
+struct make_reversed_integer_sequence_impl<std::integer_sequence<Int, Is...>> {
   using type = std::integer_sequence<Int, (sizeof...(Is) - 1 - Is)...>;
 };
 
@@ -47,8 +46,7 @@ template <typename Int, Int, typename>
 struct make_integer_sequence_of_range_impl;
 
 template <typename Int, Int Begin, Int... Is>
-struct make_integer_sequence_of_range_impl<Int, Begin, std::integer_sequence<Int, Is...>>
-{
+struct make_integer_sequence_of_range_impl<Int, Begin, std::integer_sequence<Int, Is...>> {
   using type = std::integer_sequence<Int, (Begin + Is)...>;
 };
 
@@ -74,8 +72,7 @@ template <typename Int, Int, typename>
 struct make_reversed_integer_sequence_of_range_impl;
 
 template <typename Int, Int End, Int... Is>
-struct make_reversed_integer_sequence_of_range_impl<Int, End, std::integer_sequence<Int, Is...>>
-{
+struct make_reversed_integer_sequence_of_range_impl<Int, End, std::integer_sequence<Int, Is...>> {
   using type = std::integer_sequence<Int, (End - Is)...>;
 };
 
@@ -101,8 +98,7 @@ template <std::integral T, T, typename>
 struct shift_integer_sequence;
 
 template <typename Int, Int Offset, Int... Is>
-struct shift_integer_sequence<Int, Offset, std::integer_sequence<Int, Is...>>
-{
+struct shift_integer_sequence<Int, Offset, std::integer_sequence<Int, Is...>> {
   using type = std::integer_sequence<Int, (Is + Offset)...>;
 };
 
@@ -119,14 +115,11 @@ template <std::size_t Offset, typename IndexSequence>
 using shift_index_sequence_t = shift_index_sequence<Offset, IndexSequence>::type;
 
 template <typename>
-struct is_no_cv_no_duplication_integer_sequence : std::true_type
-{
-};
+struct is_no_cv_no_duplication_integer_sequence : std::true_type {};
 
 // O(nlog n) time complexity, where n is the size of the given integer sequence
 template <typename Int, Int... Is>
-struct is_no_cv_no_duplication_integer_sequence<std::integer_sequence<Int, Is...>>
-{
+struct is_no_cv_no_duplication_integer_sequence<std::integer_sequence<Int, Is...>> {
   static constexpr bool value = [] consteval noexcept {
     std::array<std::size_t, sizeof...(Is)> I {Is...};
     std::ranges::sort(I);

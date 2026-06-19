@@ -12,8 +12,7 @@ using namespace fmia::big_integer;
 
 export {
 
-void check_naive_div_correctness()
-{
+void check_naive_div_correctness() {
   std::cout << "bigint / int:\n";
 
   std::cout << "group 1:\n";
@@ -51,8 +50,7 @@ void check_naive_div_correctness()
   naive::print(naive::div(c, d, 50), true);
 }
 
-void naive_class_ctor_and_output_with_std_ostream()
-{
+void naive_class_ctor_and_output_with_std_ostream() {
   // 0
   std::cout << naive::digit_storage("0") << '\n';
   // 0 with leading zeros (70 digits)
@@ -67,8 +65,7 @@ void naive_class_ctor_and_output_with_std_ostream()
   std::cout << naive::digit_storage("-000000123456789123456789123456789123456789123") << '\n';
 }
 
-void naive_class_input_with_std_istream()
-{
+void naive_class_input_with_std_istream() {
   naive::digit_storage n;
   std::cin >> n;
   std::cout << n << '\n';

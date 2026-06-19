@@ -12,8 +12,7 @@ import fmia.meta.arithmetic;
 using namespace fmia;
 using namespace fmia::meta;
 
-consteval void does_make_higher_precision_for_integral_work() noexcept
-{
+consteval void does_make_higher_precision_for_integral_work() noexcept {
   static_assert(std::same_as<make_higher_precision_t<int>, i64> == true);
   static_assert(std::same_as<make_higher_precision_t<const int>, const i64> == true);
   static_assert(std::same_as<make_higher_precision_t<const volatile unsigned int>, const volatile u64> == true);
@@ -24,8 +23,7 @@ consteval void does_make_higher_precision_for_integral_work() noexcept
   static_assert(std::same_as<make_higher_precision_t<integer::i<256>>, integer::i<512>> == true);
 }
 
-consteval void does_make_higher_precision_for_floating_point_work() noexcept
-{
+consteval void does_make_higher_precision_for_floating_point_work() noexcept {
   static_assert(std::same_as<make_higher_precision_t<f32>, f64> == true);
   static_assert(std::same_as<make_higher_precision_t<const f32>, const f64> == true);
   static_assert(std::same_as<make_higher_precision_t<volatile f32>, volatile f64> == true);
@@ -39,8 +37,7 @@ consteval void does_make_higher_precision_for_floating_point_work() noexcept
   static_assert(std::same_as<make_higher_precision_t<ieee754::d<1024>>, ieee754::d<2048>> == true);
 }
 
-consteval void does_compare_precision_for_integral_work() noexcept
-{
+consteval void does_compare_precision_for_integral_work() noexcept {
   static_assert(compare_precision_v<int, int> == 0);
   static_assert(compare_precision_v<int, long long> == -1);
   static_assert(compare_precision_v<int, signed char> == 1);
@@ -77,8 +74,7 @@ consteval void does_compare_precision_for_integral_work() noexcept
 #endif
 }
 
-consteval void does_compare_precision_for_floating_point_work() noexcept
-{
+consteval void does_compare_precision_for_floating_point_work() noexcept {
   static_assert(compare_precision_v<float, float> == 0);
   static_assert(compare_precision_v<float, double> == -1);
   static_assert(compare_precision_v<double, float> == 1);

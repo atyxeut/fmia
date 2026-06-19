@@ -14,8 +14,7 @@ export namespace fmia {
 
 template <typename T, typename Merge, typename Buffer = relaxed_heap_buffer<T, std::size_t, std::allocator<T>>>
   requires std::regular_invocable<Merge, T, T>
-class sparse_table final : public Buffer
-{
+class sparse_table final : public Buffer {
 public:
   using size_type = Buffer::size_type;
   using difference_type = Buffer::difference_type;
@@ -31,7 +30,7 @@ private:
 
 private:
   [[nodiscard]] constexpr size_type map_(size_type i, size_type j) const noexcept
-    // post(idx : idx < this->buffer_.size)
+    // post(idx : idx < this->buffer_.size) unknown linking error
   {
     // the jth row has only row_length - 2^j + 1 elements, so the jth row has 2^j - 1 unused slots, then from 0th row to the (j-1)th, the
     // total contribution is sum_(k = 0)^(j - 1) (2^k - 1) = 2^j - j - 1 spare slots, thus the offset is j * row_length + i - (2^j - j - 1)
@@ -44,11 +43,11 @@ private:
 public:
   template <std::ranges::forward_range R, typename F = Merge>
     requires std::same_as<Merge, std::remove_cvref_t<F>>
-  constexpr explicit sparse_table(R&& r, F&& f = Merge {}, const allocator_type& alloc = allocator_type {}) //
-    pre(std::ranges::distance(r) > 0)
+  constexpr explicit sparse_table(R&& r, F&& f = Merge {}, const allocator_type& alloc = allocator_type {}) pre(
+    std::ranges::distance(r) > 0
+  )
     : Buffer(alloc), f_(std::forward<F>(f)), size_ {static_cast<size_type>(std::ranges::distance(r))},
-      max_exp_p1_ {static_cast<size_type>(ilog2(size_) + 1)}
-  {
+      max_exp_p1_ {static_cast<size_type>(ilog2(size_) + 1)} {
     // sum_(j = 0)^(J) (n - 2^j + 1) = (n + 1)(j + 1) - (2^(j + 1) - 1)
     this->recapacity((size_ + 1) * max_exp_p1_ + 1 - (static_cast<size_type>(1) << max_exp_p1_));
 
@@ -70,9 +69,9 @@ public:
   }
 
 public:
-  [[nodiscard]] constexpr T query(size_type l, size_type r) const noexcept(std::is_nothrow_invocable_v<const Merge&, const T&, const T&>) //
-    pre(l <= r)
-  {
+  [[nodiscard]] constexpr T query(
+    size_type l, size_type r
+  ) const noexcept(std::is_nothrow_invocable_v<const Merge&, const T&, const T&>) pre(l <= r) {
     if constexpr (meta::idempotent_operator<T, Merge>) {
       const size_type j = ilog2(r - l + 1);
       return std::invoke(f_, this->buffer_[map_(l, j)], this->buffer_[map_(r + 1 - (static_cast<size_type>(1) << j), j)]);

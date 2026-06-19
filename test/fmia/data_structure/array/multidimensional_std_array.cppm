@@ -14,8 +14,7 @@ import fmia.memory.allocator;
 
 using namespace fmia;
 
-consteval void fmia_array_should_be_nested_std_array() noexcept
-{
+consteval void fmia_array_should_be_nested_std_array() noexcept {
   using T1 = std::array<double, 10>;
   using T1_ = array<double, 10>;
   static_assert(std::same_as<T1, T1_>);
@@ -33,8 +32,7 @@ consteval void fmia_array_should_be_nested_std_array() noexcept
   static_assert(std::same_as<T4, T4_>);
 }
 
-consteval void fmia_vector_should_be_nested_std_vector() noexcept
-{
+consteval void fmia_vector_should_be_nested_std_vector() noexcept {
   using T1 = std::vector<double>;
   using T1_ = vector<double>;
   static_assert(std::same_as<T1, T1_>);
@@ -53,8 +51,7 @@ consteval void fmia_vector_should_be_nested_std_vector() noexcept
   static_assert(std::same_as<T4, T4_>);
 }
 
-consteval void every_empty_allocator_template_parameter_of_fmia_vector_defaults_to_std_allocator() noexcept
-{
+consteval void every_empty_allocator_template_parameter_of_fmia_vector_defaults_to_std_allocator() noexcept {
   using T1 = std::pmr::vector<double>;
   using T1_ = vector<double, 1, std::pmr::polymorphic_allocator<double>>;
   static_assert(std::same_as<T1, T1_>);
@@ -67,8 +64,7 @@ consteval void every_empty_allocator_template_parameter_of_fmia_vector_defaults_
 
 export {
 
-void does_make_vector_work()
-{
+void does_make_vector_work() {
   auto get_v1 = [] consteval noexcept {
     return std::vector<double>(3, 3.14);
   };

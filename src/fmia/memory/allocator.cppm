@@ -8,14 +8,10 @@ import std;
 export namespace fmia {
 
 // represent std::allocator<T>
-struct std_allocator_tag
-{
-};
+struct std_allocator_tag {};
 
 // represent std::pmr::polymorphic_allocator<T>
-struct std_pmr_allocator_tag
-{
-};
+struct std_pmr_allocator_tag {};
 
 } // export namespace fmia
 
@@ -29,8 +25,7 @@ concept uninitialized_construct_function_invocable =
   && std::constructible_from<typename std::allocator_traits<Allocator>::value_type, std::iter_reference_t<InputIt>>;
 
 template <uninitialized_construction_category Category, typename Allocator, typename InputIt, typename ForwardIt>
-constexpr auto uninitialized_construct_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest)
-{
+constexpr auto uninitialized_construct_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest) {
   if (count == 0) {
     if constexpr (Category == uninitialized_construction_category::move)
       return std::pair {first, dest};
@@ -80,15 +75,13 @@ export namespace fmia {
 
 template <typename Allocator, std::input_iterator InputIt, std::forward_iterator ForwardIt>
   requires uninitialized_construct_function_invocable<Allocator, InputIt, ForwardIt>
-constexpr auto uninitialized_move_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest)
-{
+constexpr auto uninitialized_move_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest) {
   return uninitialized_construct_n<uninitialized_construction_category::move>(alloc, first, count, dest);
 }
 
 template <typename Allocator, std::input_iterator InputIt, std::forward_iterator ForwardIt>
   requires uninitialized_construct_function_invocable<Allocator, InputIt, ForwardIt>
-constexpr auto uninitialized_copy_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest)
-{
+constexpr auto uninitialized_copy_n(Allocator& alloc, InputIt first, std::size_t count, ForwardIt dest) {
   return uninitialized_construct_n<uninitialized_construction_category::copy>(alloc, first, count, dest);
 }
 
