@@ -15,3 +15,4 @@ export import fmia.math.integer;
 export import fmia.math.matrix;
 export import fmia.math.polynomial;
 export import fmia.math.quaternion;
+export import fmia.math.sequence;
