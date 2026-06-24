@@ -25,6 +25,12 @@ target("int128_output.test")
   add_files("runner/math/int128_output.cpp")
 target_end()
 
+target("print_first_10000_humble_numbers")
+  set_kind("binary")
+  add_deps("fmia.test")
+  add_files("runner/math/print_first_10000_humble_numbers.cpp")
+target_end()
+
 target("naive_bigint_class_input.test")
   set_kind("binary")
   add_deps("fmia.test")

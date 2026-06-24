@@ -4,3 +4,4 @@
 export module test.fmia.math;
 
 export import test.fmia.math.integer;
+export import test.fmia.math.sequence;
