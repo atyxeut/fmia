@@ -162,14 +162,9 @@ struct edge_weight<Weight> {
 };
 
 template <direction Direction, typename Id, typename SourceOrder, std::unsigned_integral Order, typename Weight>
-  requires ((std::is_void_v<Id> || meta::precision_gteq<Id, Order>)
-    && (std::is_void_v<SourceOrder> || std::same_as<SourceOrder, Order>))
-    && (std::is_void_v<Weight> || meta::arithmetic<Weight>)
-class edge_base
-  : public edge_id<Id>,
-    public edge_source<SourceOrder>,
-    public edge_destination<Order>,
-    public edge_weight<Weight> {};
+  requires ((std::is_void_v<Id> || meta::precision_gteq<Id, Order>) && (std::is_void_v<SourceOrder> || std::same_as<SourceOrder, Order>))
+             && (std::is_void_v<Weight> || meta::arithmetic<Weight>)
+class edge_base : public edge_id<Id>, public edge_source<SourceOrder>, public edge_destination<Order>, public edge_weight<Weight> {};
 
 }; // namespace fmia::graph
 
@@ -189,9 +184,7 @@ using directed_edge = edge_base<direction::directed, Id, SourceOrder, Order, Wei
 export namespace fmia::graph {
 
 template <typename Edge, typename Size = std::conditional_t<std::is_void_v<edge_id_t<Edge>>, edge_order_t<Edge>, edge_id_t<Edge>>>
-  requires (
-    (std::is_void_v<edge_id_t<Edge>> && meta::precision_gteq<Size, edge_order_t<Edge>>) || std::same_as<edge_id_t<Edge>, Size>
-  )
+  requires ((std::is_void_v<edge_id_t<Edge>> && meta::precision_gteq<Size, edge_order_t<Edge>>) || std::same_as<edge_id_t<Edge>, Size>)
 class edge_list final : public graph_trait_base<edge_direction_v<Edge>, edge_order_t<Edge>, edge_weight_t<Edge>, Size> {
 private:
   edge_order_t<Edge> order_;
