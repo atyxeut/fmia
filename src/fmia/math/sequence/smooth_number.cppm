@@ -25,7 +25,7 @@ template <std::integral Result, std::integral T, std::ranges::random_access_rang
   aux.reserve(n);
   for (auto prime : primes)
     aux.emplace_back(std::move(prime), 0);
-  
+
   for (T i = 1; i < count; ++i) {
     Result num = std::numeric_limits<Result>::max();
     for (const auto& [cand, _] : aux)
