@@ -2,3 +2,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 export module fmia.data_structure.linked_list;
+
+export import fmia.data_structure.linked_list.bidirectional_list;
+export import fmia.data_structure.linked_list.forward_list;
