@@ -2,3 +2,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 export module fmia.data_structure.queue;
+
+export import fmia.data_structure.queue.circular_queue;
+export import fmia.data_structure.queue.deque;
