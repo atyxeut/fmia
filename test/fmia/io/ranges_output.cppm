@@ -6,6 +6,7 @@ export module test.fmia.io.ranges_output;
 import std;
 
 import fmia.data_structure.array.multidimensional_std_array;
+import fmia.data_structure.array.multidimensional_std_vector;
 import fmia.io.ranges_output;
 
 using namespace fmia;

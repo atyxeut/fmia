@@ -282,6 +282,12 @@ struct snoc<T, indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>> 
 template <typename T, typename AnyTypeList>
 using snoc_t = snoc<T, AnyTypeList>::type;
 
+template <bool B, typename AnyTypeList, typename T>
+struct snoc_if : std::conditional<B, snoc_t<T, AnyTypeList>, AnyTypeList> {};
+
+template <bool B, typename AnyTypeList, typename T>
+using snoc_if_t = snoc_if<B, AnyTypeList, T>::type;
+
 } // export namespace fmia::meta
 
 namespace fmia::meta {
