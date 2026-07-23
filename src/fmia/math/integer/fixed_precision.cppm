@@ -12,6 +12,7 @@ export module fmia.math.integer.fixed_precision;
 
 import std;
 
+import fmia.data_structure.string.character.ascii;
 import fmia.meta.cv_qualifier;
 import fmia.meta.type_list;
 
@@ -412,6 +413,20 @@ template <meta::nonbool_potential_standard_integral T>
 template <meta::nonbool_potential_standard_integral T>
 [[nodiscard]] constexpr int ilog2(T x) noexcept pre(x >= 0) {
   return bit_width(x) - 1;
+}
+
+template <std::unsigned_integral T, std::ranges::random_access_range R>
+[[nodiscard]] std::string to_string(T n, R&& digits)
+// pre (std::ranges::size(digits) >= 2)
+{
+  if (n == 0)
+    return std::string(1, digits[0]);
+
+  std::string ans;
+  for (const auto radix = std::ranges::size(digits); n != 0; n /= radix)
+    ans += digits[n % radix];
+  std::ranges::reverse(ans);
+  return ans;
 }
 
 } // export namespace fmia
