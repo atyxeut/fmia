@@ -17,7 +17,7 @@ template <letter_case, typename>
 inline constexpr char radix_digits_impl {};
 
 template <letter_case LetterCase, std::size_t... Is>
-inline constexpr char radix_digits_impl<LetterCase, std::index_sequence<Is...>>[sizeof...(Is)]  {
+inline constexpr char radix_digits_impl<LetterCase, std::index_sequence<Is...>>[sizeof...(Is)] {
   (Is < 10 ? Is + '0' : Is + (LetterCase == letter_case::uppercase ? 'A' : 'a') - 10)...
 };
 
