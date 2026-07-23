@@ -186,7 +186,8 @@ FMIA_WCONVERSION_PUSH()
 
 // used when b is way smaller than a
 [[nodiscard]] constexpr auto floor_div(const std::vector<int>& a, int b) -> floor_div_result<int>
-  // pre(b != 0) unknown linking error
+  // ICE:
+  // pre(b != 0)
 {
   std::vector<int> q(a.size());
   long long r = 0;

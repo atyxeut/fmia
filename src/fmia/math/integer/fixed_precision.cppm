@@ -417,7 +417,7 @@ template <meta::nonbool_potential_standard_integral T>
 
 template <std::unsigned_integral T, std::ranges::random_access_range R>
 [[nodiscard]] std::string to_string(T n, R&& digits)
-// pre (std::ranges::size(digits) >= 2)
+  pre(std::ranges::size(digits) >= 2)
 {
   if (n == 0)
     return std::string(1, digits[0]);

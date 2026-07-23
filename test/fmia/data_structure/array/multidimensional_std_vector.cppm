@@ -1,10 +1,6 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-module;
-
-#include <cassert>
-
 export module test.fmia.data_structure.array.multidimensional_std_vector;
 
 import std;
@@ -59,7 +55,7 @@ void does_make_vector_work() {
   auto v2 = std::vector<std::pmr::vector<std::vector<double>>>(3, std::pmr::vector<std::vector<double>>(4, std::vector<double>(5, 3.14)));
   auto v2_ = make_vector<double, std::allocator<double>, std::pmr::polymorphic_allocator<std::vector<double>>>(3, 4, 5, 3.14);
   auto v2__ = make_vector<double, std_allocator_tag, std_pmr_allocator_tag>(3, 4, 5, 3.14);
-  assert(v2 == v2_ && v2_ == v2__);
+  contract_assert(v2 == v2_ && v2_ == v2__);
 }
 
 } // export
