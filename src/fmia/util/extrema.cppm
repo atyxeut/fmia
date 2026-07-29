@@ -7,23 +7,30 @@ import std;
 
 export namespace fmia {
 
-template <typename T, std::regular_invocable<const T&, const T&> Cmp>
-[[nodiscard]] bool assign_if(T& dest, T&& src, Cmp fn) noexcept(noexcept(fn(dest, src)) && noexcept(dest = std::forward<T>(src))) {
+template <typename T, typename U, std::regular_invocable<T&, U&&> Cmp>
+  requires std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>
+[[nodiscard]] constexpr bool assign_if(T& dest, U&& src, Cmp fn) noexcept(
+  noexcept(fn(dest, src)) && noexcept(dest = std::forward<U>(src))
+) {
   if (fn(dest, src)) {
-    dest = std::forward<T>(src);
+    dest = std::forward<U>(src);
     return true;
   }
   return false;
 }
 
-template <typename T>
-[[nodiscard]] bool update_max(T& dest, T&& src) noexcept(noexcept(assign_if(dest, std::forward<T>(src), std::ranges::less {}))) {
-  return assign_if(dest, std::forward<T>(src), std::ranges::less {});
+template <typename T, typename U>
+  requires std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>
+[[nodiscard]] constexpr bool update_max(T& dest, U&& src) noexcept(noexcept(assign_if(dest, std::forward<U>(src), std::ranges::less {}))) {
+  return assign_if(dest, std::forward<U>(src), std::ranges::less {});
 }
 
-template <typename T>
-[[nodiscard]] bool update_min(T& dest, T&& src) noexcept(noexcept(assign_if(dest, std::forward<T>(src), std::ranges::greater {}))) {
-  return assign_if(dest, std::forward<T>(src), std::ranges::greater {});
+template <typename T, typename U>
+  requires std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>
+[[nodiscard]] constexpr bool update_min(T& dest, U&& src) noexcept(
+  noexcept(assign_if(dest, std::forward<U>(src), std::ranges::greater {}))
+) {
+  return assign_if(dest, std::forward<U>(src), std::ranges::greater {});
 }
 
 } // export namespace fmia

@@ -2,3 +2,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 export module test.fmia.util;
+
+export import test.fmia.util.extrema;
