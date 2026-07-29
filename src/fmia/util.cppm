@@ -5,5 +5,6 @@ export module fmia.util;
 
 export import fmia.util.coordinate_compression;
 export import fmia.util.enum_flag;
+export import fmia.util.extrema;
 export import fmia.util.search;
 export import fmia.util.sort;
