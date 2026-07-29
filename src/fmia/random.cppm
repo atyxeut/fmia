@@ -6,6 +6,7 @@ export module fmia.random;
 import std;
 
 import fmia.data_structure.graph.storage;
+import fmia.data_structure.string.character.ascii;
 
 export namespace fmia::random {
 
@@ -35,10 +36,8 @@ template <typename T, typename Engine = std::mt19937>
 
 namespace fmia::random {
 
-constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-
 template <bool AllowNegative>
-[[nodiscard]] auto generate_integer_impl(std::size_t length) -> std::string {
+[[nodiscard]] std::string rand_integer_impl(std::size_t length) {
   if (length == 0)
     throw std::invalid_argument("length must be positive");
 
@@ -49,9 +48,9 @@ template <bool AllowNegative>
     if (rand(0uz, 1uz))
       data += '-';
 
-  data += decimal_digit_character[rand(1uz, 9uz)];
+  data += radix_digits<10>[rand(1uz, 9uz)];
   for (auto dist = uniform_distribution(0uz, 9uz); length-- > 1;)
-    data += decimal_digit_character[dist(mt19937_engine)];
+    data += radix_digits<10>[dist(mt19937_engine)];
 
   return data;
 }
@@ -60,16 +59,16 @@ template <bool AllowNegative>
 
 export namespace fmia::random {
 
-[[nodiscard]] auto generate_positive_integer(std::size_t length) {
-  return generate_integer_impl<false>(length);
+[[nodiscard]] auto rand_positive_integer(std::size_t length) {
+  return rand_integer_impl<false>(length);
 }
 
-[[nodiscard]] auto generate_integer(std::size_t length) {
-  return generate_integer_impl<true>(length);
+[[nodiscard]] auto rand_integer(std::size_t length) {
+  return rand_integer_impl<true>(length);
 }
 
 template <std::integral T>
-[[nodiscard]] auto generate_permutation(T begin, T end) -> std::vector<T> {
+[[nodiscard]] std::vector<T> rand_permutation(T begin, T end) {
   if (begin > end)
     throw std::invalid_argument("invalid integer range");
 
@@ -79,9 +78,23 @@ template <std::integral T>
   return data;
 }
 
+template <typename T, typename Fn>
+[[nodiscard]] std::vector<T> rand_vector(std::size_t count, Fn&& fn) {
+  std::vector<T> res(count);
+  std::ranges::generate(res, std::forward<Fn>(fn));
+  std::ranges::shuffle(res, mt19937_engine);
+  return res;
+}
+
+template <typename T = int>
+  requires std::is_arithmetic_v<T>
+[[nodiscard]] auto rand_number_vector(std::size_t count, T begin = std::numeric_limits<T>::min(), T end = std::numeric_limits<T>::max()) {
+  return rand_vector<T>(count, [=] { return rand(begin, end); });
+}
+
 // get the edge list of a random unweighted tree
 // template <bool GenerateStar = false, std::integral Vertex>
-// [[nodiscard]] auto generate_unweighted_tree(Vertex vertex_begin, Vertex vertex_end) -> graph::basic_unweighted_edge_list<Vertex> {
+// [[nodiscard]] auto rand_unweighted_tree(Vertex vertex_begin, Vertex vertex_end) -> graph::basic_unweighted_edge_list<Vertex> {
 //   if (vertex_begin > vertex_end)
 //     throw std::invalid_argument("invalid vertex index range");
 
@@ -103,7 +116,7 @@ template <std::integral T>
 
 // get the edge list of a random weighted tree
 // template <bool GenerateStar = false, std::integral Vertex, std::integral Weight>
-// [[nodiscard]] auto generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
+// [[nodiscard]] auto rand_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
 //   -> graph::basic_weighted_edge_list<Vertex, Weight> {
 //   if (vertex_begin > vertex_end)
 //     throw std::invalid_argument("invalid vertex index range");
