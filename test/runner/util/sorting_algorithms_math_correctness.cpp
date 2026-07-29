@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: Unlicense
+
+import test.fmia.util.sort;
+
+int main() {
+  insertion_sort_math_correctness();
+  selection_sort_math_correctness();
+  bubble_sort_math_correctness();
+  heap_sort_math_correctness();
+  quick_sort_math_correctness();
+  merge_sort_math_correctness();
+}
