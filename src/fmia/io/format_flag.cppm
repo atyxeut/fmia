@@ -5,7 +5,7 @@ export module fmia.io.format_flag;
 
 import std;
 
-import fmia.util.enum_flag;
+import fmia.meta.enum_flag;
 
 export namespace fmia::io {
 
