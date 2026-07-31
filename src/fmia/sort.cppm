@@ -115,18 +115,11 @@ constexpr void heap_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
 
 } // export namespace fmia
 
-namespace fmia {
+export namespace fmia {
 
-// randomized method
-template <typename RandomAccessIter>
-constexpr RandomAccessIter quick_sort_pivot(RandomAccessIter first, RandomAccessIter last) {
-  std::ranges::iter_swap(first, first + random::rand<std::iter_difference_t<RandomAccessIter>>(0, last - first - 1));
-  return first;
-}
-
-// median of 3 method
-template <typename RandomAccessIter, typename Cmp>
-constexpr RandomAccessIter quick_sort_pivot(RandomAccessIter first, RandomAccessIter last, Cmp cmp) {
+template <std::random_access_iterator I, typename Cmp>
+  requires comparison_sortable<I, Cmp>
+[[nodiscard]] constexpr I median_of_3(I first, I last, Cmp cmp) {
   --last;
   const auto mid = first + (last - first) / 2;
 
@@ -137,34 +130,53 @@ constexpr RandomAccessIter quick_sort_pivot(RandomAccessIter first, RandomAccess
   if (cmp(*mid, *first))
     std::ranges::iter_swap(first, mid);
 
+  return mid;
+}
+
+} // export namespace fmia
+
+namespace fmia {
+
+struct quick_sort_hoare_partition_tag {};
+
+template <typename RandomAccessIter, typename Cmp>
+constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
+  RandomAccessIter first, RandomAccessIter last, Cmp cmp, quick_sort_hoare_partition_tag
+) {
+  auto pivot = median_of_3(first, last, cmp);
+  if (last - first < 4)
+    return {first, last};
+
   ++first;
-  std::ranges::iter_swap(first, mid);
-  return first;
+  --last;
+  std::ranges::iter_swap(first, pivot);
+  pivot = first;
+  for (;;) {
+    do
+      ++first;
+    while (cmp(*first, *pivot));
+    do
+      --last;
+    while (cmp(*pivot, *last));
+    if (first >= last)
+      break;
+    std::ranges::iter_swap(first, last);
+  }
+  return {first, first};
 }
 
-struct quick_sort_two_way_partition_tag {};
+struct quick_sort_bentley_mcilroy_partition_tag {};
 
-// Hoare method
 template <typename RandomAccessIter, typename Cmp>
 constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
-  RandomAccessIter first, RandomAccessIter last, Cmp cmp, quick_sort_two_way_partition_tag
+  RandomAccessIter first, RandomAccessIter last, Cmp cmp, quick_sort_bentley_mcilroy_partition_tag
 ) {
-  //
-}
-
-struct quick_sort_three_way_partition_tag {};
-
-// Bentley-Mcilroy method
-template <typename RandomAccessIter, typename Cmp>
-constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
-  RandomAccessIter first, RandomAccessIter last, Cmp cmp, quick_sort_three_way_partition_tag
-) {
-  //
+  return {};
 }
 
 template <typename PartitionPolicy, typename RandomAccessIter, typename Cmp>
 constexpr void quick_sort_impl(RandomAccessIter first, RandomAccessIter last, Cmp cmp) {
-  if (last - first <= 1)
+  if (last - first < 2)
     return;
 
   const auto mid = quick_sort_partition(first, last, cmp, PartitionPolicy {});
@@ -178,14 +190,14 @@ export namespace fmia {
 
 template <std::random_access_iterator I, typename Cmp = std::ranges::less>
   requires comparison_sortable<I, Cmp>
-constexpr void two_way_quick_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
-  quick_sort_impl<quick_sort_two_way_partition_tag>(first, last, cmp);
+constexpr void hoare_quick_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
+  quick_sort_impl<quick_sort_hoare_partition_tag>(first, last, cmp);
 }
 
 template <std::random_access_iterator I, typename Cmp = std::ranges::less>
   requires comparison_sortable<I, Cmp>
-constexpr void quick_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
-  quick_sort_impl<quick_sort_three_way_partition_tag>(first, last, cmp);
+constexpr void bentley_mcilroy_quick_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
+  quick_sort_impl<quick_sort_bentley_mcilroy_partition_tag>(first, last, cmp);
 }
 
 } // export namespace fmia
@@ -207,7 +219,7 @@ constexpr void merge_sort_normal_merge_impl(
 template <merge_sort_merge_policy Policy, std::random_access_iterator I, typename Cmp>
 constexpr void merge_sort_impl_recursive(I first, I last, Cmp cmp) {
   const auto size = std::ranges::distance(first, last);
-  if (size <= 1)
+  if (size < 2)
     return;
 
   const auto mid = first + size / 2;

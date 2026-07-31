@@ -8,6 +8,6 @@ int main() {
   selection_sort_math_correctness();
   bubble_sort_math_correctness();
   heap_sort_math_correctness();
-  quick_sort_math_correctness();
+  hoare_quick_sort_math_correctness();
   merge_sort_math_correctness();
 }

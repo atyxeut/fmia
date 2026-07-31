@@ -6,3 +6,9 @@ target("fmia.benchmark")
   add_deps("fmia");
   add_files("fmia/**.cppm", { public = true })
 target_end()
+
+target("hoare_quick_sort_variations.benchmark")
+  set_kind("binary")
+  add_deps("fmia.benchmark")
+  add_files("runner/sort/hoare_quick_sort_variations.cpp")
+target_end()
