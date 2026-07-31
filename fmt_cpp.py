@@ -21,7 +21,7 @@ def fmt_cpp(path: Path):
       fmt_cpp(item)
   elif path.suffix == ".hpp" or path.suffix == ".cpp" or path.suffix == ".cppm":
     print(f"formatting {path}")
-    subprocess.run(["clang-format", "-style=file:.clang-format", "-i", path])
+    subprocess.run(["clang-format", "-style=file:.clang-format", "-i", path], check=False)
 
 
 def main():
