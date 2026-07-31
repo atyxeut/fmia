@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import test.fmia.util.sort;
+import test.fmia.sort;
 
 int main() {
   insertion_sort_math_correctness();

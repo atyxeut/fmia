@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-export module test.fmia.util.sort;
+export module test.fmia.sort;
 
 import std;
 
 import fmia.random;
-import fmia.util.sort;
+import fmia.sort;
 
 using namespace fmia;
 

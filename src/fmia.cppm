@@ -13,5 +13,6 @@ export import fmia.meta;
 export import fmia.misc;
 export import fmia.random;
 export import fmia.simd;
+export import fmia.sort;
 export import fmia.system;
 export import fmia.util;

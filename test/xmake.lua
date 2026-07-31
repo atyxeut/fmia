@@ -82,7 +82,7 @@ target_end()
 target("sorting_algorithms_math_correctness.test")
   set_kind("binary")
   add_deps("fmia.test")
-  add_files("runner/util/sorting_algorithms_math_correctness.cpp")
+  add_files("runner/sort/sorting_algorithms_math_correctness.cpp")
 target_end()
 
 target("update_extrema_functionality.test")
