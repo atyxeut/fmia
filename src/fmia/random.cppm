@@ -6,7 +6,7 @@ export module fmia.random;
 import std;
 
 import fmia.data_structure.graph.storage;
-import fmia.data_structure.string.character.ascii;
+import fmia.data_structure.string.character;
 
 export namespace fmia::random {
 

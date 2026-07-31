@@ -10,7 +10,7 @@ export module fmia.math.integer.arbitrary_precision;
 import std;
 
 import fmia.contract;
-import fmia.data_structure.string.character.ascii;
+import fmia.data_structure.string.character;
 import fmia.math.integer.fixed_precision;
 
 export namespace fmia::meta {
