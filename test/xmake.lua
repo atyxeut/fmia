@@ -79,10 +79,10 @@ target("print_first_10000_humble_numbers.test")
   add_files("runner/math/print_first_10000_humble_numbers.cpp")
 target_end()
 
-target("sorting_algorithms_math_correctness.test")
+target("comparison_sorting_algorithms_correctness.test")
   set_kind("binary")
   add_deps("fmia.test")
-  add_files("runner/sort/sorting_algorithms_math_correctness.cpp")
+  add_files("runner/sort/comparison_sorting_algorithms_correctness.cpp")
 target_end()
 
 target("update_extrema_functionality.test")
