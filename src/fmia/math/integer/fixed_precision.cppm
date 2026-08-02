@@ -13,7 +13,7 @@ export module fmia.math.integer.fixed_precision;
 import std;
 
 import fmia.data_structure.string.character;
-import fmia.meta.cv_qualifier;
+import fmia.meta.cvref;
 import fmia.meta.type_list;
 
 // clang-format off

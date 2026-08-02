@@ -13,7 +13,7 @@ import fmia.math.integer.fixed_precision;
 import fmia.math.integer.arbitrary_precision;
 import fmia.math.floating_point.ieee754;
 import fmia.math.floating_point.arbitrary_precision;
-import fmia.meta.cv_qualifier;
+import fmia.meta.cvref;
 
 export namespace fmia::meta {
 

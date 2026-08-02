@@ -4,7 +4,7 @@
 export module fmia.meta;
 
 export import fmia.meta.arithmetic;
-export import fmia.meta.cv_qualifier;
+export import fmia.meta.cvref;
 export import fmia.meta.enum_flag;
 export import fmia.meta.integer_sequence;
 export import fmia.meta.not_same;

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-export module fmia.meta.cv_qualifier;
+export module fmia.meta.cvref;
 
 import std;
 
