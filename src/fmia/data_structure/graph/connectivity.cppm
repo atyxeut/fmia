@@ -23,7 +23,7 @@ template <graph T, typename V = T::vertex_type>
     for (const auto v : g.neighbors(u)) {
       if (scc_id[v] != 0)
         continue;
-      if (dfn[v] != 0) {
+      if (dfn[v] == 0) {
         self(v);
         low[u] = std::min(low[u], low[v]);
       } else {
