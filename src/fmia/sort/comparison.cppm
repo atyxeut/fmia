@@ -152,12 +152,12 @@ constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
   std::ranges::iter_swap(first, pivot);
   pivot = first;
   for (;;) {
-    do
+    do {
       ++first;
-    while (cmp(*first, *pivot));
-    do
+    } while (cmp(*first, *pivot));
+    do {
       --last;
-    while (cmp(*pivot, *last));
+    } while (cmp(*pivot, *last));
     if (first >= last)
       break;
     std::ranges::iter_swap(first, last);

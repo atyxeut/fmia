@@ -28,12 +28,12 @@ void hoare_quick_sort_modified(I first, I last, Cmp cmp = std::ranges::less {}) 
   std::ranges::iter_swap(i, pivot);
   pivot = i;
   for (auto j = last - 1;;) {
-    do
+    do {
       ++i;
-    while (i < j && cmp(*i, *pivot));
-    do
+    } while (i < j && cmp(*i, *pivot));
+    do {
       --j;
-    while (i < j && cmp(*pivot, *j));
+    } while (i < j && cmp(*pivot, *j));
     if (i >= j)
       break;
     std::ranges::iter_swap(i, j);
