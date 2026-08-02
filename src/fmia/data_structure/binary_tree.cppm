@@ -4,5 +4,5 @@
 export module fmia.data_structure.binary_tree;
 
 export import fmia.data_structure.binary_tree.avl_tree;
-export import fmia.data_structure.binary_tree.binary_search_tree;
 export import fmia.data_structure.binary_tree.red_black_tree;
+export import fmia.data_structure.binary_tree.scapegoat_tree;
