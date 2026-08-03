@@ -19,6 +19,12 @@ target("1d_sparse_table_correctness.test")
   add_files("runner/data_structure/1d_sparse_table_correctness.cpp")
 target_end()
 
+target("kmp_search_correctness.test")
+  set_kind("binary")
+  add_deps("fmia.test")
+  add_files("runner/data_structure/kmp_search_correctness.cpp")
+target_end()
+
 target("make_mdvector_correctness.test")
   set_kind("binary")
   add_deps("fmia.test")

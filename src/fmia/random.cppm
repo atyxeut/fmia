@@ -37,7 +37,7 @@ template <typename T, typename Engine = std::mt19937>
 namespace fmia::random {
 
 template <bool AllowNegative>
-[[nodiscard]] std::string rand_integer_impl(std::size_t length) {
+[[nodiscard]] std::string rand_big_integer_impl(std::size_t length) {
   if (length == 0)
     throw std::invalid_argument("length must be positive");
 
@@ -59,12 +59,12 @@ template <bool AllowNegative>
 
 export namespace fmia::random {
 
-[[nodiscard]] auto rand_positive_integer(std::size_t length) {
-  return rand_integer_impl<false>(length);
+[[nodiscard]] auto rand_positive_big_integer(std::size_t length) {
+  return rand_big_integer_impl<false>(length);
 }
 
-[[nodiscard]] auto rand_integer(std::size_t length) {
-  return rand_integer_impl<true>(length);
+[[nodiscard]] auto rand_big_integer(std::size_t length) {
+  return rand_big_integer_impl<true>(length);
 }
 
 template <std::integral T>
@@ -76,6 +76,14 @@ template <std::integral T>
   std::iota(data.begin(), data.end(), begin);
   std::ranges::shuffle(data, mt19937_engine);
   return data;
+}
+
+[[nodiscard]] std::string rand_ascii_string(std::size_t count) {
+  std::string res;
+  res.reserve(count);
+  while (count--)
+    res.push_back(rand<char>(32, 126)); // 32: ' ', 126: '~'
+  return res;
 }
 
 template <typename T, typename Fn>

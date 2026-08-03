@@ -58,7 +58,7 @@ void compare_hoare_quick_sort_variations() {
 
   auto int_arr_0 = random::rand_number_vector(array_size);
   auto int_arr_1 = int_arr_0;
-  auto string_arr_of_len_1000_0 = random::rand_vector<std::string>(array_size / 10, [] { return random::rand_positive_integer(1000); });
+  auto string_arr_of_len_1000_0 = random::rand_vector<std::string>(array_size / 10, [] { return random::rand_positive_big_integer(1000); });
   auto string_arr_of_len_1000_1 = string_arr_of_len_1000_0;
 
   constexpr const char* test_type[] {"random", "sorted", "duplicate"};
