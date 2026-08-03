@@ -2,4 +2,5 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 export module fmia.math.sequence;
+
 export import fmia.math.sequence.smooth_number;

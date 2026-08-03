@@ -34,7 +34,7 @@ template <typename EdgeList, typename Vertex, typename Weight = EdgeList::weight
   std::vector<Weight> distance(vertex_count, Weight::infinity);
   distance[source] = 0;
 
-  bool relaxation_happened;
+  bool relaxation_happened [[indeterminate]];
   do {
     // works as a round counter
     if (vertex_count-- == 0)

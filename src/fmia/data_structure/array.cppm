@@ -4,3 +4,4 @@
 export module fmia.data_structure.array;
 
 export import fmia.data_structure.array.multidimensional_std_array;
+export import fmia.data_structure.array.multidimensional_std_vector;
