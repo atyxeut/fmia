@@ -9,7 +9,7 @@ import fmia.meta.integer_sequence;
 
 using namespace fmia::meta;
 
-consteval void do_custom_integer_sequence_helpers_work() noexcept {
+consteval void check_custom_integer_sequence_helpers() {
   static_assert(std::same_as<make_reversed_integer_sequence<int, 8>, std::integer_sequence<int, 7, 6, 5, 4, 3, 2, 1, 0>>);
   static_assert(std::same_as<make_reversed_index_sequence<8>, std::index_sequence<7, 6, 5, 4, 3, 2, 1, 0>>);
   static_assert(std::same_as<reversed_index_sequence_for<int, int, int, int, int>, std::index_sequence<4, 3, 2, 1, 0>>);
@@ -25,7 +25,7 @@ consteval void do_custom_integer_sequence_helpers_work() noexcept {
   static_assert(std::same_as<shift_index_sequence_t<50, std::index_sequence<1, 2, 3, 4>>, std::index_sequence<51, 52, 53, 54>>);
 }
 
-consteval void does_is_no_duplication_integer_sequence_work() noexcept {
+consteval void check_is_no_duplication_integer_sequence() {
   static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int>> == true);
   static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1>> == true);
   static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2>> == true);

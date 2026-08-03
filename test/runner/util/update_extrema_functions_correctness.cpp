@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import test.fmia.data_structure.tuple;
+import test.fmia.util;
 
 int main() {
-  std_pair_output_with_custom_print_and_std_ostream();
+  check_update_max();
+  check_update_min();
 }

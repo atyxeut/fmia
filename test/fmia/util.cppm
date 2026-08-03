@@ -11,7 +11,7 @@ using namespace fmia;
 
 export {
 
-void update_max_functionality() {
+void check_update_max() {
   int a = 10, b = 20;
 
   const bool res_0 = update_max(a, b);
@@ -34,7 +34,7 @@ void update_max_functionality() {
   contract_assert(res_5 == true);
 }
 
-void update_min_functionality() {
+void check_update_min() {
   int a = 10, b = 5;
 
   const bool res_0 = update_min(a, b);

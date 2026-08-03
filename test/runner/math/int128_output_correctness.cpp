@@ -1,9 +1,8 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import test.fmia.util;
+import test.fmia.math.integer.fixed_precision;
 
 int main() {
-  update_max_functionality();
-  update_min_functionality();
+  check_int128_output_with_std_ostream_and_std_print();
 }

@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import test.fmia.math.integer.fixed_precision;
+import test.fmia.data_structure.array.multidimensional_std_vector;
 
 int main() {
-  int128_input_with_std_istream();
+  check_make_vector();
 }

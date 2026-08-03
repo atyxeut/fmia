@@ -9,7 +9,7 @@ import fmia.data_structure.array.multidimensional_std_array;
 
 using namespace fmia;
 
-consteval void fmia_array_should_be_nested_std_array() noexcept {
+consteval void is_fmia_array_nested_std_array() {
   using T1 = std::array<double, 10>;
   using T1_ = array<double, 10>;
   static_assert(std::same_as<T1, T1_>);

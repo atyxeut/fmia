@@ -4,10 +4,10 @@
 import test.fmia.sort.comparison;
 
 int main() {
-  check_insertion_sort_correctness();
-  check_selection_sort_correctness();
-  check_bubble_sort_correctness();
-  check_heap_sort_correctness();
-  check_hoare_quick_sort_correctness();
-  check_merge_sort_correctness();
+  check_insertion_sort();
+  check_selection_sort();
+  check_bubble_sort();
+  check_heap_sort();
+  check_hoare_quick_sort();
+  check_merge_sort();
 }

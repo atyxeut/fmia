@@ -70,7 +70,7 @@ naive_sparse_table(const std::vector<int>&, const F&) -> naive_sparse_table<F>;
 
 export {
 
-void idempotent_query_on_sparse_table() {
+void check_idempotent_query() {
   auto a = make_array();
   auto f = idempotent_operator_wrapper(std::greater<int> {});
 
@@ -87,7 +87,7 @@ void idempotent_query_on_sparse_table() {
   std::println(std::cerr, "idempotent query OK");
 }
 
-void non_idempotent_query_on_sparse_table() {
+void check_non_idempotent_query() {
   constexpr int mod = 100019;
 
   auto a = make_array();

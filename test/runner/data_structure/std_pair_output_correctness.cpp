@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import test.fmia.data_structure.array.multidimensional_std_vector;
+import test.fmia.data_structure.tuple;
 
 int main() {
-  does_make_vector_work();
+  check_std_pair_output_with_custom_print_and_std_ostream();
 }
