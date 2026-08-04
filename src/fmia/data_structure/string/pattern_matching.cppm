@@ -7,7 +7,7 @@ import std;
 
 export namespace fmia {
 
-[[nodiscard]] constexpr std::vector<std::size_t> kmp_next_array(std::string_view pattern) noexcept {
+[[nodiscard]] constexpr std::vector<std::size_t> kmp_search_next_array(std::string_view pattern) noexcept {
   std::vector<std::size_t> res(pattern.size());
   for (auto i = 1uz, len = 0uz; i < pattern.size();) {
     if (pattern[i] == pattern[len])
