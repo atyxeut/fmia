@@ -7,3 +7,4 @@ export import fmia.data_structure.binary_tree.avl_tree;
 export import fmia.data_structure.binary_tree.cartesian_tree;
 export import fmia.data_structure.binary_tree.red_black_tree;
 export import fmia.data_structure.binary_tree.scapegoat_tree;
+export import fmia.data_structure.binary_tree.treap;
