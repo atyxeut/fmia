@@ -5,4 +5,4 @@ export module fmia.io;
 
 export import fmia.io.buffered_io;
 export import fmia.io.format_flag;
-export import fmia.io.ranges_output;
+export import fmia.io.range_output;

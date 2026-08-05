@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-export module test.fmia.io.ranges_output;
+export module test.fmia.io.range_output;
 
 import std;
 
 import fmia.data_structure.array.multidimensional_std_array;
 import fmia.data_structure.array.multidimensional_std_vector;
-import fmia.io.ranges_output;
+import fmia.io.range_output;
 
 using namespace fmia;
 

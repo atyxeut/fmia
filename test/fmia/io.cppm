@@ -3,4 +3,4 @@
 
 export module test.fmia.io;
 
-export import test.fmia.io.ranges_output;
+export import test.fmia.io.range_output;
