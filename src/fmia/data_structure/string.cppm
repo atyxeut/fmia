@@ -4,6 +4,6 @@
 export module fmia.data_structure.string;
 
 export import fmia.data_structure.string.character;
-export import fmia.data_structure.string.pattern_matching;
+export import fmia.data_structure.string.kmp;
 export import fmia.data_structure.string.suffix_array;
 export import fmia.data_structure.string.trie;

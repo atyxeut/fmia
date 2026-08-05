@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-export module test.fmia.data_structure.string.pattern_matching;
+export module test.fmia.data_structure.string.kmp;
 
 import std;
 
 import fmia.random;
-import fmia.data_structure.string.pattern_matching;
+import fmia.data_structure.string.kmp;
 
 using namespace fmia;
 

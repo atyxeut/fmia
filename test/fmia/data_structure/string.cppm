@@ -3,4 +3,5 @@
 
 export module test.fmia.data_structure.string;
 
+export import test.fmia.data_structure.string.kmp;
 export import test.fmia.data_structure.string.trie;
