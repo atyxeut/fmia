@@ -137,6 +137,8 @@ template <typename RandomAccessIter, typename Cmp>
   return first;
 }
 
+struct quick_sort_lomuto_partition_tag {};
+
 enum class quick_sort_hoare_partition_bound_check { off, on };
 
 template <quick_sort_hoare_partition_bound_check>
@@ -171,6 +173,15 @@ template <typename RandomAccessIter, typename Cmp, quick_sort_hoare_partition_bo
       return {first, first};
     std::ranges::iter_swap(first, last);
   }
+}
+
+struct quick_sort_dijkstra_partition_tag {};
+
+template <typename RandomAccessIter, typename Cmp>
+constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
+  RandomAccessIter first, RandomAccessIter last, Cmp cmp, quick_sort_dijkstra_partition_tag
+) {
+  return {};
 }
 
 struct quick_sort_bentley_mcilroy_partition_tag {};
