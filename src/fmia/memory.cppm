@@ -4,4 +4,5 @@
 export module fmia.memory;
 
 export import fmia.memory.allocator;
+export import fmia.memory.iterator;
 export import fmia.memory.storage_base;
