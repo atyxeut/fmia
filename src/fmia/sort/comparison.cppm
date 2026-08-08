@@ -115,11 +115,13 @@ constexpr void heap_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
 
 } // export namespace fmia
 
-export namespace fmia {
+namespace fmia {
 
-template <std::random_access_iterator I, typename Cmp>
-  requires comparison_sortable<I, Cmp>
-[[nodiscard]] constexpr I median_of_3(I first, I last, Cmp cmp) {
+template <typename RandomAccessIter, typename Cmp>
+[[nodiscard]] constexpr RandomAccessIter median_of_3(RandomAccessIter first, RandomAccessIter last, Cmp cmp) noexcept(
+  noexcept(++first) && noexcept(--first) && noexcept(first + (first - first) / 2) && noexcept(cmp(*first, *first))
+  && noexcept(std::ranges::iter_swap(first, first))
+) pre(last - first > 2) {
   --last;
   const auto mid = first + (last - first) / 2;
 
@@ -130,39 +132,45 @@ template <std::random_access_iterator I, typename Cmp>
   if (cmp(*mid, *first))
     std::ranges::iter_swap(first, mid);
 
-  return mid;
+  ++first;
+  std::ranges::iter_swap(first, mid);
+  return first;
 }
 
-} // export namespace fmia
+enum class quick_sort_hoare_partition_bound_check { off, on };
 
-namespace fmia {
-
+template <quick_sort_hoare_partition_bound_check>
 struct quick_sort_hoare_partition_tag {};
 
-template <typename RandomAccessIter, typename Cmp>
-constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
-  RandomAccessIter first, RandomAccessIter last, Cmp cmp, quick_sort_hoare_partition_tag
-) {
-  auto pivot = median_of_3(first, last, cmp);
-  if (last - first < 4)
+template <typename RandomAccessIter, typename Cmp, quick_sort_hoare_partition_bound_check BoundCheckFlag>
+[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
+  RandomAccessIter first, RandomAccessIter last, Cmp cmp, quick_sort_hoare_partition_tag<BoundCheckFlag>
+) noexcept(noexcept(median_of_3(first, first, cmp))) {
+  const auto size = last - first;
+  if (size == 2) {
+    if (const auto tail = first + 1; cmp(*tail, *first))
+      std::ranges::iter_swap(first, tail);
+    return {first, last};
+  }
+
+  const auto& pivot = *median_of_3(first, last, cmp);
+  if (size == 3)
     return {first, last};
 
+  constexpr bool bound_check_off = BoundCheckFlag == quick_sort_hoare_partition_bound_check::off;
   ++first;
   --last;
-  std::ranges::iter_swap(first, pivot);
-  pivot = first;
   for (;;) {
     do {
       ++first;
-    } while (cmp(*first, *pivot));
+    } while ((bound_check_off || first < last) && cmp(*first, pivot));
     do {
       --last;
-    } while (cmp(*pivot, *last));
+    } while ((bound_check_off || first < last) && cmp(pivot, *last));
     if (first >= last)
-      break;
+      return {first, first};
     std::ranges::iter_swap(first, last);
   }
-  return {first, first};
 }
 
 struct quick_sort_bentley_mcilroy_partition_tag {};
@@ -175,13 +183,13 @@ constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
 }
 
 template <typename PartitionPolicy, typename RandomAccessIter, typename Cmp>
-constexpr void quick_sort_impl(RandomAccessIter first, RandomAccessIter last, Cmp cmp) {
+constexpr void recursive_quick_sort_impl(RandomAccessIter first, RandomAccessIter last, Cmp cmp) {
   if (last - first < 2)
     return;
 
   const auto mid = quick_sort_partition(first, last, cmp, PartitionPolicy {});
-  quick_sort_impl<PartitionPolicy>(first, mid[0], cmp);
-  quick_sort_impl<PartitionPolicy>(mid[1], last, cmp);
+  recursive_quick_sort_impl<PartitionPolicy>(first, mid[0], cmp);
+  recursive_quick_sort_impl<PartitionPolicy>(mid[1], last, cmp);
 }
 
 } // namespace fmia
@@ -190,14 +198,20 @@ export namespace fmia {
 
 template <std::random_access_iterator I, typename Cmp = std::ranges::less>
   requires comparison_sortable<I, Cmp>
-constexpr void hoare_quick_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
-  quick_sort_impl<quick_sort_hoare_partition_tag>(first, last, cmp);
+constexpr void recursive_hoare_quick_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
+  recursive_quick_sort_impl<quick_sort_hoare_partition_tag<quick_sort_hoare_partition_bound_check::off>>(first, last, cmp);
 }
 
 template <std::random_access_iterator I, typename Cmp = std::ranges::less>
   requires comparison_sortable<I, Cmp>
-constexpr void bentley_mcilroy_quick_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
-  quick_sort_impl<quick_sort_bentley_mcilroy_partition_tag>(first, last, cmp);
+constexpr void recursive_hoare_quick_sort_less_comparison(I first, I last, Cmp cmp = std::ranges::less {}) {
+  recursive_quick_sort_impl<quick_sort_hoare_partition_tag<quick_sort_hoare_partition_bound_check::on>>(first, last, cmp);
+}
+
+template <std::random_access_iterator I, typename Cmp = std::ranges::less>
+  requires comparison_sortable<I, Cmp>
+constexpr void recursive_bentley_mcilroy_quick_sort(I first, I last, Cmp cmp = std::ranges::less {}) {
+  recursive_quick_sort_impl<quick_sort_bentley_mcilroy_partition_tag>(first, last, cmp);
 }
 
 } // export namespace fmia

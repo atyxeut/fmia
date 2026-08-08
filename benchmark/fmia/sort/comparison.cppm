@@ -10,77 +10,43 @@ import fmia.io.format_flag;
 import fmia.random;
 import fmia.sort;
 
-using namespace fmia;
-
-constexpr std::size_t array_size = 2e6;
-
-template <std::random_access_iterator I, typename Cmp = std::ranges::less>
-  requires comparison_sortable<I, Cmp>
-void hoare_quick_sort_modified(I first, I last, Cmp cmp = std::ranges::less {}) {
-  if (last - first < 2)
-    return;
-
-  auto pivot = median_of_3(first, last, cmp);
-  if (last - first < 4)
-    return;
-
-  auto i = first + 1;
-  std::ranges::iter_swap(i, pivot);
-  pivot = i;
-  for (auto j = last - 1;;) {
-    do {
-      ++i;
-    } while (i < j && cmp(*i, *pivot));
-    do {
-      --j;
-    } while (i < j && cmp(*pivot, *j));
-    if (i >= j)
-      break;
-    std::ranges::iter_swap(i, j);
-  }
-
-  hoare_quick_sort_modified(first, i, cmp);
-  hoare_quick_sort_modified(i, last, cmp);
-}
+constexpr std::size_t large_array_size = 2e6;
+constexpr std::size_t small_array_size = 2e5;
 
 export {
 
-void check_modified_version_correctness() {
-  auto arr = random::rand_number_vector(array_size);
-  hoare_quick_sort_modified(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
-}
-
 void compare_hoare_quick_sort_variations() {
-  check_modified_version_correctness();
+  const auto cmp = std::ranges::less {};
 
-  stopwatch timer;
+  fmia::stopwatch timer;
 
-  auto int_arr_0 = random::rand_number_vector(array_size);
+  auto int_arr_0 = fmia::random::rand_number_vector(large_array_size);
   auto int_arr_1 = int_arr_0;
-  auto string_arr_of_len_1000_0 = random::rand_vector<std::string>(array_size / 10, [] { return random::rand_positive_big_integer(1000); });
+  auto string_arr_of_len_1000_0 = fmia::random::rand_vector<std::string>(small_array_size, [] {
+    return fmia::random::rand_positive_big_integer(1000);
+  });
   auto string_arr_of_len_1000_1 = string_arr_of_len_1000_0;
 
   constexpr const char* test_type[] {"random", "sorted", "duplicate"};
   constexpr const char* data_type[] {"int array", "string array"};
-  constexpr const char* algorithm_type[] {"standard", "modified"};
+  constexpr const char* algorithm_type[] {"standard", "less comparison"};
   constexpr std::size_t n[] {std::ranges::size(data_type), std::ranges::size(algorithm_type)};
 
   const auto run = [&](std::size_t i) {
     timer.lap();
-    hoare_quick_sort(int_arr_0.begin(), int_arr_0.end());
+    fmia::recursive_hoare_quick_sort(int_arr_0.begin(), int_arr_0.end(), cmp);
     timer.lap();
-    hoare_quick_sort_modified(int_arr_1.begin(), int_arr_1.end());
+    fmia::recursive_hoare_quick_sort_less_comparison(int_arr_1.begin(), int_arr_1.end(), cmp);
     timer.lap();
-    hoare_quick_sort(string_arr_of_len_1000_0.begin(), string_arr_of_len_1000_0.end());
+    fmia::recursive_hoare_quick_sort(string_arr_of_len_1000_0.begin(), string_arr_of_len_1000_0.end(), cmp);
     timer.lap();
-    hoare_quick_sort_modified(string_arr_of_len_1000_1.begin(), string_arr_of_len_1000_1.end());
+    fmia::recursive_hoare_quick_sort_less_comparison(string_arr_of_len_1000_1.begin(), string_arr_of_len_1000_1.end(), cmp);
     timer.lap();
 
     for (auto j = 0uz; j < n[0]; ++j) {
       for (auto k = 0uz; k < n[1]; ++k) {
         std::print("{} version on {} {}: ", algorithm_type[k], test_type[i], data_type[j]);
-        timer.print_lap(timer.lap_count() - 4 + (j * n[1] + k + 1), io::fmt::endl);
+        timer.print_lap(timer.lap_count() - 4 + (j * n[1] + k + 1), fmia::io::fmt::endl);
       }
     }
     std::println();

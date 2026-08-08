@@ -8,68 +8,62 @@ import std;
 import fmia.random;
 import fmia.sort;
 
-using namespace fmia;
+template <std::meta::info fn>
+void check(std::size_t array_size) {
+  const auto comp = std::ranges::less {};
 
-constexpr std::size_t array_size_small = 1e3;
-constexpr std::size_t array_size_large = 5e5;
+  auto data = fmia::random::rand_number_vector(array_size);
+  [:fn:](data.begin(), data.end(), comp);
+  contract_assert(std::ranges::is_sorted(data));
+  contract_assert(!comp(data.back(), data.front()));
+
+  auto& sorted_data = data;
+  [:fn:](sorted_data.begin(), sorted_data.end(), comp);
+  contract_assert(std::ranges::is_sorted(data));
+  contract_assert(!comp(data.back(), data.front()));
+
+  auto& identical_data = data;
+  std::ranges::fill(data, fmia::random::rand(std::numeric_limits<int>::min(), std::numeric_limits<int>::max()));
+  [:fn:](identical_data.begin(), identical_data.end(), comp);
+  contract_assert(std::ranges::is_sorted(data));
+  contract_assert(!comp(data.back(), data.front()));
+}
+
+constexpr std::size_t small_array_size = 1e3;
+constexpr std::size_t large_array_size = 5e5;
 
 export {
 
 void check_insertion_sort() {
-  auto arr = random::rand_number_vector(array_size_small);
+  check<^^fmia::insertion_sort>(small_array_size);
+}
 
-  insertion_sort(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
-
-  std::ranges::shuffle(arr, random::mt19937_engine);
-
-  binary_insertion_sort(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
+void check_binary_insertion_sort() {
+  check<^^fmia::binary_insertion_sort>(small_array_size);
 }
 
 void check_selection_sort() {
-  auto arr = random::rand_number_vector(array_size_small);
-
-  selection_sort(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
+  check<^^fmia::selection_sort>(small_array_size);
 }
 
 void check_bubble_sort() {
-  auto arr = random::rand_number_vector(array_size_small);
-
-  bubble_sort(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
+  check<^^fmia::bubble_sort>(small_array_size);
 }
 
 void check_heap_sort() {
-  auto arr = random::rand_number_vector(array_size_large);
-
-  heap_sort(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
+  check<^^fmia::heap_sort>(large_array_size);
 }
 
-void check_hoare_quick_sort() {
-  auto arr = random::rand_number_vector(array_size_large);
-  hoare_quick_sort(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
+void check_recursive_hoare_quick_sort() {
+  check<^^fmia::recursive_hoare_quick_sort>(large_array_size);
 }
 
-void check_bentley_mcilroy_quick_sort() {
-  auto arr = random::rand_number_vector(array_size_large);
-  bentley_mcilroy_quick_sort(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
+void check_recursive_hoare_quick_sort_less_comparison() {
+  check<^^fmia::recursive_hoare_quick_sort_less_comparison>(large_array_size);
 }
 
 void check_merge_sort() {
-  auto arr = random::rand_number_vector(array_size_large);
-
-  merge_sort(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
-
-  std::ranges::shuffle(arr, random::mt19937_engine);
-
-  inplace_merge_sort(arr.begin(), arr.end());
-  contract_assert(std::ranges::is_sorted(arr) && arr.front() <= arr.back());
+  check<^^fmia::merge_sort>(large_array_size);
 }
 
 } // export

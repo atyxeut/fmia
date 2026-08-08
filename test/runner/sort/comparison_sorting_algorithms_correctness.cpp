@@ -5,9 +5,11 @@ import test.fmia.sort.comparison;
 
 int main() {
   check_insertion_sort();
+  check_binary_insertion_sort();
   check_selection_sort();
   check_bubble_sort();
   check_heap_sort();
-  check_hoare_quick_sort();
+  check_recursive_hoare_quick_sort();
+  check_recursive_hoare_quick_sort_less_comparison();
   check_merge_sort();
 }
