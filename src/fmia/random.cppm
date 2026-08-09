@@ -94,7 +94,7 @@ template <typename T, typename Fn>
   return res;
 }
 
-template <typename T = int>
+template <typename T>
   requires std::is_arithmetic_v<T>
 [[nodiscard]] auto rand_number_vector(std::size_t count, T begin = std::numeric_limits<T>::min(), T end = std::numeric_limits<T>::max()) {
   return rand_vector<T>(count, [=] { return rand(begin, end); });

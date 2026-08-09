@@ -20,7 +20,7 @@ void compare_hoare_quick_sort_variations() {
 
   fmia::stopwatch timer;
 
-  auto int_arr_0 = fmia::random::rand_number_vector(large_array_size);
+  auto int_arr_0 = fmia::random::rand_number_vector<int>(large_array_size);
   auto int_arr_1 = int_arr_0;
   auto string_arr_of_len_1000_0 = fmia::random::rand_vector<std::string>(small_array_size, [] {
     return fmia::random::rand_positive_big_integer(1000);

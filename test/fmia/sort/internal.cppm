@@ -12,7 +12,7 @@ template <std::meta::info Sort>
 void check(std::size_t array_size) {
   const auto comp = std::ranges::less {};
 
-  auto data = fmia::random::rand_number_vector(array_size);
+  auto data = fmia::random::rand_number_vector<int>(array_size);
   [:Sort:](data.begin(), data.end(), comp);
   contract_assert(std::ranges::is_sorted(data));
   contract_assert(!comp(data.back(), data.front()));
