@@ -7,10 +7,10 @@ target("fmia.test")
   add_files("fmia/**.cppm", { public = true })
 target_end()
 
-target("temp.test")
+target("tmp.test")
   set_kind("binary")
   add_deps("fmia.test")
-  add_files("runner/temp.cpp")
+  add_files("runner/tmp.cpp")
 target_end()
 
 target("1d_sparse_table_correctness.test")
