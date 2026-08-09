@@ -205,10 +205,10 @@ FMIA_WCONVERSION_PUSH()
 [[nodiscard]] constexpr floor_div_result<std::vector<int>> floor_div(const std::vector<int>& a, const std::vector<int>& b) pre(
   !is_zero(b)
 ) {
-  const int cmp_result = compare<int>(a, b);
-  if (cmp_result < 0)
+  const int comp_result = compare<int>(a, b);
+  if (comp_result < 0)
     return {{0}, a};
-  if (cmp_result == 0)
+  if (comp_result == 0)
     return {{1}, {0}};
 
   std::vector<int> q(a.size() - b.size() + 1), r(a);

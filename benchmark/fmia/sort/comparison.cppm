@@ -16,7 +16,7 @@ constexpr std::size_t small_array_size = 2e5;
 export {
 
 void compare_hoare_quick_sort_variations() {
-  const auto cmp = std::ranges::less {};
+  const auto comp = std::ranges::less {};
 
   fmia::stopwatch timer;
 
@@ -34,13 +34,13 @@ void compare_hoare_quick_sort_variations() {
 
   const auto run = [&](std::size_t i) {
     timer.lap();
-    fmia::recursive_hoare_quick_sort(int_arr_0.begin(), int_arr_0.end(), cmp);
+    fmia::recursive_hoare_quick_sort(int_arr_0.begin(), int_arr_0.end(), comp);
     timer.lap();
-    fmia::recursive_hoare_quick_sort_less_comparison(int_arr_1.begin(), int_arr_1.end(), cmp);
+    fmia::recursive_hoare_quick_sort_less_comparison(int_arr_1.begin(), int_arr_1.end(), comp);
     timer.lap();
-    fmia::recursive_hoare_quick_sort(string_arr_of_len_1000_0.begin(), string_arr_of_len_1000_0.end(), cmp);
+    fmia::recursive_hoare_quick_sort(string_arr_of_len_1000_0.begin(), string_arr_of_len_1000_0.end(), comp);
     timer.lap();
-    fmia::recursive_hoare_quick_sort_less_comparison(string_arr_of_len_1000_1.begin(), string_arr_of_len_1000_1.end(), cmp);
+    fmia::recursive_hoare_quick_sort_less_comparison(string_arr_of_len_1000_1.begin(), string_arr_of_len_1000_1.end(), comp);
     timer.lap();
 
     for (auto j = 0uz; j < n[0]; ++j) {

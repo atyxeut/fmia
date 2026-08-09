@@ -7,12 +7,12 @@ import std;
 
 export namespace fmia {
 
-template <typename T, typename U, std::regular_invocable<T&, U&&> Cmp>
+template <typename T, typename U, std::regular_invocable<T&, U&&> Comparator>
   requires std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>
-[[nodiscard]] constexpr bool assign_if(T& dest, U&& src, Cmp fn) noexcept(
-  noexcept(fn(dest, src)) && noexcept(dest = std::forward<U>(src))
+[[nodiscard]] constexpr bool assign_if(T& dest, U&& src, Comparator comp) noexcept(
+  noexcept(comp(dest, src)) && noexcept(dest = std::forward<U>(src))
 ) {
-  if (fn(dest, src)) {
+  if (comp(dest, src)) {
     dest = std::forward<U>(src);
     return true;
   }

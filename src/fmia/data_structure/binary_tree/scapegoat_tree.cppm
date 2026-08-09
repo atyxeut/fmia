@@ -7,7 +7,7 @@ import std;
 
 export namespace fmia {
 
-template <std::size_t N, typename Key, double Alpha = 0.70, typename Cmp = std::ranges::less>
+template <std::size_t N, typename Key, double Alpha = 0.70, typename Comparator = std::ranges::less>
 class inplace_scapegoat_tree {};
 
 } // export namespace fmia
