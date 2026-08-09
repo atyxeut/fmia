@@ -1,30 +1,30 @@
 // SPDX-FileCopyrightText: 2026 atyxeut <atyxeut@outlook.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-export module test.fmia.sort.comparison;
+export module test.fmia.sort.internal;
 
 import std;
 
 import fmia.random;
 import fmia.sort;
 
-template <std::meta::info fn>
+template <std::meta::info Sort>
 void check(std::size_t array_size) {
   const auto comp = std::ranges::less {};
 
   auto data = fmia::random::rand_number_vector(array_size);
-  [:fn:](data.begin(), data.end(), comp);
+  [:Sort:](data.begin(), data.end(), comp);
   contract_assert(std::ranges::is_sorted(data));
   contract_assert(!comp(data.back(), data.front()));
 
   auto& sorted_data = data;
-  [:fn:](sorted_data.begin(), sorted_data.end(), comp);
+  [:Sort:](sorted_data.begin(), sorted_data.end(), comp);
   contract_assert(std::ranges::is_sorted(data));
   contract_assert(!comp(data.back(), data.front()));
 
   auto& identical_data = data;
   std::ranges::fill(data, fmia::random::rand(std::numeric_limits<int>::min(), std::numeric_limits<int>::max()));
-  [:fn:](identical_data.begin(), identical_data.end(), comp);
+  [:Sort:](identical_data.begin(), identical_data.end(), comp);
   contract_assert(std::ranges::is_sorted(data));
   contract_assert(!comp(data.back(), data.front()));
 }

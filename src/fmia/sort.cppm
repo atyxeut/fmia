@@ -3,5 +3,5 @@
 
 export module fmia.sort;
 
-export import fmia.sort.comparison;
-export import fmia.sort.non_comparison;
+export import fmia.sort.external;
+export import fmia.sort.internal;
