@@ -5,13 +5,6 @@ export module fmia.meta.enum_flag;
 
 import std;
 
-export namespace fmia {
-
-using enum_underlying_type = std::uint8_t;
-using enum_flag_underlying_type = std::uint32_t;
-
-} // export namespace fmia
-
 export namespace fmia::meta {
 
 template <typename>

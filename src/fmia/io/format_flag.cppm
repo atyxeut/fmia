@@ -9,7 +9,7 @@ import fmia.meta.enum_flag;
 
 export namespace fmia {
 
-enum class iofmt : enum_flag_underlying_type { none, endl };
+enum class iofmt : std::uint32_t { none = 0, endl = 1 };
 
 } // export namespace fmia
 
