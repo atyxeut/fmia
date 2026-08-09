@@ -18,11 +18,11 @@ export {
 void check_kmp_search() {
   for (auto i = 0uz; i < test_count; ++i) {
     const auto src_0 = std::string(str_len, 'a');
-    const auto pattern_0 = std::string(random::rand(0uz, str_len), 'a');
+    const auto pattern_0 = std::string(random::rand_number(0uz, str_len), 'a');
     const auto next_0 = kmp_search_next_array(pattern_0);
 
     const auto src_1 = random::rand_ascii_string(str_len);
-    const auto pattern_1 = random::rand_ascii_string(random::rand(0uz, str_len));
+    const auto pattern_1 = random::rand_ascii_string(random::rand_number(0uz, str_len));
     const auto next_1 = kmp_search_next_array(pattern_1);
 
     { // check kmp_search_first

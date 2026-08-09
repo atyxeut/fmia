@@ -28,7 +28,7 @@ constexpr usize query_count = 1e6;
   std::vector<std::array<usize, 2>> ret(query_count);
   for (auto rand_l = random::uniform_distribution(0uz, element_count - 1); auto& [l, r] : ret) {
     l = rand_l(random::mt19937_engine);
-    r = random::rand(l, element_count - 1);
+    r = random::rand_number(l, element_count - 1);
   }
   return ret;
 }

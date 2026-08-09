@@ -23,7 +23,7 @@ void check(std::size_t array_size) {
   contract_assert(!comp(data.back(), data.front()));
 
   auto& identical_data = data;
-  std::ranges::fill(data, fmia::random::rand(std::numeric_limits<int>::min(), std::numeric_limits<int>::max()));
+  std::ranges::fill(data, fmia::random::rand_number(std::numeric_limits<int>::min(), std::numeric_limits<int>::max()));
   [:Sort:](identical_data.begin(), identical_data.end(), comp);
   contract_assert(std::ranges::is_sorted(data));
   contract_assert(!comp(data.back(), data.front()));
