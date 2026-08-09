@@ -10,18 +10,18 @@ import fmia.io.format_flag;
 export namespace fmia {
 
 template <typename Rep, typename Period = std::milli, typename OtherRep, typename OtherPeriod>
-void print_duration_as(std::chrono::duration<OtherRep, OtherPeriod> duration, io::fmt format = io::fmt::none) {
+void print_duration_as(std::chrono::duration<OtherRep, OtherPeriod> duration, iofmt format = iofmt::none) {
   const auto dur = std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(duration);
   if constexpr (std::floating_point<Rep>)
     std::cerr << std::fixed << std::setprecision(3) << dur;
   else
     std::cerr << dur;
-  if (format == io::fmt::endl)
+  if (format == iofmt::endl)
     std::println(std::cerr);
 }
 
 template <typename Rep, typename Period>
-void print_duration(std::chrono::duration<Rep, Period> duration, io::fmt format = io::fmt::none) {
+void print_duration(std::chrono::duration<Rep, Period> duration, iofmt format = iofmt::none) {
   print_duration_as<Rep, Period>(duration, format);
 }
 
@@ -101,7 +101,7 @@ public:
 
   [[nodiscard]] constexpr auto lap_count() const { return laps_.size() - 1; }
 
-  void print_lap(std::size_t idx, io::fmt format = io::fmt::none) const {
+  void print_lap(std::size_t idx, iofmt format = iofmt::none) const {
     if (idx == 0 || idx >= laps_.size())
       throw std::invalid_argument(std::format("invalid index range, index starts at 1, and now there are {} laps", lap_count()));
 
@@ -109,14 +109,14 @@ public:
   }
 
   // default to print the last lap
-  void print_last_lap(io::fmt format = io::fmt::none) const { print_lap(lap_count(), format); }
+  void print_last_lap(iofmt format = iofmt::none) const { print_lap(lap_count(), format); }
 
-  void lap_and_print(io::fmt format = io::fmt::none) {
+  void lap_and_print(iofmt format = iofmt::none) {
     lap();
     print_last_lap(format);
   }
 
-  void print_laps(std::size_t from_idx, std::size_t to_idx, io::fmt format = io::fmt::none) const {
+  void print_laps(std::size_t from_idx, std::size_t to_idx, iofmt format = iofmt::none) const {
     if (from_idx == 0 || from_idx > to_idx || to_idx >= laps_.size())
       throw std::invalid_argument(std::format("invalid index range, index starts at 1, and now there are {} laps", lap_count()));
 
@@ -127,7 +127,7 @@ public:
   }
 
   // default to print all laps
-  void print_laps(io::fmt format = io::fmt::none) const { print_laps(1, lap_count(), format); }
+  void print_laps(iofmt format = iofmt::none) const { print_laps(1, lap_count(), format); }
 };
 
 } // export namespace fmia

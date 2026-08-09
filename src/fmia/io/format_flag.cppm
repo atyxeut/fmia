@@ -7,15 +7,15 @@ import std;
 
 import fmia.meta.enum_flag;
 
-export namespace fmia::io {
+export namespace fmia {
 
-enum class fmt : enum_flag_underlying_type { none, endl };
+enum class iofmt : enum_flag_underlying_type { none, endl };
 
-} // export namespace fmia::io
+} // export namespace fmia
 
 export namespace fmia::meta {
 
 template <>
-struct is_enum_flag<io::fmt> : std::true_type {};
+struct is_enum_flag<iofmt> : std::true_type {};
 
 } // export namespace fmia::meta

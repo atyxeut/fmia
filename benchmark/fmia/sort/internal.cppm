@@ -46,7 +46,7 @@ void compare_hoare_quick_sort_variations() {
     for (auto j = 0uz; j < n[0]; ++j) {
       for (auto k = 0uz; k < n[1]; ++k) {
         std::print("{} version on {} {}: ", algorithm_type[k], test_type[i], data_type[j]);
-        timer.print_lap(timer.lap_count() - 4 + (j * n[1] + k + 1), fmia::io::fmt::endl);
+        timer.print_lap(timer.lap_count() - 4 + (j * n[1] + k + 1), fmia::iofmt::endl);
       }
     }
     std::println();
