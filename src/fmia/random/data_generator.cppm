@@ -60,17 +60,17 @@ template <std::integral T>
   return data;
 }
 
-[[nodiscard]] std::string rand_ascii_string(std::size_t count) {
+[[nodiscard]] std::string rand_ascii_string(std::size_t size) {
   std::string res;
-  res.reserve(count);
-  while (count--)
+  res.reserve(size);
+  while (size--)
     res.push_back(rand_number<char>(32, 126)); // 32: ' ', 126: '~'
   return res;
 }
 
 template <typename T, typename Fn>
-[[nodiscard]] std::vector<T> rand_vector(std::size_t count, Fn&& fn) {
-  std::vector<T> res(count);
+[[nodiscard]] std::vector<T> rand_vector(std::size_t size, Fn&& fn) {
+  std::vector<T> res(size);
   std::ranges::generate(res, std::forward<Fn>(fn));
   std::ranges::shuffle(res, mt19937_engine);
   return res;
@@ -78,8 +78,8 @@ template <typename T, typename Fn>
 
 template <typename T>
   requires std::is_arithmetic_v<T>
-[[nodiscard]] auto rand_number_vector(std::size_t count, T begin = std::numeric_limits<T>::min(), T end = std::numeric_limits<T>::max()) {
-  return rand_vector<T>(count, [=] { return rand_number(begin, end); });
+[[nodiscard]] auto rand_number_vector(std::size_t size, T begin = std::numeric_limits<T>::min(), T end = std::numeric_limits<T>::max()) {
+  return rand_vector<T>(size, [=] { return rand_number(begin, end); });
 }
 
 // get the edge list of a random unweighted tree
