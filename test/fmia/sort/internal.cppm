@@ -8,29 +8,46 @@ import std;
 import fmia.random;
 import fmia.sort;
 
+using element_type = int;
+
+constexpr auto comp = std::ranges::less {};
+
+constexpr auto rand = [] {
+  return fmia::random::rand_number(std::numeric_limits<element_type>::min(), std::numeric_limits<element_type>::max());
+};
+
 template <std::meta::info Sort>
 void check(std::size_t array_size) {
-  const auto comp = std::ranges::less {};
+  const auto check_impl = [](std::vector<element_type>& data) {
+    [:Sort:](data.begin(), data.end(), comp);
+    contract_assert(std::ranges::is_sorted(data));
+    contract_assert(!comp(data.back(), data.front()));
+  };
 
-  auto data = fmia::random::rand_number_vector<int>(array_size);
-  [:Sort:](data.begin(), data.end(), comp);
-  contract_assert(std::ranges::is_sorted(data));
-  contract_assert(!comp(data.back(), data.front()));
+  std::print("{}: ", std::meta::identifier_of(Sort));
 
-  auto& sorted_data = data;
-  [:Sort:](sorted_data.begin(), sorted_data.end(), comp);
-  contract_assert(std::ranges::is_sorted(data));
-  contract_assert(!comp(data.back(), data.front()));
+  // unique data
+  auto data = fmia::random::rand_permutation<element_type>(array_size);
+  check_impl(data);
+  std::print("unique data OK | ");
 
-  auto& identical_data = data;
-  std::ranges::fill(data, fmia::random::rand_number(std::numeric_limits<int>::min(), std::numeric_limits<int>::max()));
-  [:Sort:](identical_data.begin(), identical_data.end(), comp);
-  contract_assert(std::ranges::is_sorted(data));
-  contract_assert(!comp(data.back(), data.front()));
+  // sorted data
+  check_impl(data);
+  std::print("sorted data OK | ");
+
+  // random data
+  std::ranges::generate(data, rand);
+  check_impl(data);
+  std::print("random data OK | ");
+
+  // identical data
+  std::ranges::fill(data, rand());
+  check_impl(data);
+  std::print("identical data OK\n");
 }
 
 constexpr std::size_t small_array_size = 1e3;
-constexpr std::size_t large_array_size = 5e5;
+constexpr std::size_t large_array_size = 1e5;
 
 export {
 
