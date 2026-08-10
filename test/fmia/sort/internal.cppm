@@ -76,6 +76,10 @@ void check_recursive_lomuto_quick_sort() {
   check<^^fmia::recursive_lomuto_quick_sort>(small_array_size);
 }
 
+void check_recursive_dijkstra_quick_sort() {
+  check<^^fmia::recursive_dijkstra_quick_sort>(large_array_size);
+}
+
 void check_recursive_hoare_quick_sort() {
   check<^^fmia::recursive_hoare_quick_sort>(large_array_size);
 }

@@ -147,6 +147,25 @@ template <typename RandomAccessIter, typename Comparator>
   return {first, first + 1};
 }
 
+struct quick_sort_dijkstra_partition_tag {};
+
+template <typename RandomAccessIter, typename Comparator>
+[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
+  RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_dijkstra_partition_tag
+) {
+  // during the core loop, the pivot can be moved, but `*first == pivot` always hold
+  std::ranges::iter_swap(first, quick_sort_pivot_median_of_3(first, last, comp));
+  for (auto i = first + 1; i != last;) {
+    if (comp(*i, *first))
+      std::ranges::iter_swap(i++, first++);
+    else if (comp(*first, *i))
+      std::ranges::iter_swap(i, --last);
+    else
+      ++i;
+  }
+  return {first, last};
+}
+
 enum class quick_sort_hoare_partition_bound_check { off, on };
 
 template <quick_sort_hoare_partition_bound_check>
@@ -171,15 +190,6 @@ template <typename RandomAccessIter, typename Comparator, quick_sort_hoare_parti
       return {first, first};
     std::ranges::iter_swap(first, last);
   }
-}
-
-struct quick_sort_dijkstra_partition_tag {};
-
-template <typename RandomAccessIter, typename Comparator>
-[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
-  RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_dijkstra_partition_tag
-) {
-  return {};
 }
 
 struct quick_sort_bentley_mcilroy_partition_tag {};
@@ -220,6 +230,12 @@ template <std::random_access_iterator I, typename Comparator = std::ranges::less
   requires comparison_sortable<I, Comparator>
 constexpr void recursive_lomuto_quick_sort(I first, I last, Comparator comp = std::ranges::less {}) {
   recursive_quick_sort_impl<quick_sort_lomuto_partition_tag>(first, last, comp);
+}
+
+template <std::random_access_iterator I, typename Comparator = std::ranges::less>
+  requires comparison_sortable<I, Comparator>
+constexpr void recursive_dijkstra_quick_sort(I first, I last, Comparator comp = std::ranges::less {}) {
+  recursive_quick_sort_impl<quick_sort_dijkstra_partition_tag>(first, last, comp);
 }
 
 template <std::random_access_iterator I, typename Comparator = std::ranges::less>
