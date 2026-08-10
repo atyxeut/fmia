@@ -53,12 +53,9 @@ export namespace fmia::random {
 }
 
 template <std::integral T>
-[[nodiscard]] std::vector<T> rand_permutation(T begin, T end) {
-  if (begin > end)
-    throw std::invalid_argument("invalid integer range");
-
-  std::vector<T> data(end - begin + 1);
-  std::iota(data.begin(), data.end(), begin);
+[[nodiscard]] std::vector<T> rand_permutation(T size) pre(size > 0) {
+  std::vector<T> data(size);
+  std::iota(data.begin(), data.end(), static_cast<T>(1));
   std::ranges::shuffle(data, mt19937_engine);
   return data;
 }
@@ -91,9 +88,8 @@ template <typename T>
 //   if (vertex_begin > vertex_end)
 //     throw std::invalid_argument("invalid vertex index range");
 
-//   const auto p = permutation(vertex_begin, vertex_end);
-
 //   const auto edge_cnt = vertex_end - vertex_begin;
+//   const auto p = rand_permutation(edge_cnt);
 //   graph::basic_unweighted_edge_list<Vertex> data;
 //   data.reserve(edge_cnt);
 
@@ -118,9 +114,8 @@ template <typename T>
 //   if (weight_begin > weight_end)
 //     throw std::invalid_argument("invalid weight range");
 
-//   const auto p = permutation(vertex_begin, vertex_end);
-
 //   const auto edge_cnt = vertex_end - vertex_begin;
+//   const auto p = rand_permutation(edge_cnt);
 //   graph::basic_weighted_edge_list<Vertex, Weight> data;
 //   data.reserve(edge_cnt);
 
