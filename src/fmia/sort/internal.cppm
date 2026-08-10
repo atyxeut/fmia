@@ -117,22 +117,18 @@ constexpr void heap_sort(I first, I last, Comparator comp = std::ranges::less {}
 
 namespace fmia {
 
-// note that `first` is incremented and `last` is decremented after this call
 template <typename RandomAccessIter, typename Comparator>
-constexpr RandomAccessIter median_of_3(RandomAccessIter& first, RandomAccessIter& last, Comparator comp) pre(last - first > 2) {
-  --last;
-  const auto mid = first + (last - first) / 2;
-
+constexpr RandomAccessIter quick_sort_pivot_median_of_3(RandomAccessIter first, RandomAccessIter last, Comparator comp) pre(
+  last - first > 2
+) {
+  const auto mid = first + (--last - first) / 2;
   if (comp(*mid, *first))
     std::ranges::iter_swap(first, mid);
   if (comp(*last, *mid))
     std::ranges::iter_swap(mid, last);
   if (comp(*mid, *first))
     std::ranges::iter_swap(first, mid);
-
-  ++first;
-  std::ranges::iter_swap(first, mid);
-  return first;
+  return mid;
 }
 
 struct quick_sort_lomuto_partition_tag {};
@@ -141,8 +137,10 @@ template <typename RandomAccessIter, typename Comparator>
 [[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
   RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_lomuto_partition_tag
 ) {
-  const auto pivot = median_of_3(first, last, comp);
-  for (auto i = pivot + 1; i <= last; ++i)
+  const auto mid = quick_sort_pivot_median_of_3(first++, last, comp);
+  std::ranges::iter_swap(first, mid);
+  const auto pivot = first;
+  for (auto i = pivot + 1; i != last; ++i)
     if (!comp(*pivot, *i) && ++first != i)
       std::ranges::iter_swap(first, i);
   std::ranges::iter_swap(pivot, first);
@@ -159,7 +157,9 @@ template <typename RandomAccessIter, typename Comparator, quick_sort_hoare_parti
   RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_hoare_partition_tag<BoundCheckFlag>
 ) {
   constexpr bool bound_check_off = BoundCheckFlag == quick_sort_hoare_partition_bound_check::off;
-  const auto& pivot = *median_of_3(first, last, comp);
+  const auto mid = quick_sort_pivot_median_of_3(first++, last--, comp);
+  std::ranges::iter_swap(first, mid);
+  const auto& pivot = *first;
   for (;;) {
     do {
       ++first;
@@ -203,7 +203,7 @@ constexpr void recursive_quick_sort_impl(RandomAccessIter first, RandomAccessIte
     return;
   }
   if (size == 3) {
-    median_of_3(first, last, comp);
+    quick_sort_pivot_median_of_3(first, last, comp);
     return;
   }
 
