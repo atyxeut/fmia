@@ -9,8 +9,8 @@ import fmia.random;
 
 export namespace fmia {
 
-template <typename Iter, typename Comparator, typename Proj = std::identity>
-concept comparison_sortable = std::sortable<Iter, Comparator, Proj>;
+template <typename Iter, typename Comparator, typename Projection = std::identity>
+concept comparison_sortable = std::sortable<Iter, Comparator, Projection>;
 
 } // export namespace fmia
 
@@ -81,10 +81,8 @@ constexpr void bubble_sort(I first, I last, Comparator comp = std::ranges::less 
 
 namespace fmia {
 
-template <typename RandomAccessIter, typename Comparator>
-constexpr void heap_sort_sift_down(
-  std::iter_difference_t<RandomAccessIter> size, std::iter_difference_t<RandomAccessIter> cur, RandomAccessIter first, Comparator comp
-) {
+template <typename Iter, typename Comparator>
+constexpr void heap_sort_sift_down(std::iter_difference_t<Iter> size, std::iter_difference_t<Iter> cur, Iter first, Comparator comp) {
   while (cur < size / 2) {
     auto right = cur * 2 + 1;
     auto left = right++;
@@ -117,10 +115,8 @@ constexpr void heap_sort(I first, I last, Comparator comp = std::ranges::less {}
 
 namespace fmia {
 
-template <typename RandomAccessIter, typename Comparator>
-constexpr RandomAccessIter quick_sort_pivot_median_of_3(RandomAccessIter first, RandomAccessIter last, Comparator comp) pre(
-  last - first > 2
-) {
+template <typename Iter, typename Comparator>
+constexpr Iter quick_sort_pivot_median_of_3(Iter first, Iter last, Comparator comp) pre(last - first > 2) {
   const auto mid = first + (--last - first) / 2;
   if (comp(*mid, *first))
     std::ranges::iter_swap(first, mid);
@@ -133,10 +129,8 @@ constexpr RandomAccessIter quick_sort_pivot_median_of_3(RandomAccessIter first, 
 
 struct quick_sort_lomuto_partition_tag {};
 
-template <typename RandomAccessIter, typename Comparator>
-[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
-  RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_lomuto_partition_tag
-) {
+template <typename Iter, typename Comparator>
+[[nodiscard]] constexpr std::array<Iter, 2> quick_sort_partition(Iter first, Iter last, Comparator comp, quick_sort_lomuto_partition_tag) {
   const auto mid = quick_sort_pivot_median_of_3(first++, last, comp);
   std::ranges::iter_swap(first, mid);
   const auto pivot = first;
@@ -149,9 +143,9 @@ template <typename RandomAccessIter, typename Comparator>
 
 struct quick_sort_dijkstra_partition_tag {};
 
-template <typename RandomAccessIter, typename Comparator>
-[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
-  RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_dijkstra_partition_tag
+template <typename Iter, typename Comparator>
+[[nodiscard]] constexpr std::array<Iter, 2> quick_sort_partition(
+  Iter first, Iter last, Comparator comp, quick_sort_dijkstra_partition_tag
 ) {
   // during the core loop, the pivot can be moved, but `*first == pivot` always hold
   std::ranges::iter_swap(first, quick_sort_pivot_median_of_3(first, last, comp));
@@ -171,9 +165,9 @@ enum class quick_sort_hoare_partition_bound_check { off, on };
 template <quick_sort_hoare_partition_bound_check>
 struct quick_sort_hoare_partition_tag {};
 
-template <typename RandomAccessIter, typename Comparator, quick_sort_hoare_partition_bound_check BoundCheckFlag>
-[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
-  RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_hoare_partition_tag<BoundCheckFlag>
+template <typename Iter, typename Comparator, quick_sort_hoare_partition_bound_check BoundCheckFlag>
+[[nodiscard]] constexpr std::array<Iter, 2> quick_sort_partition(
+  Iter first, Iter last, Comparator comp, quick_sort_hoare_partition_tag<BoundCheckFlag>
 ) {
   constexpr bool bound_check_off = BoundCheckFlag == quick_sort_hoare_partition_bound_check::off;
   const auto mid = quick_sort_pivot_median_of_3(first++, last--, comp);
@@ -194,15 +188,15 @@ template <typename RandomAccessIter, typename Comparator, quick_sort_hoare_parti
 
 struct quick_sort_bentley_mcilroy_partition_tag {};
 
-template <typename RandomAccessIter, typename Comparator>
-[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
-  RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_bentley_mcilroy_partition_tag
+template <typename Iter, typename Comparator>
+[[nodiscard]] constexpr std::array<Iter, 2> quick_sort_partition(
+  Iter first, Iter last, Comparator comp, quick_sort_bentley_mcilroy_partition_tag
 ) {
   return {};
 }
 
-template <typename PartitionPolicy, typename RandomAccessIter, typename Comparator>
-constexpr void recursive_quick_sort_impl(RandomAccessIter first, RandomAccessIter last, Comparator comp) {
+template <typename PartitionPolicy, typename Iter, typename Comparator>
+constexpr void recursive_quick_sort_impl(Iter first, Iter last, Comparator comp) {
   const auto size = last - first;
   if (size < 2)
     return;
@@ -262,11 +256,9 @@ namespace fmia {
 
 enum class merge_sort_merge_policy { normal, inplace };
 
-template <typename ForwardIter, typename Comparator>
-constexpr void merge_sort_normal_merge_impl(
-  std::iter_difference_t<ForwardIter> size, ForwardIter first, ForwardIter mid, ForwardIter last, Comparator comp
-) {
-  std::vector<std::iter_value_t<ForwardIter>> buffer;
+template <typename Iter, typename Comparator>
+constexpr void merge_sort_normal_merge_impl(std::iter_difference_t<Iter> size, Iter first, Iter mid, Iter last, Comparator comp) {
+  std::vector<std::iter_value_t<Iter>> buffer;
   buffer.reserve(static_cast<std::size_t>(size));
   std::merge(first, mid, mid, last, std::back_inserter(buffer), comp);
   std::ranges::move(buffer, first);
