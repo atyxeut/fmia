@@ -3,7 +3,7 @@
 
 module;
 
-#include <macro/wconversion_switch.hpp>
+#include <macro/wconversion_flag.hpp>
 
 export module fmia.math.integer.arbitrary_precision;
 

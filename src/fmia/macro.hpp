@@ -4,6 +4,6 @@
 // IWYU pragma: begin_keep
 
 #include "macro/is_in_debug_mode.hpp"
-#include "macro/wconversion_switch.hpp"
+#include "macro/wconversion_flag.hpp"
 
 // IWYU pragma: end_keep
