@@ -117,11 +117,9 @@ constexpr void heap_sort(I first, I last, Comparator comp = std::ranges::less {}
 
 namespace fmia {
 
+// note that `first` is incremented and `last` is decremented after this call
 template <typename RandomAccessIter, typename Comparator>
-[[nodiscard]] constexpr RandomAccessIter median_of_3(RandomAccessIter first, RandomAccessIter last, Comparator comp) noexcept(
-  noexcept(++first) && noexcept(--first) && noexcept(first + (first - first) / 2) && noexcept(comp(*first, *first))
-  && noexcept(std::ranges::iter_swap(first, first))
-) pre(last - first > 2) {
+constexpr RandomAccessIter median_of_3(RandomAccessIter& first, RandomAccessIter& last, Comparator comp) pre(last - first > 2) {
   --last;
   const auto mid = first + (last - first) / 2;
 
@@ -147,21 +145,9 @@ struct quick_sort_hoare_partition_tag {};
 template <typename RandomAccessIter, typename Comparator, quick_sort_hoare_partition_bound_check BoundCheckFlag>
 [[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
   RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_hoare_partition_tag<BoundCheckFlag>
-) noexcept(noexcept(median_of_3(first, first, comp))) {
-  const auto size = last - first;
-  if (size == 2) {
-    if (const auto tail = first + 1; comp(*tail, *first))
-      std::ranges::iter_swap(first, tail);
-    return {first, last};
-  }
-
-  const auto& pivot = *median_of_3(first, last, comp);
-  if (size == 3)
-    return {first, last};
-
+) {
   constexpr bool bound_check_off = BoundCheckFlag == quick_sort_hoare_partition_bound_check::off;
-  ++first;
-  --last;
+  const auto& pivot = *median_of_3(first, last, comp);
   for (;;) {
     do {
       ++first;
@@ -178,7 +164,7 @@ template <typename RandomAccessIter, typename Comparator, quick_sort_hoare_parti
 struct quick_sort_dijkstra_partition_tag {};
 
 template <typename RandomAccessIter, typename Comparator>
-constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
+[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
   RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_dijkstra_partition_tag
 ) {
   return {};
@@ -187,7 +173,7 @@ constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
 struct quick_sort_bentley_mcilroy_partition_tag {};
 
 template <typename RandomAccessIter, typename Comparator>
-constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
+[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
   RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_bentley_mcilroy_partition_tag
 ) {
   return {};
@@ -195,8 +181,19 @@ constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
 
 template <typename PartitionPolicy, typename RandomAccessIter, typename Comparator>
 constexpr void recursive_quick_sort_impl(RandomAccessIter first, RandomAccessIter last, Comparator comp) {
-  if (last - first < 2)
+  const auto size = last - first;
+  if (size < 2)
     return;
+  if (size == 2) {
+    const auto tail = first + 1;
+    if (comp(*tail, *first))
+      std::ranges::iter_swap(first, tail);
+    return;
+  }
+  if (size == 3) {
+    median_of_3(first, last, comp);
+    return;
+  }
 
   const auto mid = quick_sort_partition(first, last, comp, PartitionPolicy {});
   recursive_quick_sort_impl<PartitionPolicy>(first, mid[0], comp);
