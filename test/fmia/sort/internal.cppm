@@ -71,6 +71,11 @@ void check_heap_sort() {
   check<^^fmia::heap_sort>(large_array_size);
 }
 
+void check_recursive_lomuto_quick_sort() {
+  // bad performance on duplicate elements
+  check<^^fmia::recursive_lomuto_quick_sort>(small_array_size);
+}
+
 void check_recursive_hoare_quick_sort() {
   check<^^fmia::recursive_hoare_quick_sort>(large_array_size);
 }

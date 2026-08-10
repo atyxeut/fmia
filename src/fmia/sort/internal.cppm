@@ -137,6 +137,18 @@ constexpr RandomAccessIter median_of_3(RandomAccessIter& first, RandomAccessIter
 
 struct quick_sort_lomuto_partition_tag {};
 
+template <typename RandomAccessIter, typename Comparator>
+[[nodiscard]] constexpr std::array<RandomAccessIter, 2> quick_sort_partition(
+  RandomAccessIter first, RandomAccessIter last, Comparator comp, quick_sort_lomuto_partition_tag
+) {
+  const auto pivot = median_of_3(first, last, comp);
+  for (auto i = pivot + 1; i <= last; ++i)
+    if (!comp(*pivot, *i) && ++first != i)
+      std::ranges::iter_swap(first, i);
+  std::ranges::iter_swap(pivot, first);
+  return {first, first + 1};
+}
+
 enum class quick_sort_hoare_partition_bound_check { off, on };
 
 template <quick_sort_hoare_partition_bound_check>
@@ -203,6 +215,12 @@ constexpr void recursive_quick_sort_impl(RandomAccessIter first, RandomAccessIte
 } // namespace fmia
 
 export namespace fmia {
+
+template <std::random_access_iterator I, typename Comparator = std::ranges::less>
+  requires comparison_sortable<I, Comparator>
+constexpr void recursive_lomuto_quick_sort(I first, I last, Comparator comp = std::ranges::less {}) {
+  recursive_quick_sort_impl<quick_sort_lomuto_partition_tag>(first, last, comp);
+}
 
 template <std::random_access_iterator I, typename Comparator = std::ranges::less>
   requires comparison_sortable<I, Comparator>
