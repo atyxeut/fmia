@@ -10,6 +10,7 @@ export import fmia.data_structure.graph;
 export import fmia.data_structure.hash_table;
 export import fmia.data_structure.heap;
 export import fmia.data_structure.linked_list;
+export import fmia.data_structure.prefix_sum;
 export import fmia.data_structure.queue;
 export import fmia.data_structure.segment_tree;
 export import fmia.data_structure.sparse_table;
