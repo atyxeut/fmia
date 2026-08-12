@@ -90,7 +90,7 @@ template <typename Limb>
 
 namespace fmia::big_integer::naive {
 
-enum class carry_policy { all, non_negative };
+enum class carry_policy { none, assume_unsigned };
 
 template <carry_policy Policy, typename Limb, Limb Radix, typename Range>
 constexpr Limb carry_impl(Range&& number) noexcept {
@@ -99,7 +99,7 @@ constexpr Limb carry_impl(Range&& number) noexcept {
     limb += carry;
     carry = limb / Radix;
     limb %= Radix;
-    if (Policy == carry_policy::all && limb < 0) {
+    if (Policy == carry_policy::none && limb < 0) {
       --carry;
       limb += Radix;
     }
@@ -112,13 +112,13 @@ constexpr Limb carry_impl(Range&& number) noexcept {
 export namespace fmia::big_integer::naive {
 
 template <typename Limb, Limb Radix = 10, std::ranges::forward_range R>
-constexpr auto carry_positive(R&& number) noexcept {
-  return carry_impl<carry_policy::non_negative, Limb, Radix>(std::forward<R>(number));
+constexpr auto carry_unsigned(R&& number) noexcept {
+  return carry_impl<carry_policy::assume_unsigned, Limb, Radix>(std::forward<R>(number));
 }
 
 template <typename Limb, Limb Radix = 10, std::ranges::forward_range R>
 constexpr auto carry(R&& number) noexcept {
-  return carry_impl<carry_policy::all, Limb, Radix>(std::forward<R>(number));
+  return carry_impl<carry_policy::none, Limb, Radix>(std::forward<R>(number));
 }
 
 template <typename Limb>
@@ -135,7 +135,7 @@ constexpr void remove_lz(std::vector<Limb>& num) noexcept {
   for (auto i = 0uz; i < b.size(); ++i)
     ans[i] += b[i];
 
-  carry_positive<int>(ans);
+  carry_unsigned<int>(ans);
   remove_lz(ans);
   return ans;
 }
@@ -178,7 +178,7 @@ void print(const sub_result& result, bool new_line = false) {
     for (auto j = 0uz; j < b.size(); ++j)
       ans[i + j] += a[i] * b[j];
 
-  carry_positive<int>(ans);
+  carry_unsigned<int>(ans);
   remove_lz(ans);
   return ans;
 }
@@ -263,7 +263,7 @@ FMIA_WCONVERSION_PUSH()
   if (precision == 0) {
     if (r * 10 / b >= 5) {
       ++q_int[0];
-      if (int carry = carry_positive<int>(q_int); carry > 0)
+      if (int carry = carry_unsigned<int>(q_int); carry > 0)
         q_int.resize(q_int.size() + 1, carry);
     }
     return {std::move(q_int), std::vector<int> {}};
@@ -279,9 +279,9 @@ FMIA_WCONVERSION_PUSH()
   }
   if (q_frac.back() >= 5) {
     ++q_frac[precision - 2];
-    if (carry_positive<int>(std::views::reverse(std::span(q_frac.begin(), q_frac.begin() + precision - 1))) > 0) {
+    if (carry_unsigned<int>(std::views::reverse(std::span(q_frac.begin(), q_frac.begin() + precision - 1))) > 0) {
       ++q_int[0];
-      if (int carry = carry_positive<int>(q_int); carry != 0)
+      if (int carry = carry_unsigned<int>(q_int); carry != 0)
         q_int.resize(q_int.size() + 1, carry);
     }
   }
