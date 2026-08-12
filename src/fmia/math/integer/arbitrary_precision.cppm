@@ -47,17 +47,14 @@ export namespace fmia::big_integer::naive {
 [[nodiscard]] constexpr std::vector<int> parse(std::string_view s) {
   const auto n = s.size();
   std::vector<int> ret(n);
-
   for (auto i = 0uz; i < n; ++i)
     ret[i] = s[n - i - 1] - '0';
-
   return ret;
 }
 
-[[nodiscard]] auto input() {
+[[nodiscard]] std::vector<int> input() {
   std::string s;
   std::cin >> s;
-
   return parse(s);
 }
 
@@ -77,40 +74,51 @@ template <typename Limb>
 // a < b : -1, a = b: 0, a > b: 1
 template <typename Limb>
 [[nodiscard]] constexpr int compare(std::span<const Limb> a, std::span<const Limb> b) noexcept {
-  const auto la = a.size(), lb = b.size();
-  if (la == lb) {
-    for (auto i = la; i > 0;) {
-      --i;
-      if (a[i] != b[i])
-        return (a[i] > b[i]) - (a[i] < b[i]);
+  const auto al = a.size();
+  const auto bl = b.size();
+  if (al != bl)
+    return (al > bl) - (al < bl);
+  for (auto i = al; i > 0;) {
+    --i;
+    if (a[i] != b[i])
+      return (a[i] > b[i]) - (a[i] < b[i]);
+  }
+  return 0;
+}
+
+} // export namespace fmia::big_integer::naive
+
+namespace fmia::big_integer::naive {
+
+enum class carry_policy { all, non_negative };
+
+template <carry_policy Policy, typename Limb, Limb Radix, typename Range>
+constexpr Limb carry_impl(Range&& number) noexcept {
+  Limb carry = 0;
+  for (auto& limb : number) {
+    limb += carry;
+    carry = limb / Radix;
+    limb %= Radix;
+    if (Policy == carry_policy::all && limb < 0) {
+      --carry;
+      limb += Radix;
     }
   }
-  return (la > lb) - (la < lb);
+  return carry;
+}
+
+} // namespace fmia::big_integer::naive
+
+export namespace fmia::big_integer::naive {
+
+template <typename Limb, Limb Radix = 10, std::ranges::forward_range R>
+constexpr auto carry_positive(R&& number) noexcept {
+  return carry_impl<carry_policy::non_negative, Limb, Radix>(std::forward<R>(number));
 }
 
 template <typename Limb, Limb Radix = 10, std::ranges::forward_range R>
-constexpr auto carry_positive(R&& num) noexcept {
-  Limb c = 0;
-  for (auto& limb : num) {
-    limb += c;
-    c = limb / Radix;
-    limb %= Radix;
-  }
-
-  return c;
-}
-
-template <typename Limb, Limb Radix = 10, std::ranges::forward_range R>
-constexpr Limb carry(R&& num) noexcept {
-  Limb c = 0;
-  for (Limb r; auto& limb : num) {
-    limb += c;
-    r = limb % Radix;
-    c = limb / Radix - (r < 0);
-    limb = r + Radix * (r < 0);
-  }
-
-  return c;
+constexpr auto carry(R&& number) noexcept {
+  return carry_impl<carry_policy::all, Limb, Radix>(std::forward<R>(number));
 }
 
 template <typename Limb>
