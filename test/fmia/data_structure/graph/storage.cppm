@@ -9,8 +9,6 @@ import fmia.data_structure.graph.storage;
 
 using namespace fmia;
 
-export {
-
 consteval void check_edge_class_aggregate_initialization() {
   using T0 = graph::undirected_edge<std::size_t, std::size_t, std::size_t, int>;
   static_assert(std::is_aggregate_v<T0>);
@@ -35,5 +33,3 @@ consteval void check_edge_class_aggregate_initialization() {
   // can omit the last empty initializer
   T3 has_id_no_weight_edge {0, {}, 3};
 }
-
-} // export
