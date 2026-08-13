@@ -10,3 +10,12 @@ target("fmia")
   set_optimize("fastest")
   add_cxxflags("-fcontract-evaluation-semantic=ignore")
 target_end()
+
+if is_mode("debug") then
+  target("fmia.debug")
+    set_kind("object")
+    add_files("**.cppm", { public = true })
+    set_optimize("none")
+    add_cxxflags("-fcontract-evaluation-semantic=enforce")
+  target_end()
+end
