@@ -7,8 +7,7 @@ import fmia;
 
 // clang-format off
 
-int main()
-{
+int main() {
   
 }
 

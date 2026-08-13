@@ -8,10 +8,6 @@ set_languages("cxx26")
 add_rules("mode.debug", "mode.release")
 set_policy("check.auto_ignore_flags", false)
 
-if is_mode("release") then
-  add_defines("NDEBUG")
-end
-
 set_config("builddir", "build")
 set_config("runtimes", "c++_shared")
 
@@ -27,8 +23,9 @@ if is_host("windows") then
 elseif is_host("macosx") then
   if get_config("toolchain") == "gcc" then
     -- gcc-15 from Homebrew
-    set_toolset("cxx", "/usr/local/opt/gcc@15/bin/g++-15") -- `usr` is the username
-    set_toolset("ld", "/usr/local/opt/gcc@15/bin/g++-15")  -- `usr` is the username
+    -- `usr` is the username
+    set_toolset("cxx", "/usr/local/opt/gcc@15/bin/g++-15")
+    set_toolset("ld", "/usr/local/opt/gcc@15/bin/g++-15")
   elseif get_config("toolchain") == "llvm" then
     set_policy("build.c++.modules", true)
     -- binary from Homebrew: brew install llvm
