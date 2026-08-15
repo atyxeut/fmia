@@ -168,40 +168,40 @@ struct length<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>> :
 template <typename AnyTypeList>
 constexpr std::size_t length_v = length<AnyTypeList>::value;
 
-// get the nth type of a type list, index starts at 0
+// get the nth type of a type list (index starts at 0)
 // O(1) time complexity
-template <std::size_t, typename>
+template <typename, std::size_t>
 struct nth;
 
-template <std::size_t Idx, typename... Ts>
-struct nth<Idx, type_list<Ts...>> {
+template <typename... Ts, std::size_t Idx>
+struct nth<type_list<Ts...>, Idx> {
   using type = Ts...[Idx];
 };
 
-template <std::size_t Idx, std::size_t... Is, typename... Ts>
-struct nth<Idx, indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>> {
+template <std::size_t... Is, typename... Ts, std::size_t Idx>
+struct nth<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>, Idx> {
   using type = indexed_type<Is...[Idx], Ts...[Idx]>;
 };
 
-template <std::size_t Idx, typename AnyTypeList>
-using nth_t = nth<Idx, AnyTypeList>::type;
+template <typename AnyTypeList, std::size_t Idx>
+using nth_t = nth<AnyTypeList, Idx>::type;
 
 // name after Haskell Data.List head
 // get the first type of a type list
 // O(1) time complexity
 template <nonempty_list_of_types T>
-using head = nth<0, T>;
+using head = nth<T, 0>;
 
-template <typename T>
+template <nonempty_list_of_types T>
 using head_t = head<T>::type;
 
 // name after Haskell Data.List last
 // get the last type of a type list
 // O(1) time complexity
 template <nonempty_list_of_types T>
-using last = nth<length_v<T> - 1, T>;
+using last = nth<T, length_v<T> - 1>;
 
-template <typename T>
+template <nonempty_list_of_types T>
 using last_t = last<T>::type;
 
 } // export namespace fmia::meta
@@ -209,7 +209,7 @@ using last_t = last<T>::type;
 namespace fmia::meta {
 
 template <std::size_t I, typename T>
-indexed_type<I, T> lookup_indexed_type_helper(indexed_type<I, T>);
+indexed_type<I, T> indexed_type_lookup_helper(indexed_type<I, T>);
 
 } // namespace fmia::meta
 
@@ -218,14 +218,14 @@ export namespace fmia::meta {
 // name after Haskell Data.List lookup
 // get the corresponding indexed type of a indexed_type_list with a given index
 // O(1) time complexity
-template <std::size_t I, typename IndexedTypeList>
-  requires is_indexed_type_list_v<IndexedTypeList>
+template <typename T, std::size_t I>
+  requires is_indexed_type_list_v<T>
 struct lookup {
-  using type = decltype(lookup_indexed_type_helper<I>(std::declval<IndexedTypeList>()));
+  using type = decltype(indexed_type_lookup_helper<I>(std::declval<T>()));
 };
 
-template <std::size_t I, typename IndexedTypeList>
-using lookup_t = lookup<I, IndexedTypeList>::type;
+template <typename IndexedTypeList, std::size_t I>
+using lookup_t = lookup<IndexedTypeList, I>::type;
 
 // name after Haskell Data.List : operator (1 : [1, 2] --> [1, 1, 2])
 // get a type list that has one element added to the beginning comparing to the given list
@@ -234,19 +234,19 @@ using lookup_t = lookup<I, IndexedTypeList>::type;
 template <typename, typename>
 struct cons;
 
-template <typename T, typename... Ts>
-struct cons<T, type_list<Ts...>> {
+template <typename... Ts, typename T>
+struct cons<type_list<Ts...>, T> {
   using type = type_list<T, Ts...>;
 };
 
-template <typename T, std::size_t... Is, typename... Ts>
+template <std::size_t... Is, typename... Ts, typename T>
   requires (is_indexed_type_v<T> && ((T::idx != Is) && ...))
-struct cons<T, indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>> {
+struct cons<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>, T> {
   using type = indexed_type_list<std::index_sequence<T::idx, Is...>, type_list<typename T::type, Ts...>>;
 };
 
-template <typename T, typename AnyTypeList>
-using cons_t = cons<T, AnyTypeList>::type;
+template <typename AnyTypeList, typename T>
+using cons_t = cons<AnyTypeList, T>::type;
 
 // get a type list that has one element added to the end comparing to the given list
 // O(1) time complexity for type_list
@@ -254,25 +254,25 @@ using cons_t = cons<T, AnyTypeList>::type;
 template <typename, typename>
 struct snoc;
 
-template <typename T, typename... Ts>
-struct snoc<T, type_list<Ts...>> {
+template <typename... Ts, typename T>
+struct snoc<type_list<Ts...>, T> {
   using type = type_list<Ts..., T>;
 };
 
-template <typename T, std::size_t... Is, typename... Ts>
+template <std::size_t... Is, typename... Ts, typename T>
   requires (is_indexed_type_v<T> && ((T::idx != Is) && ...))
-struct snoc<T, indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>> {
+struct snoc<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>, T> {
   using type = indexed_type_list<std::index_sequence<Is..., T::idx>, type_list<Ts..., typename T::type>>;
 };
 
-template <typename T, typename AnyTypeList>
-using snoc_t = snoc<T, AnyTypeList>::type;
+template <typename AnyTypeList, typename T>
+using snoc_t = snoc<AnyTypeList, T>::type;
 
-template <bool B, typename AnyTypeList, typename T>
-struct snoc_if : std::conditional<B, snoc_t<T, AnyTypeList>, AnyTypeList> {};
+template <typename AnyTypeList, typename T, bool B>
+struct snoc_if : std::conditional<B, snoc_t<AnyTypeList, T>, AnyTypeList> {};
 
-template <bool B, typename AnyTypeList, typename T>
-using snoc_if_t = snoc_if<B, AnyTypeList, T>::type;
+template <typename AnyTypeList, typename T, bool B>
+using snoc_if_t = snoc_if<AnyTypeList, T, B>::type;
 
 } // export namespace fmia::meta
 
@@ -293,11 +293,11 @@ export namespace fmia::meta {
 // name after Haskell Data.List replicate
 // get a type list that contains N identical types
 // O(1) time complexity
-template <std::size_t N, typename T>
+template <typename T, std::size_t N>
 using replicate = replicate_impl<T, std::make_index_sequence<N>>;
 
-template <std::size_t N, typename T>
-using replicate_t = replicate<N, T>::type;
+template <typename T, std::size_t N>
+using replicate_t = replicate<T, N>::type;
 
 template <template <typename...> typename T, typename... BoundArgs>
 struct bind_front {
@@ -359,33 +359,33 @@ struct is_predicate_tester;
 
 // clang-format off
 
-template <template <typename...> typename T, typename... Ts>
-struct is_predicate_tester<T, type_list<Ts...>> : std::bool_constant<requires { { T<Ts...>::value } -> no_cvref_same_as<bool>; }> {};
+template <template <typename...> typename Fn, typename... Ts>
+struct is_predicate_tester<Fn, type_list<Ts...>> : std::bool_constant<requires { { Fn<Ts...>::value } -> no_cvref_same_as<bool>; }> {};
 
 // clang-format on
 
 template <template <typename...> typename, typename>
 struct is_predicate_impl;
 
-template <template <typename...> typename T, std::size_t... Is>
-struct is_predicate_impl<T, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<T, replicate_t<Is + 1, void>>...> {};
+template <template <typename...> typename Fn, std::size_t... Is>
+struct is_predicate_impl<Fn, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<Fn, replicate_t<void, Is + 1>>...> {};
 
 } // namespace fmia::meta
 
 export namespace fmia::meta {
 
-template <template <typename...> typename T, std::size_t ArityLimit = 5>
+template <template <typename...> typename Fn, std::size_t ArityLimit = 5>
   requires (ArityLimit > 0)
-struct is_predicate : is_predicate_impl<T, std::make_index_sequence<ArityLimit>> {};
+struct is_predicate : is_predicate_impl<Fn, std::make_index_sequence<ArityLimit>> {};
 
-template <template <typename...> typename T, std::size_t ArityLimit = 5>
-inline constexpr bool is_predicate_v = is_predicate<T, ArityLimit>::value;
+template <template <typename...> typename Fn, std::size_t ArityLimit = 5>
+inline constexpr bool is_predicate_v = is_predicate<Fn, ArityLimit>::value;
 
-template <template <typename...> typename T>
-concept predicate = is_predicate_v<T>;
+template <template <typename...> typename Fn>
+concept predicate = is_predicate_v<Fn>;
 
-template <typename T>
-concept wrapped_predicate = wrapped_template<T> && predicate<T::template type>;
+template <typename Fn>
+concept wrapped_predicate = wrapped_template<Fn> && predicate<Fn::template type>;
 
 } // export namespace fmia::meta
 
@@ -473,129 +473,129 @@ export namespace fmia::meta {
 template <list_of_types... Ts>
 using concat = concat_get_result_helper<typename concat_impl<Ts...>::type>;
 
-template <typename... AnyTypeLists>
-using concat_t = concat<AnyTypeLists...>::type;
+template <list_of_types... Ts>
+using concat_t = concat<Ts...>::type;
 
 // get a type list that contains types whose real indices are in the given `std::index_sequence`
 // O(1) time complexity
 template <typename, typename>
 struct select_by_index_sequence;
 
-template <std::size_t... Is, typename... Ts>
-struct select_by_index_sequence<std::index_sequence<Is...>, type_list<Ts...>> {
+template <typename... Ts, std::size_t... Is>
+struct select_by_index_sequence<type_list<Ts...>, std::index_sequence<Is...>> {
   using type = type_list<Ts...[Is]...>;
 };
 
-template <std::size_t... Is, std::size_t... Idxs, typename... Ts>
-struct select_by_index_sequence<std::index_sequence<Is...>, indexed_type_list<std::index_sequence<Idxs...>, type_list<Ts...>>> {
-  using type = indexed_type_list<std::index_sequence<Idxs...[Is]...>, type_list<Ts...[Is]...>>;
+template <std::size_t... Indices, typename... Ts, std::size_t... Is>
+struct select_by_index_sequence<indexed_type_list<std::index_sequence<Indices...>, type_list<Ts...>>, std::index_sequence<Is...>> {
+  using type = indexed_type_list<std::index_sequence<Indices...[Is]...>, type_list<Ts...[Is]...>>;
 };
 
-template <typename IndexSequence, typename AnyTypeList>
-using select_by_index_sequence_t = select_by_index_sequence<IndexSequence, AnyTypeList>::type;
+template <typename AnyTypeList, typename IndexSequence>
+using select_by_index_sequence_t = select_by_index_sequence<AnyTypeList, IndexSequence>::type;
 
 // name after Haskell Data.List reverse
 // get a type list that is the reverse of the given list
 // O(1) time complexity
 template <list_of_types T>
-using reverse = select_by_index_sequence<make_reversed_index_sequence<length_v<T>>, T>;
+using reverse = select_by_index_sequence<T, make_reversed_index_sequence<length_v<T>>>;
 
-template <typename AnyTypeList>
-using reverse_t = reverse<AnyTypeList>::type;
+template <list_of_types T>
+using reverse_t = reverse<T>::type;
 
 // name after Haskell Data.List tail
 // get a type list with the first type removed comparing to the given list
 // O(1) time complexity
 template <nonempty_list_of_types T>
-using tail = select_by_index_sequence<make_index_sequence_of_range<1, length_v<T> - 1>, T>;
+using tail = select_by_index_sequence<T, make_index_sequence_of_range<1, length_v<T> - 1>>;
 
-template <typename AnyTypeList>
-using tail_t = tail<AnyTypeList>::type;
+template <nonempty_list_of_types T>
+using tail_t = tail<T>::type;
 
 // name after Haskell Data.List init
 // get a type list with the last type removed comparing to the given list
 // O(1) time complexity
 template <nonempty_list_of_types T>
-using init = select_by_index_sequence<std::make_index_sequence<length_v<T> - 1>, T>;
+using init = select_by_index_sequence<T, std::make_index_sequence<length_v<T> - 1>>;
 
-template <typename AnyTypeList>
-using init_t = init<AnyTypeList>::type;
+template <nonempty_list_of_types T>
+using init_t = init<T>::type;
 
 // name after Haskell Data.List take
 // get a type list that contains the first N types of the given list
 // O(1) time complexity
-template <std::size_t N, list_of_types T>
+template <list_of_types T, std::size_t N>
   requires (N <= length_v<T>)
-using take = select_by_index_sequence<std::make_index_sequence<N>, T>;
+using take = select_by_index_sequence<T, std::make_index_sequence<N>>;
 
-template <std::size_t N, typename TypeList>
-using take_t = take<N, TypeList>::type;
+template <list_of_types T, std::size_t N>
+using take_t = take<T, N>::type;
 
 // same as take, but take from the end
 // O(1) time complexity
-template <std::size_t N, list_of_types T>
+template <list_of_types T, std::size_t N>
   requires (N <= length_v<T>)
-struct take_end : select_by_index_sequence<make_index_sequence_of_range<length_v<T> - N, length_v<T> - 1>, T> {};
+struct take_end : select_by_index_sequence<T, make_index_sequence_of_range<length_v<T> - N, length_v<T> - 1>> {};
 
 template <typename T>
   requires is_type_list_v<T>
-struct take_end<0, T> {
+struct take_end<T, 0> {
   using type = empty_type_list;
 };
 
 template <typename T>
   requires is_indexed_type_list_v<T>
-struct take_end<0, T> {
+struct take_end<T, 0> {
   using type = empty_indexed_type_list;
 };
 
-template <std::size_t N, typename AnyTypeList>
-using take_end_t = take_end<N, AnyTypeList>::type;
+template <list_of_types T, std::size_t N>
+using take_end_t = take_end<T, N>::type;
 
 // name after Haskell Data.List drop
 // get a type list with the first N types removed comparing to the given list
 // O(1) time complexity
-template <std::size_t N, list_of_types T>
+template <list_of_types T, std::size_t N>
   requires (N <= length_v<T>)
-using drop = take_end<length_v<T> - N, T>;
+using drop = take_end<T, length_v<T> - N>;
 
-template <std::size_t N, typename AnyTypeList>
-using drop_t = drop<N, AnyTypeList>::type;
+template <list_of_types T, std::size_t N>
+using drop_t = drop<T, N>::type;
 
 // same as drop, but drop from the end
 // O(1) time complexity
-template <std::size_t N, list_of_types T>
+template <list_of_types T, std::size_t N>
   requires (N <= length_v<T>)
-using drop_end = take<length_v<T> - N, T>;
+using drop_end = take<T, length_v<T> - N>;
 
-template <std::size_t N, typename AnyTypeList>
-using drop_end_t = drop_end<N, AnyTypeList>::type;
+template <list_of_types T, std::size_t N>
+using drop_end_t = drop_end<T, N>::type;
 
 } // export namespace fmia::meta
 
 namespace fmia::meta {
 
-template <template <typename> typename, typename, typename = empty_type_list>
+template <typename, template <typename> typename, typename = empty_type_list>
 struct take_while_impl;
 
-template <template <typename> typename Pred, typename TypeListOfTaken>
-struct take_while_impl<Pred, empty_type_list, TypeListOfTaken> {
+template <template <typename> typename Fn, typename TypeListOfTaken>
+struct take_while_impl<empty_type_list, Fn, TypeListOfTaken> {
   using type = TypeListOfTaken;
 };
 
-template <template <typename> typename, typename, typename>
+template <typename, template <typename> typename, typename>
 struct take_while_impl_lazy_evaluation_helper;
 
-template <template <typename> typename Pred, typename T, typename... Ts, typename... Taken>
-struct take_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>, type_list<Taken...>> {
+template <typename T, typename... Ts, template <typename> typename Fn, typename... Taken>
+struct take_while_impl_lazy_evaluation_helper<type_list<T, Ts...>, Fn, type_list<Taken...>> {
   // cannot use inheritance here, otherwise the evaluation is not lazy
-  using type = take_while_impl<Pred, type_list<Ts...>, type_list<Taken..., T>>::type;
+  using type = take_while_impl<type_list<Ts...>, Fn, type_list<Taken..., T>>::type;
 };
 
-template <template <typename> typename Pred, typename T, typename... Ts, typename... Taken>
-struct take_while_impl<Pred, type_list<T, Ts...>, type_list<Taken...>>
+template <typename T, typename... Ts, template <typename> typename Fn, typename... Taken>
+struct take_while_impl<type_list<T, Ts...>, Fn, type_list<Taken...>>
   : std::conditional_t<
-      Pred<T>::value, take_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>, type_list<Taken...>>,
+      Fn<T>::value, take_while_impl_lazy_evaluation_helper<type_list<T, Ts...>, Fn, type_list<Taken...>>,
       std::type_identity<type_list<Taken...>>
     > {};
 
@@ -606,47 +606,49 @@ export namespace fmia::meta {
 // name after Haskell Data.List takeWhile
 // get the longest prefix type list whose types all satisfy a given predicate
 // O(k) time complexity, where k is the length of the longest prefix
-template <template <typename> typename Pred, list_of_types T>
-  requires predicate<Pred>
-using take_while = take_while_impl<Pred, T>;
+template <list_of_types T, template <typename> typename Fn>
+  requires predicate<Fn>
+using take_while = take_while_impl<T, Fn>;
 
-template <template <typename> typename Pred, typename TypeList>
-using take_while_t = take_while<Pred, TypeList>::type;
+template <list_of_types T, template <typename> typename Fn>
+  requires predicate<Fn>
+using take_while_t = take_while<T, Fn>::type;
 
 // get the longest suffix type list whose types all satisfy a given predicate
 // O(k) time complexity, where k is the length of the longest suffix
-template <template <typename> typename Pred, list_of_types T>
-  requires predicate<Pred>
-struct take_while_end : reverse<take_while_t<Pred, reverse_t<T>>> {};
+template <list_of_types T, template <typename> typename Fn>
+  requires predicate<Fn>
+struct take_while_end : reverse<take_while_t<reverse_t<T>, Fn>> {};
 
-template <template <typename> typename Pred, typename TypeList>
-using take_while_end_t = take_while_end<Pred, TypeList>::type;
+template <list_of_types T, template <typename> typename Fn>
+  requires predicate<Fn>
+using take_while_end_t = take_while_end<T, Fn>::type;
 
 } // export namespace fmia::meta
 
 namespace fmia::meta {
 
-template <template <typename> typename, typename>
+template <typename, template <typename> typename>
 struct drop_while_impl;
 
-template <template <typename> typename Pred>
-struct drop_while_impl<Pred, empty_type_list> {
+template <template <typename> typename Fn>
+struct drop_while_impl<empty_type_list, Fn> {
   using type = empty_type_list;
 };
 
-template <template <typename> typename, typename>
+template <typename, template <typename> typename>
 struct drop_while_impl_lazy_evaluation_helper;
 
-template <template <typename> typename Pred, typename T, typename... Ts>
-struct drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>> {
+template <typename T, typename... Ts, template <typename> typename Fn>
+struct drop_while_impl_lazy_evaluation_helper<type_list<T, Ts...>, Fn> {
   // cannot use inheritance here, otherwise the evaluation is not lazy
-  using type = drop_while_impl<Pred, type_list<Ts...>>::type;
+  using type = drop_while_impl<type_list<Ts...>, Fn>::type;
 };
 
-template <template <typename> typename Pred, typename T, typename... Ts>
-struct drop_while_impl<Pred, type_list<T, Ts...>>
+template <typename T, typename... Ts, template <typename> typename Fn>
+struct drop_while_impl<type_list<T, Ts...>, Fn>
   : std::conditional_t<
-      Pred<T>::value, drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>>, std::type_identity<type_list<T, Ts...>>
+      Fn<T>::value, drop_while_impl_lazy_evaluation_helper<type_list<T, Ts...>, Fn>, std::type_identity<type_list<T, Ts...>>
     > {};
 
 } // namespace fmia::meta
@@ -656,128 +658,134 @@ export namespace fmia::meta {
 // name after Haskell Data.List dropWhile
 // get a type list with a longest prefix type list removed, whose types all satisfy a given predicate
 // O(k) time complexity, where k is the longest dropped prefix
-template <template <typename> typename Pred, list_of_types T>
-  requires predicate<Pred>
-using drop_while = drop_while_impl<Pred, T>;
+template <list_of_types T, template <typename> typename Fn>
+  requires predicate<Fn>
+using drop_while = drop_while_impl<T, Fn>;
 
-template <template <typename> typename Pred, typename TypeList>
-using drop_while_t = drop_while<Pred, TypeList>::type;
+template <list_of_types T, template <typename> typename Fn>
+  requires predicate<Fn>
+using drop_while_t = drop_while<T, Fn>::type;
 
 // name after Haskell Data.List dropWhileEnd
 // get a type list with a longest suffix type list removed, whose types all satisfy a given predicate
 // O(k) time complexity, where k is the length of the longest dropped suffix
-template <template <typename> typename Pred, list_of_types T>
-  requires predicate<Pred>
-struct drop_while_end : reverse<drop_while_t<Pred, reverse_t<T>>> {};
+template <list_of_types T, template <typename> typename Fn>
+  requires predicate<Fn>
+struct drop_while_end : reverse<drop_while_t<reverse_t<T>, Fn>> {};
 
-template <template <typename> typename Pred, typename TypeList>
-using drop_while_end_t = drop_while_end<Pred, TypeList>::type;
+template <list_of_types T, template <typename> typename Fn>
+  requires predicate<Fn>
+using drop_while_end_t = drop_while_end<T, Fn>::type;
 
 // name after Haskell Data.List filter
 // get a type list that contains all the types that satisfy a given predicate
 // O(log n) time complexity, limited by `concat`, where n is the length of the given list
-template <template <typename> typename Pred, typename>
-  requires predicate<Pred>
+template <typename, template <typename> typename Fn>
+  requires predicate<Fn>
 struct filter;
 
-template <template <typename> typename Pred>
-struct filter<Pred, empty_type_list> {
+template <template <typename> typename Fn>
+struct filter<empty_type_list, Fn> {
   using type = empty_type_list;
 };
 
-template <template <typename> typename Pred, typename... Ts>
-struct filter<Pred, type_list<Ts...>> : concat<std::conditional_t<Pred<Ts>::value, type_list<Ts>, empty_type_list>...> {};
+template <typename... Ts, template <typename> typename Fn>
+struct filter<type_list<Ts...>, Fn> : concat<std::conditional_t<Fn<Ts>::value, type_list<Ts>, empty_type_list>...> {};
 
-template <template <typename> typename Pred, typename TypeList>
-using filter_t = filter<Pred, TypeList>::type;
+template <typename TypeList, template <typename> typename Fn>
+using filter_t = filter<TypeList, Fn>::type;
 
 // get a type list that only contains the given type T comparing to the given list
 // O(log n) time complexity, where n is the length of the given list
-template <typename T, list_of_types U>
-using keep = filter<bind_front<std::is_same, T>::template type, U>;
+template <list_of_types T, typename U>
+using keep = filter<T, bind_front<std::is_same, U>::template type>;
 
-template <typename T, typename TypeList>
-using keep_t = keep<T, TypeList>::type;
+template <list_of_types T, typename U>
+using keep_t = keep<T, U>::type;
 
 // get a type list that does not contain the given type T comparing to the given list
 // O(log n) time complexity, where n is the length of the given list
-template <typename T, list_of_types U>
-using remove = filter<bind_front<not_same, T>::template type, U>;
+template <list_of_types T, typename U>
+using remove = filter<T, bind_front<not_same, U>::template type>;
 
-template <typename T, typename TypeList>
-using remove_t = remove<T, TypeList>::type;
+template <list_of_types T, typename U>
+using remove_t = remove<T, U>::type;
 
 // apply the given template to every type of the given list
 // O(1) time complexity
-template <template <typename> typename, typename>
+template <typename, template <typename> typename>
 struct transform;
 
-template <template <typename> typename T, typename... Us>
-struct transform<T, type_list<Us...>> {
-  using type = type_list<typename T<Us>::type...>;
+template <typename... Ts, template <typename> typename Fn>
+struct transform<type_list<Ts...>, Fn> {
+  using type = type_list<typename Fn<Ts>::type...>;
 };
 
-template <template <typename> typename T, typename TypeList>
-using transform_t = transform<T, TypeList>::type;
+template <typename TypeList, template <typename> typename Fn>
+using transform_t = transform<TypeList, Fn>::type;
 
 // name after Haskell Data.List any
 // test if any of the types of the given list satisfy the given predicate
 // O(k) time complexity, where k is the length of the longest prefix whose types do not satisfy the given predicate
-template <template <typename> typename T, typename>
-  requires predicate<T>
+template <typename, template <typename> typename Fn>
+  requires predicate<Fn>
 struct any;
 
-template <template <typename> typename T, typename... Us>
-struct any<T, type_list<Us...>> : std::disjunction<T<Us>...> {};
+template <typename... Ts, template <typename> typename Fn>
+struct any<type_list<Ts...>, Fn> : std::disjunction<Fn<Ts>...> {};
 
-template <template <typename> typename T, typename TypeList>
-inline constexpr bool any_v = any<T, TypeList>::value;
+template <typename TypeList, template <typename> typename Fn>
+  requires predicate<Fn>
+inline constexpr bool any_v = any<TypeList, Fn>::value;
 
 // test if none of the types of the given list satisfy the given predicate
-template <template <typename> typename T, list_of_types U>
-using none = std::negation<any<T, U>>;
+template <typename TypeList, template <typename> typename Fn>
+  requires predicate<Fn>
+using none = std::negation<any<TypeList, Fn>>;
 
-template <template <typename> typename T, typename TypeList>
-inline constexpr bool none_v = none<T, TypeList>::value;
+template <typename TypeList, template <typename> typename Fn>
+  requires predicate<Fn>
+inline constexpr bool none_v = none<TypeList, Fn>::value;
 
 // name after Haskell Data.List all
 // test if all of the types of the given list satisfy the given predicate
 // O(k) time complexity, where k is the length of the longest prefix whose types satisfy the given predicate
-template <template <typename> typename T, typename>
-  requires predicate<T>
+template <typename, template <typename> typename Fn>
+  requires predicate<Fn>
 struct all;
 
-template <template <typename> typename T>
-struct all<T, empty_type_list> : std::false_type {};
+template <template <typename> typename Fn>
+struct all<empty_type_list, Fn> : std::false_type {};
 
-template <template <typename> typename T, typename... Us>
-struct all<T, type_list<Us...>> : std::conjunction<T<Us>...> {};
+template <typename... Ts, template <typename> typename Fn>
+struct all<type_list<Ts...>, Fn> : std::conjunction<Fn<Ts>...> {};
 
-template <template <typename> typename T, typename TypeList>
-inline constexpr bool all_v = all<T, TypeList>::value;
+template <typename TypeList, template <typename> typename Fn>
+  requires predicate<Fn>
+inline constexpr bool all_v = all<TypeList, Fn>::value;
 
 template <typename, typename>
 struct has_any;
 
 template <typename T>
-struct has_any<T, empty_type_list> : std::false_type {};
+struct has_any<empty_type_list, T> : std::false_type {};
 
 template <typename T>
-struct has_any<T, empty_indexed_type_list> : std::false_type {};
+struct has_any<empty_indexed_type_list, T> : std::false_type {};
 
-template <typename T, typename... Us>
-struct has_any<T, type_list<Us...>> : is_any_of<T, Us...> {};
+template <typename... Ts, typename T>
+struct has_any<type_list<Ts...>, T> : is_any_of<T, Ts...> {};
 
-template <typename T, std::size_t... Is, typename... Us>
-struct has_any<T, indexed_type_list<std::index_sequence<Is...>, type_list<Us...>>> : is_any_of<T, Us...> {};
+template <std::size_t... Is, typename... Ts, typename T>
+struct has_any<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>, T> : is_any_of<T, Ts...> {};
 
-template <typename T, typename AnyTypeList>
-inline constexpr bool has_any_v = has_any<T, AnyTypeList>::value;
+template <typename AnyTypeList, typename T>
+inline constexpr bool has_any_v = has_any<AnyTypeList, T>::value;
 
-template <typename T, list_of_types U>
+template <list_of_types T, typename U>
 using has_none = std::negation<has_any<T, U>>;
 
-template <typename T, typename U>
+template <list_of_types T, typename U>
 inline constexpr bool has_none_v = has_none<T, U>::value;
 
 } // export namespace fmia::meta
