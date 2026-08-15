@@ -83,7 +83,7 @@ struct indexed_type {
 };
 
 template <std::size_t I, typename T>
-constexpr auto indexed_type_v = indexed_type<I, T>::idx;
+inline constexpr auto indexed_type_v = indexed_type<I, T>::idx;
 
 template <std::size_t I, typename T>
 using indexed_type_t = indexed_type<I, T>::type;
