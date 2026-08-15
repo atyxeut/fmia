@@ -57,6 +57,9 @@ void print(R&& number, iofmt format = iofmt::none) {
 template <std::integral Limb = int>
 [[nodiscard]] constexpr std::vector<Limb> parse(std::string_view s) {
   const auto n = s.size();
+  if (n == 1 && s[0] == '0')
+    return {};
+
   std::vector<Limb> res(n);
   for (auto i = 0uz; i < n; ++i)
     res[i] = s[n - i - 1] - '0';
@@ -70,13 +73,13 @@ template <std::integral Limb = int>
   return parse<Limb>(s);
 }
 
-template <typename Limb>
-[[nodiscard]] constexpr bool is_zero(const std::vector<Limb>& num) noexcept {
-  return num.size() == 1 && num[0] == 0;
+template <std::integral Limb>
+[[nodiscard]] constexpr bool is_zero(const std::vector<Limb>& number) noexcept {
+  return number.empty();
 }
 
-// a < b : -1, a = b: 0, a > b: 1
-template <typename Limb>
+// -1: a < b, 0: a = b, 1: a > b
+template <std::integral Limb>
 [[nodiscard]] constexpr int compare(std::span<const Limb> a, std::span<const Limb> b) noexcept {
   const auto al = a.size();
   const auto bl = b.size();
@@ -115,128 +118,137 @@ constexpr Limb carry_impl(Range&& number) noexcept {
 
 export namespace fmia::big_integer::naive {
 
-template <typename Limb, Limb Radix = 10, std::ranges::forward_range R>
+template <std::integral Limb, Limb Radix = 10, std::ranges::forward_range R>
 constexpr auto carry_unsigned(R&& number) noexcept {
   return carry_impl<carry_policy::assume_unsigned, Limb, Radix>(std::forward<R>(number));
 }
 
-template <typename Limb, Limb Radix = 10, std::ranges::forward_range R>
+template <std::integral Limb, Limb Radix = 10, std::ranges::forward_range R>
 constexpr auto carry(R&& number) noexcept {
   return carry_impl<carry_policy::none, Limb, Radix>(std::forward<R>(number));
 }
 
-template <typename Limb>
-constexpr void remove_lz(std::vector<Limb>& num) noexcept {
-  while (num.size() > 1 && num.back() == 0)
-    num.pop_back();
+template <std::integral Limb>
+constexpr void remove_lz(std::vector<Limb>& number) noexcept {
+  while (!number.empty() && number.back() == 0)
+    number.pop_back();
 }
 
-[[nodiscard]] constexpr std::vector<int> add(const std::vector<int>& a, const std::vector<int>& b) {
-  std::vector<int> ans(std::max(a.size(), b.size()) + 1);
+template <std::integral Limb>
+[[nodiscard]] constexpr std::vector<Limb> add(const std::vector<Limb>& a, const std::vector<Limb>& b) {
+  if (is_zero(a))
+    return b;
+  if (is_zero(b))
+    return a;
 
+  std::vector<Limb> ans(std::max(a.size(), b.size()) + 1);
   for (auto i = 0uz; i < a.size(); ++i)
     ans[i] += a[i];
   for (auto i = 0uz; i < b.size(); ++i)
     ans[i] += b[i];
-
-  carry_unsigned<int>(ans);
+  carry_unsigned<Limb>(ans);
   remove_lz(ans);
   return ans;
 }
 
+template <std::integral Limb>
 struct sub_result {
-  int sgn;
-  std::vector<int> mag;
+  bool negative;
+  std::vector<Limb> mag;
 };
 
-void print(const sub_result& result, bool new_line = false) {
-  if (result.sgn < 0)
-    std::cout << '-';
-  print(result.mag, new_line);
+template <std::integral Limb>
+void print(const sub_result<Limb>& result, iofmt format = iofmt::none) {
+  if (result.negative)
+    std::print("-");
+  print(result.mag, format);
 }
 
-[[nodiscard]] constexpr sub_result sub(const std::vector<int>& a, const std::vector<int>& b) {
-  std::vector<int> ans(std::max(a.size(), b.size()));
+template <std::integral Limb>
+[[nodiscard]] constexpr sub_result<Limb> sub(const std::vector<Limb>& a, const std::vector<Limb>& b) {
+  if (is_zero(a))
+    return {true, b};
+  if (is_zero(b))
+    return {false, a};
 
+  std::vector<Limb> ans(std::max(a.size(), b.size()));
   const int sgn = compare<int>(a, b);
-
   for (auto i = 0uz; i < a.size(); ++i)
     ans[i] += a[i] * sgn;
   for (auto i = 0uz; i < b.size(); ++i)
     ans[i] -= b[i] * sgn;
-
-  carry<int>(ans);
+  carry<Limb>(ans);
   remove_lz(ans);
-  return {sgn, std::move(ans)};
+  return {sgn < 0, std::move(ans)};
 }
 
-[[nodiscard]] constexpr std::vector<int> mul(const std::vector<int>& a, const std::vector<int>& b) {
+template <std::integral Limb>
+[[nodiscard]] constexpr std::vector<Limb> mul(const std::vector<Limb>& a, const std::vector<Limb>& b) {
   if (is_zero(a) || is_zero(b))
-    return std::vector<int> {0};
+    return std::vector<Limb> {};
 
   // delayed carry is always safe here, ans[k] accumulates at most min(la, lb) additions, assume that every addition is ans[k] += 9 * 9,
   // it requires (2^31 - 1) / 81 > 1e7 additions to overflow, such inputs are far beyond the capability of this O(n^2) algorithm
-  std::vector<int> ans(a.size() + b.size());
+  std::vector<Limb> ans(a.size() + b.size());
 
   for (auto i = 0uz; i < a.size(); ++i)
     for (auto j = 0uz; j < b.size(); ++j)
       ans[i + j] += a[i] * b[j];
 
-  carry_unsigned<int>(ans);
+  carry_unsigned<Limb>(ans);
   remove_lz(ans);
   return ans;
 }
 
-template <typename Remainder>
+template <std::integral Limb, typename Remainder>
 struct floor_div_result {
-  std::vector<int> q;
+  std::vector<Limb> q;
   Remainder r;
 };
 
 FMIA_WCONVERSION_PUSH()
 
 // used when b is way smaller than a
-[[nodiscard]] constexpr floor_div_result<int> floor_div(const std::vector<int>& a, int b)
-// ICE:
+template <std::integral Limb>
+[[nodiscard]] constexpr floor_div_result<Limb, long long> floor_div(const std::vector<Limb>& a, int b)
+// ICE in debug mode
 // pre(b != 0)
 {
-  std::vector<int> q(a.size());
+  std::vector<Limb> q(a.size());
   long long r = 0;
-
   for (auto i = q.size(); i > 0;) {
     --i;
     r = r * 10 + a[i];
     q[i] = r / b;
     r %= b;
   }
-
   remove_lz(q);
-  return {std::move(q), static_cast<int>(r)};
+  return {std::move(q), r};
 }
 
-[[nodiscard]] constexpr floor_div_result<std::vector<int>> floor_div(const std::vector<int>& a, const std::vector<int>& b) pre(
+template <std::integral Limb>
+[[nodiscard]] constexpr floor_div_result<Limb, std::vector<Limb>> floor_div(const std::vector<Limb>& a, const std::vector<Limb>& b) pre(
   !is_zero(b)
 ) {
-  const int comp_result = compare<int>(a, b);
+  const int comp_result = compare<Limb>(a, b);
   if (comp_result < 0)
-    return {{0}, a};
+    return {{}, a};
   if (comp_result == 0)
-    return {{1}, {0}};
+    return {{1}, {}};
 
-  std::vector<int> q(a.size() - b.size() + 1), r(a);
-
+  std::vector<Limb> q(a.size() - b.size() + 1);
+  std::vector<Limb> r(a);
   bool not_first_digit = false;
   for (auto i = q.size(); i > 0;) {
     --i;
-    while ((not_first_digit && r[i + b.size()] != 0) || compare<int>(std::span(r.begin() + i, b.size()), b) >= 0) {
+    while ((not_first_digit && r[i + b.size()] != 0) || compare<Limb>(std::span(r.begin() + i, b.size()), b) >= 0) {
       ++q[i];
       for (auto j = 0uz; j < b.size(); ++j)
         r[i + j] -= b[j];
-      carry<int>(std::span(r.begin() + i, b.size() + not_first_digit));
+      carry<Limb>(std::span(r.begin() + i, b.size() + not_first_digit));
     }
     not_first_digit = true;
   }
-
   remove_lz(q);
   r.resize(b.size());
   remove_lz(r);
@@ -245,37 +257,37 @@ FMIA_WCONVERSION_PUSH()
 
 FMIA_WCONVERSION_POP()
 
+template <std::integral Limb>
 struct div_result {
-  std::vector<int> q_int;
-  std::vector<int> q_frac; // not store the digits in reverse order
+  std::vector<Limb> q_int;
+  std::vector<Limb> q_frac; // big endian
 };
 
-void print(const div_result& result, bool new_line = false) {
-  print(result.q_int, false);
+template <std::integral Limb>
+void print(const div_result<Limb>& result, iofmt format = iofmt::none) {
+  print(result.q_int);
   if (!result.q_frac.empty())
-    std::cout << '.';
-  print(std::views::reverse(result.q_frac), new_line);
+    std::print(".");
+  print(std::views::reverse(result.q_frac), format);
 }
 
 FMIA_WCONVERSION_PUSH()
 
 // will calculate to precision + 1 decimal digits and round to the nearest
-[[nodiscard]] constexpr div_result div(const std::vector<int>& a, int b, usize precision = 16) {
-  auto [q_int, r_] = floor_div(a, b);
-  long long r = r_;
-
+template <std::integral Limb>
+[[nodiscard]] constexpr div_result<Limb> div(const std::vector<Limb>& a, int b, usize precision = 16) {
+  auto [q_int, r] = floor_div(a, b);
   if (precision == 0) {
     if (r * 10 / b >= 5) {
       ++q_int[0];
-      if (int carry = carry_unsigned<int>(q_int); carry > 0)
+      if (Limb carry = carry_unsigned<Limb>(q_int); carry > 0)
         q_int.resize(q_int.size() + 1, carry);
     }
-    return {std::move(q_int), std::vector<int> {}};
+    return {std::move(q_int), std::vector<Limb> {}};
   }
 
   ++precision;
-  std::vector<int> q_frac(precision);
-
+  std::vector<Limb> q_frac(precision);
   for (auto i = 0uz; i < precision; ++i) {
     r *= 10;
     q_frac[i] = r / b;
@@ -285,7 +297,7 @@ FMIA_WCONVERSION_PUSH()
     ++q_frac[precision - 2];
     if (carry_unsigned<int>(std::views::reverse(std::span(q_frac.begin(), q_frac.begin() + precision - 1))) > 0) {
       ++q_int[0];
-      if (int carry = carry_unsigned<int>(q_int); carry != 0)
+      if (Limb carry = carry_unsigned<Limb>(q_int); carry != 0)
         q_int.resize(q_int.size() + 1, carry);
     }
   }
@@ -296,11 +308,12 @@ FMIA_WCONVERSION_PUSH()
 
 FMIA_WCONVERSION_POP()
 
-[[nodiscard]] constexpr std::vector<int> pow(std::vector<int> a, int n) pre(n >= 0) {
+template <std::integral Limb>
+[[nodiscard]] constexpr std::vector<Limb> pow(std::vector<Limb> a, int n) pre(n >= 0) {
   if (n == 0)
     return {1};
 
-  std::vector<int> ans {1};
+  std::vector<Limb> ans {1};
   while (true) {
     if (n & 1)
       ans = mul(ans, a);
@@ -318,7 +331,8 @@ FMIA_WCONVERSION_PUSH()
   if (n == 1 || is_zero(a))
     return a;
 
-  std::vector<int> l {0}, r(pow(std::vector<int> {0, 1}, a.size() / n + 1));
+  std::vector<int> l;
+  std::vector<int> r(pow(std::vector<int> {0, 1}, a.size() / n + 1));
   while (compare<int>(add(l, std::vector<int> {1}), r) < 0) {
     std::vector<int> mid(floor_div(add(l, r), 2).q);
     if (compare<int>(pow(mid, n), a) <= 0)
@@ -396,7 +410,7 @@ public:
   static constexpr limb_type digits_per_limb = 6;
 
 private:
-  limb_type sgn_;
+  bool negative_;
   std::vector<limb_type> mag_;
 
 public:
@@ -404,7 +418,7 @@ public:
 
   explicit constexpr digit_storage(std::string_view s) {
     const auto ns = preprocess_input_string(s);
-    sgn_ = s[0] == '-' ? -1 : 1;
+    negative_ = s[0] == '-';
     mag_.resize(get_digit_limb_count<limb_type, digits_per_limb>(ns));
     set_digit_limbs<limb_type, digits_per_limb>(ns, mag_);
   }
@@ -417,7 +431,7 @@ public:
   }
 
   friend auto& operator <<(std::ostream& ostr, const digit_storage& n) {
-    if (n.sgn_ < 0)
+    if (n.negative_)
       ostr << '-';
     print_digit_limbs<limb_type, digits_per_limb>(ostr, n.mag_);
     return ostr;

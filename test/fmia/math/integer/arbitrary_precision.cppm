@@ -5,6 +5,7 @@ export module test.fmia.math.integer.arbitrary_precision;
 
 import std;
 
+import fmia.io.format_flag;
 import fmia.math.integer.arbitrary_precision;
 
 using namespace fmia;
@@ -22,19 +23,19 @@ void check_naive_div() {
 
   // 6448188312553677787699
   std::cout << "precision 0: ";
-  naive::print(naive::div(a, b, 0), true);
+  naive::print(naive::div(a, b, 0), iofmt::endl);
 
   // 6448188312553677787699.2290480687418245
   std::cout << "precision 16 (default): ";
-  naive::print(naive::div(a, b), true);
+  naive::print(naive::div(a, b), iofmt::endl);
 
   // 6448188312553677787699.22904806874182450992140197657113986861479462525565
   std::cout << "precision 50: ";
-  naive::print(naive::div(a, b, 50), true);
+  naive::print(naive::div(a, b, 50), iofmt::endl);
 
   // 6448188312553677787699.229048068741824509921401976571139868614794625255649269211874003155098298171115246681084506
   std::cout << "precision 90: ";
-  naive::print(naive::div(a, b, 90), true);
+  naive::print(naive::div(a, b, 90), iofmt::endl);
 
   std::cout << "group 2:\n";
 
@@ -43,11 +44,11 @@ void check_naive_div() {
 
   // 316912650057057350374175801344
   std::cout << "precision 0: ";
-  naive::print(naive::div(c, d, 0), true);
+  naive::print(naive::div(c, d, 0), iofmt::endl);
 
   // 316912650057057350374175801344.00000000000000000000000000000000000000000000000000
   std::cout << "precision 50: ";
-  naive::print(naive::div(c, d, 50), true);
+  naive::print(naive::div(c, d, 50), iofmt::endl);
 }
 
 void check_naive_class_ctor_and_output_with_std_ostream() {
