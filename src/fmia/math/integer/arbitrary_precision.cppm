@@ -10,6 +10,7 @@ export module fmia.math.integer.arbitrary_precision;
 import std;
 
 import fmia.data_structure.string.character;
+import fmia.io.format_flag;
 import fmia.math.integer.fixed_precision;
 
 export namespace fmia::meta {
@@ -44,6 +45,14 @@ export namespace fmia::big_integer::naive {
 
 // basic utils for unsigned operands in radix 10^k
 
+template <std::ranges::bidirectional_range R>
+void print(R&& number, iofmt format = iofmt::none) {
+  for (const auto limb : number | std::views::reverse)
+    std::print("{}", limb);
+  if (format == iofmt::endl)
+    std::println();
+}
+
 [[nodiscard]] constexpr std::vector<int> parse(std::string_view s) {
   const auto n = s.size();
   std::vector<int> ret(n);
@@ -56,14 +65,6 @@ export namespace fmia::big_integer::naive {
   std::string s;
   std::cin >> s;
   return parse(s);
-}
-
-template <std::ranges::input_range R>
-void print(R&& num, bool new_line = false) {
-  for (const auto digit : num | std::views::reverse)
-    std::cout << digit;
-  if (new_line)
-    std::cout << '\n';
 }
 
 template <typename Limb>
