@@ -20,7 +20,7 @@ template <std::meta::info Sort>
 void check(std::size_t array_size) {
   const auto check_impl = [](std::vector<element_type>& data) {
     [:Sort:](data.begin(), data.end(), comp);
-    contract_assert(std::ranges::is_sorted(data));
+    contract_assert(std::ranges::is_sorted(data, comp));
     contract_assert(!comp(data.back(), data.front()));
   };
 
