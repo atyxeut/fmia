@@ -53,18 +53,21 @@ void print(R&& number, iofmt format = iofmt::none) {
     std::println();
 }
 
-[[nodiscard]] constexpr std::vector<int> parse(std::string_view s) {
+// s must be an unsigned integer, otherwise the behavior is undefined
+template <std::integral Limb = int>
+[[nodiscard]] constexpr std::vector<Limb> parse(std::string_view s) {
   const auto n = s.size();
-  std::vector<int> ret(n);
+  std::vector<Limb> res(n);
   for (auto i = 0uz; i < n; ++i)
-    ret[i] = s[n - i - 1] - '0';
-  return ret;
+    res[i] = s[n - i - 1] - '0';
+  return res;
 }
 
-[[nodiscard]] std::vector<int> input() {
+template <std::integral Limb = int>
+[[nodiscard]] std::vector<Limb> input() {
   std::string s;
   std::cin >> s;
-  return parse(s);
+  return parse<Limb>(s);
 }
 
 template <typename Limb>
