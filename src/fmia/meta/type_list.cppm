@@ -248,6 +248,12 @@ struct cons<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>, T> 
 template <typename AnyTypeList, typename T>
 using cons_t = cons<AnyTypeList, T>::type;
 
+template <typename AnyTypeList, typename T, bool B>
+struct cons_if : std::conditional<B, cons_t<AnyTypeList, T>, AnyTypeList> {};
+
+template <typename AnyTypeList, typename T, bool B>
+using cons_if_t = cons_if<AnyTypeList, T, B>::type;
+
 // get a type list that has one element added to the end comparing to the given list
 // O(1) time complexity for type_list
 // O(n) time complexity for indexed_type_list (because of the validation for indices), where n is the length of the given list
