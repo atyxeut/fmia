@@ -42,7 +42,7 @@ concept nonbool_integral = integral<T> && !boolean<T>;
 
 export namespace fmia::big_integer::naive {
 
-// +, -, *, /, %, power, root operations for nonnegative operands (radix 10^k) with free functions
+// basic utils for unsigned operands in radix 10^k
 
 [[nodiscard]] constexpr std::vector<int> parse(std::string_view s) {
   const auto n = s.size();
