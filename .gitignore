@@ -5,6 +5,7 @@
 !COPYING.LESSER
 !LICENSE
 !README.md
+!VERSION
 
 !ruff.toml
 !.clangd
