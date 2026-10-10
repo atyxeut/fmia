@@ -3,4 +3,5 @@
 
 export module fmia.misc;
 
+export import fmia.misc.n_queens;
 export import fmia.misc.tower_of_hanoi;
